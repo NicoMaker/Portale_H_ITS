@@ -10,6 +10,14 @@
   <div class="navbar">Dashboard Utente</div>
   <div class="container">
     <h2>Benvenuto nella tua dashboard</h2>
+    <div id="user-filters" style="margin-bottom:1.5rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center;">
+      <label for="filter-teacher-u" style="font-weight:600;">Docente:</label>
+      <input type="text" id="filter-teacher-u" placeholder="Cerca docente" style="width:120px;" />
+      <label for="filter-room-u" style="font-weight:600;">Aula:</label>
+      <input type="text" id="filter-room-u" placeholder="Cerca aula" style="width:90px;" />
+      <label for="filter-subject-u" style="font-weight:600;">Materia:</label>
+      <input type="text" id="filter-subject-u" placeholder="Cerca materia" style="width:120px;" />
+    </div>
     <div id="user-courses"></div>
     <div id="user-courses-debug" class="hint"></div>
     <a href="/logout" style="display:inline-block;margin-bottom:1.5rem;">Logout</a>

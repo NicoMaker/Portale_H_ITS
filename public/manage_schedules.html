@@ -9,10 +9,24 @@
 <body>
   <div class="navbar"><span style="font-size:1.5em;vertical-align:middle;">🗓️</span> Gestione Orari</div>
   <div class="container" style="max-width:900px;">
-    <div style="margin-bottom:1.5rem;display:flex;align-items:center;gap:1.5rem;">
-      <label for="filter-course" style="font-weight:600;">Filtra per corso:</label>
-      <select id="filter-course" style="margin-left:1rem;"></select>
-      <button id="add-schedule-btn" style="margin-left:auto;">+ Aggiungi Orario</button>
+    <div class="filters-bar">
+      <div class="filter-group">
+        <label for="filter-course"><span class="filter-icon">📚</span>Corso</label>
+        <select id="filter-course"></select>
+      </div>
+      <div class="filter-group">
+        <label for="filter-teacher"><span class="filter-icon">👨‍🏫</span>Docente</label>
+        <input type="text" id="filter-teacher" placeholder="Cerca docente" />
+      </div>
+      <div class="filter-group">
+        <label for="filter-room"><span class="filter-icon">🏫</span>Aula</label>
+        <input type="text" id="filter-room" placeholder="Cerca aula" />
+      </div>
+      <div class="filter-group">
+        <label for="filter-subject"><span class="filter-icon">📖</span>Materia</label>
+        <input type="text" id="filter-subject" placeholder="Cerca materia" />
+      </div>
+      <button id="add-schedule-btn" class="primary-btn">+ Aggiungi Orario</button>
     </div>
     <div id="schedules-list"></div>
     <a href="/admin_dashboard.html" style="display:inline-block;margin-top:2.5rem;">Torna alla Dashboard</a>
@@ -25,6 +39,7 @@
         <select id="edit-course-select" required></select>
         <input type="text" id="edit-teacher" placeholder="Docente" required />
         <input type="text" id="edit-room" placeholder="Aula" required />
+        <input type="text" id="edit-subject" placeholder="Materia" required />
         <input type="text" id="edit-day" placeholder="Giorno" required />
         <input type="date" id="edit-date" required />
         <div style="display:flex;gap:1rem;">
@@ -45,6 +60,7 @@
         <select id="add-course-select" required></select>
         <input type="text" id="add-teacher" placeholder="Docente" required />
         <input type="text" id="add-room" placeholder="Aula" required />
+        <input type="text" id="add-subject" placeholder="Materia" required />
         <input type="text" id="add-day" placeholder="Giorno" required />
         <input type="date" id="add-date" required />
         <div style="display:flex;gap:1rem;">

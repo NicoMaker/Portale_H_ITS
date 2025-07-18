@@ -1,5 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
-  fetch('/user/courses').then(r=>r.json()).then(courses => {
+  let allSchedules = [];
+  let allCourses = [];
+  // Funzione per filtrare e renderizzare
+  function renderUserCourses(courses, schedules) {
+    const teacherFilter = document.getElementById('filter-teacher-u').value.toLowerCase();
+    const roomFilter = document.getElementById('filter-room-u').value.toLowerCase();
+    const subjectFilter = document.getElementById('filter-subject-u').value.toLowerCase();
     let html = '<h3>🎓 Corsi assegnati</h3>';
     let debug = '';
     if (!courses.length) {
@@ -9,29 +15,36 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('user-courses-debug').textContent = debug;
       return;
     }
-    html += '<div class="courses-list">' + courses.map(c=>`<div class='course-card'><h4>${c.name} <span class='badge'>ID: ${c.id}</span></h4><p>${c.description||''}</p><div id='schedule-for-course-${c.id}'></div></div>`).join('') + '</div>';
+    html += '<div class="courses-list">' + courses.map(c=>{
+      // Filtra orari per corso e per filtri
+      const scheds = schedules.filter(s=>s.course_id==c.id &&
+        (!teacherFilter || (s.teacher && s.teacher.toLowerCase().includes(teacherFilter))) &&
+        (!roomFilter || (s.room && s.room.toLowerCase().includes(roomFilter))) &&
+        (!subjectFilter || (s.subject && s.subject.toLowerCase().includes(subjectFilter)))
+      );
+      let schedHtml = '<h4 style="margin:1rem 0 0.5rem 0">🗓️ Orari</h4>';
+      if (!scheds.length) {
+        schedHtml += '<div class="hint">Nessun orario trovato per questi filtri.</div>';
+      } else {
+        schedHtml += '<div style="overflow-x:auto"><table class="schedule-table"><tr><th>Docente</th><th>Aula</th><th>Materia</th><th>Giorno</th><th>Data</th><th>Inizio</th><th>Fine</th></tr>' +
+          scheds.map(s=>`<tr><td>${s.teacher}</td><td>${s.room}</td><td>${s.subject||''}</td><td>${s.day}</td><td>${formatDate(s.date)}</td><td>${s.start_time}</td><td>${s.end_time}</td></tr>`).join('') + '</table></div>';
+      }
+      return `<div class='course-card'><h4>${c.name} <span class='badge'>ID: ${c.id}</span></h4><p>${c.description||''}</p><div id='schedule-for-course-${c.id}'>${schedHtml}</div></div>`;
+    }).join('') + '</div>';
     debug = 'Corsi collegati: ' + courses.map(c=>`${c.name} (ID: ${c.id})`).join(', ');
     document.getElementById('user-courses').innerHTML = html;
     document.getElementById('user-courses-debug').textContent = debug;
-    // Fetch orari una sola volta
+  }
+  // Fetch dati e setup filtri
+  fetch('/user/courses').then(r=>r.json()).then(courses => {
+    allCourses = courses;
     fetch('/user/schedules').then(r=>r.json()).then(schedules => {
-      courses.forEach(c => {
-        const scheds = schedules.filter(s=>s.course_id==c.id);
-        let schedHtml = '<h4 style="margin:1rem 0 0.5rem 0">🗓️ Orari</h4>';
-        if (!scheds.length) {
-          schedHtml += '<div class="hint">Nessun orario trovato per questo corso. Contatta l’amministratore per aggiungere orari.</div>';
-        } else {
-          schedHtml += '<div style="overflow-x:auto"><table class="schedule-table"><tr><th>Docente</th><th>Aula</th><th>Giorno</th><th>Data</th><th>Inizio</th><th>Fine</th></tr>' +
-            scheds.map(s=>`<tr><td>${s.teacher}</td><td>${s.room}</td><td>${s.day}</td><td>${formatDate(s.date)}</td><td>${s.start_time}</td><td>${s.end_time}</td></tr>`).join('') + '</table></div>';
-        }
-        document.getElementById('schedule-for-course-'+c.id).innerHTML = schedHtml;
+      allSchedules = schedules;
+      renderUserCourses(allCourses, allSchedules);
+      // Setup filtri
+      ['filter-teacher-u','filter-room-u','filter-subject-u'].forEach(id=>{
+        document.getElementById(id).oninput = () => renderUserCourses(allCourses, allSchedules);
       });
-      if (!schedules.length && courses.length) {
-        // Nessun orario in assoluto
-        courses.forEach(c => {
-          document.getElementById('schedule-for-course-'+c.id).innerHTML = '<div class="hint">Nessun orario presente nel sistema per questo corso.</div>';
-        });
-      }
     }).catch(() => {
       courses.forEach(c => {
         document.getElementById('schedule-for-course-'+c.id).innerHTML = '<div class="hint">Errore nel recupero degli orari. Riprova più tardi.</div>';

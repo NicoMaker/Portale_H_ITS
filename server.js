@@ -34,6 +34,7 @@ function initDb() {
       course_id INTEGER NOT NULL,
       teacher TEXT NOT NULL,
       room TEXT NOT NULL,
+      subject TEXT NOT NULL,
       start_time TEXT NOT NULL,
       end_time TEXT NOT NULL,
       day TEXT NOT NULL,
@@ -317,9 +318,16 @@ const server = http.createServer((req, res) => {
     if (!session || session.user.role !== 'admin') {
       res.writeHead(403); res.end('Forbidden'); return;
     }
-    // GET /api/schedules
+    // GET /api/schedules + ricerca
     if (req.method === 'GET' && parsedUrl.pathname === '/api/schedules') {
-      db.all('SELECT s.*, c.name as course_name FROM schedules s LEFT JOIN courses c ON s.course_id=c.id', [], (err, schedules) => {
+      // Filtri: teacher, room, subject
+      const { teacher, room, subject } = parsedUrl.query;
+      let query = 'SELECT s.*, c.name as course_name FROM schedules s LEFT JOIN courses c ON s.course_id=c.id WHERE 1=1';
+      const params = [];
+      if (teacher) { query += ' AND s.teacher LIKE ?'; params.push(`%${teacher}%`); }
+      if (room) { query += ' AND s.room LIKE ?'; params.push(`%${room}%`); }
+      if (subject) { query += ' AND s.subject LIKE ?'; params.push(`%${subject}%`); }
+      db.all(query, params, (err, schedules) => {
         if (err) { res.writeHead(500); res.end('DB error'); return; }
         res.end(JSON.stringify(schedules));
       });
@@ -327,9 +335,9 @@ const server = http.createServer((req, res) => {
     }
     // POST /api/schedules
     if (req.method === 'POST' && parsedUrl.pathname === '/api/schedules') {
-      parseBody(({course_id, teacher, room, day, date, start_time, end_time}) => {
-        db.run('INSERT INTO schedules (course_id, teacher, room, day, date, start_time, end_time) VALUES (?, ?, ?, ?, ?, ?, ?)',
-          [course_id, teacher, room, day, date, start_time, end_time], function(err) {
+      parseBody(({course_id, teacher, room, subject, day, date, start_time, end_time}) => {
+        db.run('INSERT INTO schedules (course_id, teacher, room, subject, day, date, start_time, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+          [course_id, teacher, room, subject, day, date, start_time, end_time], function(err) {
           if (err) { res.writeHead(400); res.end('Errore inserimento orario'); return; }
           res.end('OK');
         });
@@ -339,9 +347,9 @@ const server = http.createServer((req, res) => {
     // PUT /api/schedules/:id
     if (req.method === 'PUT' && parsedUrl.pathname.match(/^\/api\/schedules\/\d+$/)) {
       const id = parsedUrl.pathname.split('/')[3];
-      parseBody(({course_id, teacher, room, day, date, start_time, end_time}) => {
-        db.run('UPDATE schedules SET course_id=?, teacher=?, room=?, day=?, date=?, start_time=?, end_time=? WHERE id=?',
-          [course_id, teacher, room, day, date, start_time, end_time, id], function(err) {
+      parseBody(({course_id, teacher, room, subject, day, date, start_time, end_time}) => {
+        db.run('UPDATE schedules SET course_id=?, teacher=?, room=?, subject=?, day=?, date=?, start_time=?, end_time=? WHERE id=?',
+          [course_id, teacher, room, subject, day, date, start_time, end_time, id], function(err) {
           if (err) { res.writeHead(400); res.end('Errore update orario'); return; }
           res.end('OK');
         });

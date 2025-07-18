@@ -22,8 +22,14 @@ function formatDate(iso) {
 }
 function renderSchedules() {
   const courseId = document.getElementById('filter-course').value;
+  const teacherFilter = document.getElementById('filter-teacher').value.toLowerCase();
+  const roomFilter = document.getElementById('filter-room').value.toLowerCase();
+  const subjectFilter = document.getElementById('filter-subject').value.toLowerCase();
   let filtered = schedules;
-  if(courseId) filtered = schedules.filter(s=>String(s.course_id)===String(courseId));
+  if(courseId) filtered = filtered.filter(s=>String(s.course_id)===String(courseId));
+  if(teacherFilter) filtered = filtered.filter(s=>s.teacher && s.teacher.toLowerCase().includes(teacherFilter));
+  if(roomFilter) filtered = filtered.filter(s=>s.room && s.room.toLowerCase().includes(roomFilter));
+  if(subjectFilter) filtered = filtered.filter(s=>s.subject && s.subject.toLowerCase().includes(subjectFilter));
   // Ordina per data e ora
   filtered = filtered.slice().sort((a,b)=>{
     if(a.date===b.date) return a.start_time.localeCompare(b.start_time);
@@ -31,15 +37,16 @@ function renderSchedules() {
   });
   let html = '';
   if (!filtered.length) {
-    html = '<div class="hint">Nessun orario per questo corso.</div>';
+    html = '<div class="hint">Nessun orario per questi filtri.</div>';
   } else {
-    html = `<div class='table-responsive'><table class='modern-table'><thead><tr><th>ID</th><th>Corso</th><th>Docente</th><th>Aula</th><th>Giorno</th><th>Data</th><th>Inizio</th><th>Fine</th><th>Azioni</th></tr></thead><tbody>`;
+    html = `<div class='table-responsive'><table class='modern-table'><thead><tr><th>ID</th><th>Corso</th><th>Docente</th><th>Aula</th><th>Materia</th><th>Giorno</th><th>Data</th><th>Inizio</th><th>Fine</th><th>Azioni</th></tr></thead><tbody>`;
     filtered.forEach(s => {
       const course = courses.find(c=>c.id==s.course_id);
       html += `<tr><td><span class='badge' style='background:var(--primary-light);color:#fff;'>${s.id}</span></td>`;
       html += `<td><span class='badge' style='background:#f1f5f9;color:var(--primary);'>${course?course.name:''}</span></td>`;
       html += `<td>${s.teacher}</td>`;
       html += `<td>${s.room}</td>`;
+      html += `<td>${s.subject||''}</td>`;
       html += `<td>${s.day}</td>`;
       html += `<td>${formatDate(s.date)}</td>`;
       html += `<td>${s.start_time}</td>`;
@@ -50,12 +57,17 @@ function renderSchedules() {
   }
   document.getElementById('schedules-list').innerHTML = html;
 }
+// Aggiorna i filtri per ricerca live
+['filter-teacher','filter-room','filter-subject'].forEach(id=>{
+  document.getElementById(id).oninput = renderSchedules;
+});
 function openEditSchedule(id) {
   editingScheduleId = id;
   const s = schedules.find(x=>x.id==id);
   document.getElementById('edit-course-select').innerHTML = courses.map(c=>`<option value="${c.id}"${c.id==s.course_id?' selected':''}>${c.name}</option>`).join('');
   document.getElementById('edit-teacher').value = s.teacher;
   document.getElementById('edit-room').value = s.room;
+  document.getElementById('edit-subject').value = s.subject||'';
   document.getElementById('edit-day').value = s.day;
   document.getElementById('edit-date').value = s.date;
   document.getElementById('edit-start').value = s.start_time;
@@ -79,6 +91,7 @@ document.getElementById('edit-schedule-form').onsubmit = async function(e) {
   const course_id = document.getElementById('edit-course-select').value;
   const teacher = document.getElementById('edit-teacher').value;
   const room = document.getElementById('edit-room').value;
+  const subject = document.getElementById('edit-subject').value;
   const day = document.getElementById('edit-day').value;
   const date = document.getElementById('edit-date').value;
   const start_time = document.getElementById('edit-start').value;
@@ -97,6 +110,7 @@ document.getElementById('edit-schedule-form').onsubmit = async function(e) {
       course_id,
       teacher,
       room,
+      subject,
       day,
       date,
       start_time,
@@ -107,7 +121,6 @@ document.getElementById('edit-schedule-form').onsubmit = async function(e) {
     if(msg==='OK') {
       el.textContent = 'Orario aggiornato!';
       el.className = 'success';
-      // Aggiorna il filtro per mostrare il nuovo corso selezionato
       document.getElementById('filter-course').value = course_id;
       renderSchedules();
       setTimeout(()=>{
@@ -124,11 +137,11 @@ function deleteSchedule(id) {
     fetch(`/api/schedules/${id}`, {method:'DELETE'}).then(()=>fetchCoursesAndSchedules());
 }
 document.getElementById('add-schedule-btn').onclick = () => {
-  // Preimposta il corso selezionato
   const filterVal = document.getElementById('filter-course').value;
   document.getElementById('add-course-select').innerHTML = courses.map(c=>`<option value="${c.id}"${c.id==filterVal?' selected':''}>${c.name}</option>`).join('');
   document.getElementById('add-teacher').value = '';
   document.getElementById('add-room').value = '';
+  document.getElementById('add-subject').value = '';
   document.getElementById('add-day').value = '';
   document.getElementById('add-date').value = '';
   document.getElementById('add-start').value = '';
@@ -152,6 +165,7 @@ document.getElementById('add-schedule-form').onsubmit = async function(e) {
   const course_id = document.getElementById('add-course-select').value;
   const teacher = document.getElementById('add-teacher').value;
   const room = document.getElementById('add-room').value;
+  const subject = document.getElementById('add-subject').value;
   const day = document.getElementById('add-day').value;
   const date = document.getElementById('add-date').value;
   const start_time = document.getElementById('add-start').value;
@@ -170,6 +184,7 @@ document.getElementById('add-schedule-form').onsubmit = async function(e) {
       course_id,
       teacher,
       room,
+      subject,
       day,
       date,
       start_time,
@@ -180,7 +195,6 @@ document.getElementById('add-schedule-form').onsubmit = async function(e) {
     if(msg==='OK') {
       el.textContent = 'Orario aggiunto!';
       el.className = 'success';
-      // Aggiorna il filtro per mostrare il nuovo corso selezionato
       document.getElementById('filter-course').value = course_id;
       renderSchedules();
       setTimeout(()=>{
