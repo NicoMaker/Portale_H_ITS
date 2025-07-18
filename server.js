@@ -188,7 +188,10 @@ const server = http.createServer((req, res) => {
       const id = parsedUrl.pathname.split('/')[3];
       db.run('UPDATE users SET role="admin" WHERE id=?', [id], function(err) {
         if (err) { res.writeHead(500); res.end('DB error'); return; }
-        res.end('OK');
+        db.run('DELETE FROM user_courses WHERE user_id=?', [id], function(err2) {
+          if (err2) { res.writeHead(500); res.end('DB error'); return; }
+          res.end('OK');
+        });
       });
       return;
     }

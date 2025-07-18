@@ -31,7 +31,7 @@ function renderUsersList() {
   let html = '<table><tr><th>Username</th><th>Ruolo</th><th>Corso</th><th>Azioni</th></tr>';
   users.filter(u => {
     const matchName = u.username.toLowerCase().includes(search);
-    const matchCourse = !courseId || (u.courses && u.courses[0] && u.courses[0].id==courseId);
+    const matchCourse = u.role === 'admin' ? (!courseId || courseId === '') : (!courseId || (u.courses && u.courses[0] && u.courses[0].id==courseId));
     return matchName && matchCourse;
   }).forEach(u => {
     html += `<tr><td>${u.username}</td><td>`;

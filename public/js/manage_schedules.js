@@ -1,6 +1,7 @@
 let courses = [];
 let schedules = [];
 let editingScheduleId = null;
+let searchScheduleCourseInput, filterScheduleCourseSelect, allSchedules = [], allCourses = [];
 function fetchCoursesAndSchedules() {
   Promise.all([
     fetch('/api/courses').then(r => r.json()),
@@ -206,4 +207,47 @@ document.getElementById('add-schedule-form').onsubmit = async function (e) {
     }
   });
 };
+function renderSchedulesList() {
+  const search = searchScheduleCourseInput.value.toLowerCase();
+  const courseId = filterScheduleCourseSelect.value;
+  let html = '';
+  const filtered = allSchedules.filter(s => {
+    const course = allCourses.find(c => c.id == s.course_id) || {};
+    const matchName = (course.name || '').toLowerCase().includes(search);
+    const matchId = !courseId || s.course_id == courseId;
+    return matchName && matchId;
+  });
+  if (!filtered.length) {
+    html = '<div class="hint">Nessun orario trovato.';
+  } else {
+    html = `<div class='table-responsive'><table class='modern-table'><thead><tr><th>Corso</th><th>Docente</th><th>Aula</th><th>Giorno</th><th>Data</th><th>Inizio</th><th>Fine</th><th>Azioni</th></tr></thead><tbody>`;
+    filtered.forEach(s => {
+      const course = allCourses.find(c => c.id == s.course_id) || {};
+      html += `<tr><td>${course.name||'-'}</td><td>${s.teacher}</td><td>${s.room}</td><td>${s.day}</td><td>${s.date}</td><td>${s.start_time}</td><td>${s.end_time}</td><td style='text-align:center;'><button class='icon-btn' title='Modifica' onclick='openEditSchedule(${s.id})'>✏️</button> <button class='icon-btn' title='Elimina' onclick='deleteSchedule(${s.id})'>🗑️</button></td></tr>`;
+    });
+    html += '</tbody></table></div>';
+  }
+  document.getElementById('schedules-list').innerHTML = html;
+}
+function updateFilterScheduleCourseSelect() {
+  filterScheduleCourseSelect.innerHTML = '<option value="">Tutti i corsi</option>' + allCourses.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+}
+function fetchCourses() {
+  return fetch('/api/courses').then(r=>r.json()).then(data => { allCourses = data; updateFilterScheduleCourseSelect(); });
+}
+function fetchSchedules() {
+  fetch('/api/schedules').then(r=>r.json()).then(data => {
+    allSchedules = data;
+    renderSchedulesList();
+  });
+}
+document.addEventListener('DOMContentLoaded', () => {
+  searchScheduleCourseInput = document.getElementById('search-schedule-course');
+  filterScheduleCourseSelect = document.getElementById('filter-schedule-course');
+  if(searchScheduleCourseInput && filterScheduleCourseSelect) {
+    searchScheduleCourseInput.addEventListener('input', renderSchedulesList);
+    filterScheduleCourseSelect.addEventListener('change', renderSchedulesList);
+  }
+  fetchCourses().then(fetchSchedules);
+});
 fetchCoursesAndSchedules(); 
