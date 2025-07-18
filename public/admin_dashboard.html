@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Admin</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="navbar">Dashboard Admin</div>
+  <div class="container">
+    <h2>Benvenuto Admin</h2>
+    <nav style="margin-bottom:2rem;">
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:1rem;padding:0;">
+        <li><a href="/manage_users.html">👤 Gestione Utenti</a></li>
+        <li><a href="/manage_courses.html">📚 Gestione Corsi</a></li>
+        <li><a href="/manage_schedules.html">🗓️ Gestione Orari</a></li>
+      </ul>
+    </nav>
+    <a href="/logout" style="display:inline-block;margin-bottom:1.5rem;">Logout</a>
+    <button id="edit-profile-btn" style="margin-top:1.5rem">Modifica Profilo</button>
+    <div id="edit-profile-modal" class="modal" style="display:none">
+      <div class="modal-content">
+        <span class="close" id="close-modal">&times;</span>
+        <h3>Modifica Profilo</h3>
+        <form id="edit-profile-form">
+          <input type="text" name="new_username" id="new_username" placeholder="Nuovo username" required />
+          <input type="password" name="new_password" id="new_password" placeholder="Nuova password" required />
+          <div id="edit-password-hint" class="hint"></div>
+          <button type="submit">Salva</button>
+          <div id="edit-profile-msg"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Modale modifica profilo
+    const modal = document.getElementById('edit-profile-modal');
+    document.getElementById('edit-profile-btn').onclick = () => { modal.style.display = 'flex'; };
+    document.getElementById('close-modal').onclick = () => { modal.style.display = 'none'; };
+    window.onclick = e => { if(e.target === modal) modal.style.display = 'none'; };
+    // Validazione password
+    const newPassword = document.getElementById('new_password');
+    const editHint = document.getElementById('edit-password-hint');
+    newPassword.addEventListener('input', () => {
+      const val = newPassword.value;
+      let msg = '';
+      if(val.length < 8) msg += 'Min 8 caratteri. ';
+      if(!/[A-Z]/.test(val)) msg += 'Almeno una maiuscola. ';
+      if(!/[a-z]/.test(val)) msg += 'Almeno una minuscola. ';
+      if(!/[0-9]/.test(val)) msg += 'Almeno un numero. ';
+      editHint.textContent = msg;
+      editHint.style.color = msg ? 'var(--accent)' : 'green';
+    });
+    document.getElementById('edit-profile-form').onsubmit = function(e) {
+      if(editHint.textContent) {
+        e.preventDefault();
+        editHint.style.color = 'red';
+        return false;
+      }
+      e.preventDefault();
+      fetch('/user/profile', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({username:document.getElementById('new_username').value, password:newPassword.value})
+      }).then(r=>r.text()).then(msg => {
+        document.getElementById('edit-profile-msg').textContent = msg;
+        if(msg==='OK') setTimeout(()=>location.reload(), 1000);
+      });
+    };
+  </script>
+</body>
+</html>

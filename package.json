@@ -1,0 +1,12 @@
+{
+  "name": "course-management-app",
+  "version": "1.0.0",
+  "main": "pure_server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "sqlite3": "^5.1.2",
+    "bcrypt": "^5.1.0"
+  }
+}

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="navbar"><span style="font-size:1.5em;vertical-align:middle;">🔐</span> Portale ITS - Login</div>
+  <div class="form-container">
+    <h2>Accedi al tuo account</h2>
+    <form id="login-form" method="POST" action="/login">
+      <input type="text" name="username" id="username" placeholder="Username" required autocomplete="username" />
+      <input type="password" name="password" id="password" placeholder="Password" required autocomplete="current-password" />
+      <button type="submit">Login</button>
+      <div id="login-msg"></div>
+    </form>
+    <p>Non hai un account? <a href="/register.html">Registrati</a></p>
+  </div>
+  <script>
+    document.getElementById('login-form').onsubmit = function(e) {
+      e.preventDefault();
+      const form = this;
+      fetch('/login', {
+        method:'POST',
+        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body:`username=${encodeURIComponent(form.username.value)}&password=${encodeURIComponent(form.password.value)}`
+      }).then(r=>r.text()).then(msg => {
+        if(msg.includes('dashboard')) {
+          window.location = msg.includes('admin_dashboard') ? '/admin_dashboard.html' : '/user_dashboard.html';
+        } else if(msg.includes('Credenziali non valide')) {
+          document.getElementById('login-msg').innerHTML = '<span style="color:red">❌ Credenziali non valide</span>';
+        } else {
+          document.getElementById('login-msg').innerHTML = msg;
+        }
+      });
+    };
+  </script>
+</body>
+</html>

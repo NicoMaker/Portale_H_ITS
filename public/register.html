@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Registrazione</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="navbar"><span style="font-size:1.5em;vertical-align:middle;">📝</span> Portale ITS - Registrazione</div>
+  <div class="form-container">
+    <h2>Crea un nuovo account</h2>
+    <form id="register-form" method="POST" action="/register">
+      <input type="text" name="username" id="username" placeholder="Username" required autocomplete="username" />
+      <input type="password" name="password" id="password" placeholder="Password" required autocomplete="new-password" />
+      <div id="password-hint" class="hint"></div>
+      <button type="submit">Registrati</button>
+      <div id="register-msg"></div>
+    </form>
+    <p>Hai già un account? <a href="/login.html">Accedi</a></p>
+  </div>
+  <script>
+    // Validazione password live
+    const password = document.getElementById('password');
+    const hint = document.getElementById('password-hint');
+    password.addEventListener('input', () => {
+      const val = password.value;
+      let msg = '';
+      if(val.length < 8) msg += 'Min 8 caratteri. ';
+      if(!/[A-Z]/.test(val)) msg += 'Almeno una maiuscola. ';
+      if(!/[a-z]/.test(val)) msg += 'Almeno una minuscola. ';
+      if(!/[0-9]/.test(val)) msg += 'Almeno un numero. ';
+      hint.textContent = msg;
+      hint.style.color = msg ? 'var(--accent)' : 'green';
+    });
+    // Feedback submit
+    document.getElementById('register-form').onsubmit = function(e) {
+      if(hint.textContent) {
+        e.preventDefault();
+        hint.style.color = 'red';
+        return false;
+      }
+      e.preventDefault();
+      const form = this;
+      fetch('/register', {
+        method:'POST',
+        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body:`username=${encodeURIComponent(form.username.value)}&password=${encodeURIComponent(form.password.value)}`
+      }).then(r=>r.text()).then(msg => {
+        if(msg.includes('window.location')) {
+          document.getElementById('register-msg').innerHTML = '<span style="color:green">Registrazione avvenuta! Vai al <a href="/login.html">login</a>.</span>';
+          form.reset();
+        } else {
+          document.getElementById('register-msg').innerHTML = '<span style="color:red">'+msg+'</span>';
+        }
+      });
+    };
+  </script>
+</body>
+</html>
