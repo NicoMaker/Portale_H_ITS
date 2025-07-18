@@ -1,8 +1,9 @@
 let courses = [];
 let users = [];
 let editingUserId = null;
+let searchUserInput, filterCourseSelect;
 function fetchCourses() {
-  return fetch('/api/courses').then(r=>r.json()).then(data => { courses = data; updateNewCourseSelect(); });
+  return fetch('/api/courses').then(r=>r.json()).then(data => { courses = data; updateNewCourseSelect(); updateFilterCourseSelect(); });
 }
 function updateNewCourseSelect() {
   const select = document.getElementById('new-course');
@@ -14,37 +15,49 @@ function updateNewCourseSelect() {
   }
 }
 document.getElementById('new-role').onchange = updateNewCourseSelect;
+function updateFilterCourseSelect() {
+  filterCourseSelect.innerHTML = '<option value="">Tutti i corsi</option>' + courses.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+}
 function fetchUsers() {
   fetch('/api/users').then(r=>r.json()).then(data => {
     users = data;
-    const adminCount = users.filter(u=>u.role==="admin").length;
-    let html = '<table><tr><th>Username</th><th>Ruolo</th><th>Corso</th><th>Azioni</th></tr>';
-    users.forEach(u => {
-      html += `<tr><td>${u.username}</td><td>`;
-      html += `<span class='badge ${u.role}'>${u.role === 'admin' ? 'Admin' : 'Utente'}</span>`;
-      html += `</td><td>`;
-      if(u.role==="user") {
-        html += `<select onchange='assignCourse(${u.id}, this.value)' style="min-width:120px;">`;
-        html += `<option value="">Nessun corso</option>`;
-        courses.forEach(c => {
-          const selected = (u.courses && u.courses[0] && u.courses[0].id==c.id) ? 'selected' : '';
-          html += `<option value="${c.id}" ${selected}>${c.name}</option>`;
-        });
-        html += `</select>`;
-      } else {
-        html += '<span style="color:#888">-</span>';
-      }
-      html += `</td><td>`;
-      html += `<button onclick='openEditUser(${u.id})'>Modifica</button> `;
-      if(u.role==="user" && u.courses && u.courses[0]) html += `<button onclick='showUserSchedules(${u.id},${u.courses[0].id})'>Orari</button> `;
-      if(u.role!=="admin") html += `<button onclick='promote(${u.id})'>Rendi Admin</button>`;
-      if(u.role==="admin" && adminCount>1) html += `<button onclick='demote(${u.id})'>Rendi Utente</button>`;
-      if(adminCount>1 || u.role!=="admin") html += `<button onclick='deleteUser(${u.id})'>Elimina</button>`;
-      html += `</td></tr>`;
-    });
-    html += '</table>';
-    document.getElementById('users-list').innerHTML = html;
+    renderUsersList();
   });
+}
+function renderUsersList() {
+  const search = searchUserInput.value.toLowerCase();
+  const courseId = filterCourseSelect.value;
+  const adminCount = users.filter(u=>u.role==="admin").length;
+  let html = '<table><tr><th>Username</th><th>Ruolo</th><th>Corso</th><th>Azioni</th></tr>';
+  users.filter(u => {
+    const matchName = u.username.toLowerCase().includes(search);
+    const matchCourse = !courseId || (u.courses && u.courses[0] && u.courses[0].id==courseId);
+    return matchName && matchCourse;
+  }).forEach(u => {
+    html += `<tr><td>${u.username}</td><td>`;
+    html += `<span class='badge ${u.role}'>${u.role === 'admin' ? 'Admin' : 'Utente'}</span>`;
+    html += `</td><td>`;
+    if(u.role==="user") {
+      html += `<select onchange='assignCourse(${u.id}, this.value)' style="min-width:120px;">`;
+      html += `<option value="">Nessun corso</option>`;
+      courses.forEach(c => {
+        const selected = (u.courses && u.courses[0] && u.courses[0].id==c.id) ? 'selected' : '';
+        html += `<option value="${c.id}" ${selected}>${c.name}</option>`;
+      });
+      html += `</select>`;
+    } else {
+      html += '<span style="color:#888">-</span>';
+    }
+    html += `</td><td>`;
+    html += `<button onclick='openEditUser(${u.id})'>Modifica</button> `;
+    if(u.role==="user" && u.courses && u.courses[0]) html += `<button onclick='showUserSchedules(${u.id},${u.courses[0].id})'>Orari</button> `;
+    if(u.role!=="admin") html += `<button onclick='promote(${u.id})'>Rendi Admin</button>`;
+    if(u.role==="admin" && adminCount>1) html += `<button onclick='demote(${u.id})'>Rendi Utente</button>`;
+    if(adminCount>1 || u.role!=="admin") html += `<button onclick='deleteUser(${u.id})'>Elimina</button>`;
+    html += `</td></tr>`;
+  });
+  html += '</table>';
+  document.getElementById('users-list').innerHTML = html;
 }
 function promote(id) {
   fetch(`/api/users/${id}/promote`, {method:'POST'}).then(()=>fetchUsers());
@@ -170,4 +183,12 @@ document.getElementById('add-user-form').onsubmit = function(e) {
     }
   });
 };
+document.addEventListener('DOMContentLoaded', () => {
+  searchUserInput = document.getElementById('search-user');
+  filterCourseSelect = document.getElementById('filter-course');
+  if(searchUserInput && filterCourseSelect) {
+    searchUserInput.addEventListener('input', renderUsersList);
+    filterCourseSelect.addEventListener('change', renderUsersList);
+  }
+});
 fetchCourses().then(fetchUsers); 

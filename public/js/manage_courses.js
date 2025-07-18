@@ -1,19 +1,35 @@
+let searchCourseInput, filterCourseListSelect, allCourses = [];
+function renderCoursesList() {
+  const search = searchCourseInput.value.toLowerCase();
+  const courseId = filterCourseListSelect.value;
+  let html = '';
+  const filtered = allCourses.filter(c => {
+    const matchName = c.name.toLowerCase().includes(search);
+    const matchId = !courseId || c.id == courseId;
+    return matchName && matchId;
+  });
+  if (!filtered.length) {
+    html = '<div class="hint">Nessun corso trovato.</div>';
+  } else {
+    html = `<div class='table-responsive'><table class='modern-table'><thead><tr><th>ID</th><th>Nome</th><th>Descrizione</th><th>Azioni</th></tr></thead><tbody>`;
+    filtered.forEach(c => {
+      html += `<tr><td><span class='badge' style='background:var(--primary-light);color:#fff;'>${c.id}</span></td>`;
+      html += `<td><span class='badge' style='background:#f1f5f9;color:var(--primary);'>${c.name}</span></td>`;
+      html += `<td>${c.description||''}</td>`;
+      html += `<td style='text-align:center;'><button class='icon-btn' title='Modifica' onclick='openEditCourse(${c.id})'>✏️</button> <button class='icon-btn' title='Elimina' onclick='deleteCourse(${c.id})'>🗑️</button></td></tr>`;
+    });
+    html += '</tbody></table></div>';
+  }
+  document.getElementById('courses-list').innerHTML = html;
+}
+function updateFilterCourseListSelect() {
+  filterCourseListSelect.innerHTML = '<option value="">Tutti i corsi</option>' + allCourses.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+}
 function fetchCourses() {
   fetch('/api/courses').then(r=>r.json()).then(courses => {
-    let html = '';
-    if (!courses.length) {
-      html = '<div class="hint">Nessun corso presente. Aggiungi un corso per iniziare.</div>';
-    } else {
-      html = `<div class='table-responsive'><table class='modern-table'><thead><tr><th>ID</th><th>Nome</th><th>Descrizione</th><th>Azioni</th></tr></thead><tbody>`;
-      courses.forEach(c => {
-        html += `<tr><td><span class='badge' style='background:var(--primary-light);color:#fff;'>${c.id}</span></td>`;
-        html += `<td><span class='badge' style='background:#f1f5f9;color:var(--primary);'>${c.name}</span></td>`;
-        html += `<td>${c.description||''}</td>`;
-        html += `<td style='text-align:center;'><button class='icon-btn' title='Modifica' onclick='openEditCourse(${c.id})'>✏️</button> <button class='icon-btn' title='Elimina' onclick='deleteCourse(${c.id})'>🗑️</button></td></tr>`;
-      });
-      html += '</tbody></table></div>';
-    }
-    document.getElementById('courses-list').innerHTML = html;
+    allCourses = courses;
+    updateFilterCourseListSelect();
+    renderCoursesList();
   });
 }
 document.getElementById('add-course-form').onsubmit = function(e) {
@@ -80,6 +96,14 @@ function deleteCourse(id) {
     fetch(`/api/courses/${id}`, {method:'DELETE'}).then(()=>fetchCourses());
 }
 fetchCourses();
+document.addEventListener('DOMContentLoaded', () => {
+  searchCourseInput = document.getElementById('search-course');
+  filterCourseListSelect = document.getElementById('filter-course-list');
+  if(searchCourseInput && filterCourseListSelect) {
+    searchCourseInput.addEventListener('input', renderCoursesList);
+    filterCourseListSelect.addEventListener('change', renderCoursesList);
+  }
+});
 // CSS extra per tabella moderna e responsive
 const style = document.createElement('style');
 style.innerHTML = `
