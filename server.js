@@ -146,8 +146,8 @@ const server = http.createServer((req, res) => {
           res.writeHead(400, {'Content-Type':'text/html'});
           return res.end('<script>alert("Username già esistente");window.location=\'/register.html\';</script>');
         }
-        res.writeHead(302, { Location: '/login.html' });
-        res.end();
+        res.writeHead(200, {'Content-Type':'text/plain'});
+        res.end('Registrazione avvenuta!');
       });
     });
     return;
@@ -180,6 +180,35 @@ const server = http.createServer((req, res) => {
           });
         });
         if (users.length === 0) res.end(JSON.stringify([]));
+      });
+      return;
+    }
+    // POST /api/users (creazione utente da admin)
+    if (req.method === 'POST' && parsedUrl.pathname === '/api/users') {
+      parseBody(({username, password, role, course_id}) => {
+        // Validazione password
+        if (!password || password.length < 8 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
+          res.end('Password non sicura'); return;
+        }
+        let userRole = 'user';
+        if (role === 'admin' && session && session.user && session.user.role === 'admin') {
+          userRole = 'admin';
+        }
+        const hash = bcrypt.hashSync(password, 10);
+        db.run('INSERT INTO users (username, password, role) VALUES (?, ?, ?)', [username, hash, userRole], function (err) {
+          if (err) {
+            res.end('Username già esistente'); return;
+          }
+          // Se è stato passato un corso e il ruolo è user, associalo
+          if (userRole === 'user' && course_id) {
+            db.run('INSERT OR IGNORE INTO user_courses (user_id, course_id) VALUES (?, ?)', [this.lastID, course_id], function(err2) {
+              if (err2) { res.end('Errore DB'); return; }
+              res.end('OK');
+            });
+          } else {
+            res.end('OK');
+          }
+        });
       });
       return;
     }

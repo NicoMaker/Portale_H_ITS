@@ -25,9 +25,8 @@ document.getElementById('register-form').onsubmit = function(e) {
     headers:{'Content-Type':'application/x-www-form-urlencoded'},
     body:`username=${encodeURIComponent(form.username.value)}&password=${encodeURIComponent(form.password.value)}`
   }).then(r=>r.text()).then(msg => {
-    if(msg.includes('window.location')) {
-      document.getElementById('register-msg').innerHTML = '<span style="color:green">Registrazione avvenuta! Vai al <a href="/login.html">login</a>.</span>';
-      form.reset();
+    if(msg.trim() === 'Registrazione avvenuta!') {
+      document.getElementById('register-msg').innerHTML = '<span style="color:green">Registrazione avvenuta! Vai ad <a href="/login.html">accedi</a> per entrare.</span>';
     } else {
       document.getElementById('register-msg').innerHTML = '<span style="color:red">'+msg+'</span>';
     }

@@ -26,6 +26,11 @@
     </div>
     <div style="display:flex;gap:1rem;align-items:center;margin-bottom:1.2rem;">
       <input type="text" id="search-user" placeholder="Cerca utente per nome..." style="flex:2 1 200px;" />
+      <select id="filter-role" style="flex:1 1 120px;">
+        <option value="">Tutti gli utenti</option>
+        <option value="admin">Solo admin</option>
+        <option value="user">Solo utenti</option>
+      </select>
       <select id="filter-course" style="flex:1 1 120px;"><option value="">Tutti i corsi</option></select>
     </div>
     <div id="users-list"></div>
