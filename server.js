@@ -6,7 +6,11 @@ const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 
-const db = new sqlite3.Database(path.join(__dirname, 'database.db'));
+const dbDir = path.join(__dirname, 'db');
+if (!fs.existsSync(dbDir)) {
+  fs.mkdirSync(dbDir);
+}
+const db = new sqlite3.Database(path.join(dbDir, 'database.db'));
 
 // Inizializzazione DB e admin
 function initDb() {
