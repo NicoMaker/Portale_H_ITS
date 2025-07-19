@@ -40,10 +40,10 @@ function renderSchedules() {
   if (!filtered.length) {
     html = '<div class="hint">Nessun orario per questi filtri.</div>';
   } else {
-    html = `<div class='table-responsive'><table class='modern-table'><thead><tr><th>ID</th><th>Corso</th><th>Docente</th><th>Aula</th><th>Materia</th><th>Giorno</th><th>Data</th><th>Inizio</th><th>Fine</th><th>Azioni</th></tr></thead><tbody>`;
+    html = `<div class='table-responsive'><table class='modern-table'><thead><tr><th>Corso</th><th>Docente</th><th>Aula</th><th>Materia</th><th>Giorno</th><th>Data</th><th>Inizio</th><th>Fine</th><th>Azioni</th></tr></thead><tbody>`;
     filtered.forEach(s => {
       const course = courses.find(c => c.id == s.course_id);
-      html += `<tr><td><span class='badge' style='background:var(--primary-light);color:#fff;'>${s.id}</span></td>`;
+      html += `<tr>`;
       html += `<td><span class='badge' style='background:#f1f5f9;color:var(--primary);'>${course ? course.name : ''}</span></td>`;
       html += `<td>${s.teacher}</td>`;
       html += `<td>${s.room}</td>`;
