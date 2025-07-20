@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const teacherFilter = document.getElementById('filter-teacher-u').value.toLowerCase();
     const roomFilter = document.getElementById('filter-room-u').value.toLowerCase();
     const subjectFilter = document.getElementById('filter-subject-u').value.toLowerCase();
+    const dateFilter = document.getElementById('filter-date-u').value;
     let html = '<h3>🎓 Corsi assegnati</h3>';
     let debug = '';
     if (!courses.length) {
@@ -20,7 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const scheds = schedules.filter(s=>s.course_id==c.id &&
         (!teacherFilter || (s.teacher && s.teacher.toLowerCase().includes(teacherFilter))) &&
         (!roomFilter || (s.room && s.room.toLowerCase().includes(roomFilter))) &&
-        (!subjectFilter || (s.subject && s.subject.toLowerCase().includes(subjectFilter)))
+        (!subjectFilter || (s.subject && s.subject.toLowerCase().includes(subjectFilter))) &&
+        (!dateFilter || (s.date === dateFilter))
       );
       let schedHtml = '<h4 style="margin:1rem 0 0.5rem 0">🗓️ Orari</h4>';
       if (!scheds.length) {
@@ -42,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
       allSchedules = schedules;
       renderUserCourses(allCourses, allSchedules);
       // Setup filtri
-      ['filter-teacher-u','filter-room-u','filter-subject-u'].forEach(id=>{
+      ['filter-teacher-u','filter-room-u','filter-subject-u','filter-date-u'].forEach(id=>{
         document.getElementById(id).oninput = () => renderUserCourses(allCourses, allSchedules);
       });
     }).catch(() => {

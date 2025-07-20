@@ -26,11 +26,15 @@ function renderSchedules() {
   const teacherFilter = document.getElementById('filter-teacher').value.toLowerCase();
   const roomFilter = document.getElementById('filter-room').value.toLowerCase();
   const subjectFilter = document.getElementById('filter-subject').value.toLowerCase();
+  const dayFilter = document.getElementById('filter-day').value;
+  const dateFilter = document.getElementById('filter-date').value;
   let filtered = schedules;
   if (courseId) filtered = filtered.filter(s => String(s.course_id) === String(courseId));
   if (teacherFilter) filtered = filtered.filter(s => s.teacher && s.teacher.toLowerCase().includes(teacherFilter));
   if (roomFilter) filtered = filtered.filter(s => s.room && s.room.toLowerCase().includes(roomFilter));
   if (subjectFilter) filtered = filtered.filter(s => s.subject && s.subject.toLowerCase().includes(subjectFilter));
+  if (dayFilter) filtered = filtered.filter(s => s.day === dayFilter);
+  if (dateFilter) filtered = filtered.filter(s => s.date === dateFilter);
   // Ordina per data e ora
   filtered = filtered.slice().sort((a, b) => {
     if (a.date === b.date) return a.start_time.localeCompare(b.start_time);
@@ -59,8 +63,15 @@ function renderSchedules() {
   document.getElementById('schedules-list').innerHTML = html;
 }
 // Aggiorna i filtri per ricerca live
-['filter-teacher', 'filter-room', 'filter-subject'].forEach(id => {
-  document.getElementById(id).oninput = renderSchedules;
+['filter-teacher', 'filter-room', 'filter-subject', 'filter-day', 'filter-date'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) {
+    if (el.tagName === 'SELECT') {
+      el.onchange = renderSchedules;
+    } else {
+      el.oninput = renderSchedules;
+    }
+  }
 });
 function openEditSchedule(id) {
   editingScheduleId = id;

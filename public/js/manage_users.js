@@ -29,6 +29,7 @@ function renderUsersList() {
   const courseId = filterCourseSelect.value;
   const filterRoleSelect = document.getElementById('filter-role');
   const filterRole = filterRoleSelect ? filterRoleSelect.value : '';
+  const dateFilter = document.getElementById('filter-user-date').value;
   const adminCount = users.filter(u=>u.role==="admin").length;
   let html = '<table><tr><th>Username</th><th>Ruolo</th><th>Corso</th><th>Azioni</th></tr>';
   users
@@ -37,7 +38,8 @@ function renderUsersList() {
       const matchName = u.username.toLowerCase().includes(search);
       const matchCourse = u.role === 'admin' ? (!courseId || courseId === '') : (!courseId || (u.courses && u.courses[0] && u.courses[0].id==courseId));
       const matchRole = !filterRole || u.role === filterRole;
-      return matchName && matchCourse && matchRole;
+      const matchDate = !dateFilter || (u.created_at && u.created_at.startsWith(dateFilter));
+      return matchName && matchCourse && matchRole && matchDate;
     })
     .forEach(u => {
     html += `<tr><td>${u.username}</td><td>`;
@@ -201,10 +203,12 @@ document.addEventListener('DOMContentLoaded', () => {
   searchUserInput = document.getElementById('search-user');
   filterCourseSelect = document.getElementById('filter-course');
   const filterRoleSelect = document.getElementById('filter-role');
+  const filterUserDate = document.getElementById('filter-user-date');
   if(searchUserInput && filterCourseSelect) {
     searchUserInput.addEventListener('input', renderUsersList);
     filterCourseSelect.addEventListener('change', renderUsersList);
     if(filterRoleSelect) filterRoleSelect.addEventListener('change', renderUsersList);
+    if(filterUserDate) filterUserDate.addEventListener('input', renderUsersList);
   }
 });
 fetchCourses().then(fetchUsers); 

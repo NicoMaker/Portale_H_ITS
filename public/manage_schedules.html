@@ -26,6 +26,23 @@
         <label for="filter-subject"><span class="filter-icon">📖</span>Materia</label>
         <input type="text" id="filter-subject" placeholder="Cerca materia" />
       </div>
+      <div class="filter-group">
+        <label for="filter-day"><span class="filter-icon">📅</span>Giorno</label>
+        <select id="filter-day">
+          <option value="">Tutti i giorni</option>
+          <option value="Lunedì">Lunedì</option>
+          <option value="Martedì">Martedì</option>
+          <option value="Mercoledì">Mercoledì</option>
+          <option value="Giovedì">Giovedì</option>
+          <option value="Venerdì">Venerdì</option>
+          <option value="Sabato">Sabato</option>
+          <option value="Domenica">Domenica</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="filter-date"><span class="filter-icon">📆</span>Data</label>
+        <input type="date" id="filter-date" />
+      </div>
       <button id="add-schedule-btn" class="primary-btn">+ Aggiungi Orario</button>
     </div>
     <div style="display:flex;gap:1rem;align-items:center;margin-bottom:1.2rem;">
