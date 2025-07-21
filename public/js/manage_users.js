@@ -158,7 +158,7 @@ function showUserSchedules(userId, courseId) {
       html = '<div class="hint">Nessun orario trovato per il corso assegnato a questo utente.</div>';
     } else {
       html = '<div style="overflow-x:auto"><table class="schedule-table"><tr><th>Docente</th><th>Aula</th><th>Giorno</th><th>Data</th><th>Inizio</th><th>Fine</th></tr>' +
-        scheds.map(s=>`<tr><td>${s.teacher}</td><td>${s.room}</td><td>${s.day}</td><td>${s.date}</td><td>${s.start_time}</td><td>${s.end_time}</td></tr>`).join('') + '</table></div>';
+        scheds.map(s=>`<tr><td>${s.teacher}</td><td>${s.room}</td><td>${s.day}</td><td>${typeof formatDate === 'function' ? formatDate(s.date) : s.date}</td><td>${s.start_time}</td><td>${s.end_time}</td></tr>`).join('') + '</table></div>';
     }
     document.getElementById('user-schedules-content').innerHTML = html;
     document.getElementById('user-schedules-modal').style.display = 'flex';
@@ -211,4 +211,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if(filterUserDate) filterUserDate.addEventListener('input', renderUsersList);
   }
 });
-fetchCourses().then(fetchUsers); 
+fetchCourses().then(fetchUsers);
+// Importa la funzione formatDate
+if (typeof window.formatDate !== 'function') {
+  const script = document.createElement('script');
+  script.src = 'js/utils.js';
+  document.head.appendChild(script);
+} 

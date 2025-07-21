@@ -15,11 +15,12 @@ function fetchCoursesAndSchedules() {
   });
 }
 document.getElementById('filter-course').onchange = renderSchedules;
-function formatDate(iso) {
-  if (!iso) return '-';
-  const d = new Date(iso);
-  if (isNaN(d)) return '-';
-  return d.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });
+// Importa la funzione formatDate
+// Se il browser non supporta import/export, assicuriamoci che formatDate sia globale
+if (typeof window.formatDate !== 'function') {
+  const script = document.createElement('script');
+  script.src = 'js/utils.js';
+  document.head.appendChild(script);
 }
 function renderSchedules() {
   const courseId = document.getElementById('filter-course').value;
@@ -234,7 +235,7 @@ function renderSchedulesList() {
     html = `<div class='table-responsive'><table class='modern-table'><thead><tr><th>Corso</th><th>Docente</th><th>Aula</th><th>Materia</th><th>Giorno</th><th>Data</th><th>Inizio</th><th>Fine</th><th>Azioni</th></tr></thead><tbody>`;
     filtered.forEach(s => {
       const course = allCourses.find(c => c.id == s.course_id) || {};
-      html += `<tr><td>${course.name||'-'}</td><td>${s.teacher}</td><td>${s.room}</td><td>${s.subject || ''}</td><td>${s.day}</td><td>${s.date}</td><td>${s.start_time}</td><td>${s.end_time}</td><td style='text-align:center;'><button class='icon-btn' title='Modifica' onclick='openEditSchedule(${s.id})'>✏️</button> <button class='icon-btn' title='Elimina' onclick='deleteSchedule(${s.id})'>🗑️</button></td></tr>`;
+      html += `<tr><td>${course.name||'-'}</td><td>${s.teacher}</td><td>${s.room}</td><td>${s.subject || ''}</td><td>${s.day}</td><td>${typeof formatDate === 'function' ? formatDate(s.date) : s.date}</td><td>${s.start_time}</td><td>${s.end_time}</td><td style='text-align:center;'><button class='icon-btn' title='Modifica' onclick='openEditSchedule(${s.id})'>✏️</button> <button class='icon-btn' title='Elimina' onclick='deleteSchedule(${s.id})'>🗑️</button></td></tr>`;
     });
     html += '</tbody></table></div>';
   }
