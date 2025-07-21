@@ -80,7 +80,7 @@ function openEditSchedule(id) {
   document.getElementById('edit-teacher').value = s.teacher;
   document.getElementById('edit-room').value = s.room;
   document.getElementById('edit-subject').value = s.subject || '';
-  document.getElementById('edit-day').value = s.day;
+  document.getElementById('edit-day').textContent = s.day;
   document.getElementById('edit-date').value = s.date;
   document.getElementById('edit-start').value = s.start_time;
   document.getElementById('edit-end').value = s.end_time;
@@ -104,7 +104,7 @@ document.getElementById('edit-schedule-form').onsubmit = async function (e) {
   const teacher = document.getElementById('edit-teacher').value;
   const room = document.getElementById('edit-room').value;
   const subject = document.getElementById('edit-subject').value;
-  const day = document.getElementById('edit-day').value;
+  const day = document.getElementById('edit-day').textContent;
   const date = document.getElementById('edit-date').value;
   const start_time = document.getElementById('edit-start').value;
   const end_time = document.getElementById('edit-end').value;
@@ -154,7 +154,7 @@ document.getElementById('add-schedule-btn').onclick = () => {
   document.getElementById('add-teacher').value = '';
   document.getElementById('add-room').value = '';
   document.getElementById('add-subject').value = '';
-  document.getElementById('add-day').value = '';
+  document.getElementById('add-day').textContent = '';
   document.getElementById('add-date').value = '';
   document.getElementById('add-start').value = '';
   document.getElementById('add-end').value = '';
@@ -178,7 +178,7 @@ document.getElementById('add-schedule-form').onsubmit = async function (e) {
   const teacher = document.getElementById('add-teacher').value;
   const room = document.getElementById('add-room').value;
   const subject = document.getElementById('add-subject').value;
-  const day = document.getElementById('add-day').value;
+  const day = document.getElementById('add-day').textContent;
   const date = document.getElementById('add-date').value;
   const start_time = document.getElementById('add-start').value;
   const end_time = document.getElementById('add-end').value;
@@ -231,10 +231,10 @@ function renderSchedulesList() {
   if (!filtered.length) {
     html = '<div class="hint">Nessun orario trovato.';
   } else {
-    html = `<div class='table-responsive'><table class='modern-table'><thead><tr><th>Corso</th><th>Docente</th><th>Aula</th><th>Giorno</th><th>Data</th><th>Inizio</th><th>Fine</th><th>Azioni</th></tr></thead><tbody>`;
+    html = `<div class='table-responsive'><table class='modern-table'><thead><tr><th>Corso</th><th>Docente</th><th>Aula</th><th>Materia</th><th>Giorno</th><th>Data</th><th>Inizio</th><th>Fine</th><th>Azioni</th></tr></thead><tbody>`;
     filtered.forEach(s => {
       const course = allCourses.find(c => c.id == s.course_id) || {};
-      html += `<tr><td>${course.name||'-'}</td><td>${s.teacher}</td><td>${s.room}</td><td>${s.day}</td><td>${s.date}</td><td>${s.start_time}</td><td>${s.end_time}</td><td style='text-align:center;'><button class='icon-btn' title='Modifica' onclick='openEditSchedule(${s.id})'>✏️</button> <button class='icon-btn' title='Elimina' onclick='deleteSchedule(${s.id})'>🗑️</button></td></tr>`;
+      html += `<tr><td>${course.name||'-'}</td><td>${s.teacher}</td><td>${s.room}</td><td>${s.subject || ''}</td><td>${s.day}</td><td>${s.date}</td><td>${s.start_time}</td><td>${s.end_time}</td><td style='text-align:center;'><button class='icon-btn' title='Modifica' onclick='openEditSchedule(${s.id})'>✏️</button> <button class='icon-btn' title='Elimina' onclick='deleteSchedule(${s.id})'>🗑️</button></td></tr>`;
     });
     html += '</tbody></table></div>';
   }
@@ -252,6 +252,35 @@ function fetchSchedules() {
     renderSchedulesList();
   });
 }
+// Funzione per ottenere il giorno della settimana in italiano da una data ISO
+function getItalianDayOfWeek(dateString) {
+  if (!dateString) return '';
+  const giorni = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
+  const d = new Date(dateString);
+  if (isNaN(d)) return '';
+  return giorni[d.getDay()];
+}
+
+// Collega il calcolo automatico del giorno ai campi data nei modali di aggiunta e modifica
+function setupAutoDayFill() {
+  const addDate = document.getElementById('add-date');
+  const addDayDiv = document.getElementById('add-day');
+  if (addDate && addDayDiv) {
+    addDate.addEventListener('change', function() {
+      const giorno = getItalianDayOfWeek(this.value);
+      addDayDiv.textContent = giorno;
+    });
+  }
+  const editDate = document.getElementById('edit-date');
+  const editDayDiv = document.getElementById('edit-day');
+  if (editDate && editDayDiv) {
+    editDate.addEventListener('change', function() {
+      const giorno = getItalianDayOfWeek(this.value);
+      editDayDiv.textContent = giorno;
+    });
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   searchScheduleCourseInput = document.getElementById('search-schedule-course');
   filterScheduleCourseSelect = document.getElementById('filter-schedule-course');
@@ -260,5 +289,6 @@ document.addEventListener('DOMContentLoaded', () => {
     filterScheduleCourseSelect.addEventListener('change', renderSchedulesList);
   }
   fetchCourses().then(fetchSchedules);
+  setupAutoDayFill();
 });
 fetchCoursesAndSchedules(); 
