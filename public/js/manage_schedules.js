@@ -2,6 +2,8 @@ let courses = [];
 let schedules = [];
 let editingScheduleId = null;
 let searchScheduleCourseInput, filterScheduleCourseSelect, allSchedules = [], allCourses = [];
+// Inizializza Choices.js per i filtri multipli
+let teacherChoices, roomChoices, subjectChoices, dayChoices;
 function fetchCoursesAndSchedules() {
   Promise.all([
     fetch('/api/courses').then(r => r.json()),
@@ -11,6 +13,7 @@ function fetchCoursesAndSchedules() {
     schedules = allSchedules;
     const select = document.getElementById('filter-course');
     select.innerHTML = '<option value="">Tutti i corsi</option>' + courses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    populateFilterOptions();
     renderSchedules();
   });
 }
@@ -24,17 +27,18 @@ if (typeof window.formatDate !== 'function') {
 }
 function renderSchedules() {
   const courseId = document.getElementById('filter-course').value;
-  const teacherFilter = document.getElementById('filter-teacher').value.toLowerCase();
-  const roomFilter = document.getElementById('filter-room').value.toLowerCase();
-  const subjectFilter = document.getElementById('filter-subject').value.toLowerCase();
-  const dayFilter = document.getElementById('filter-day').value;
+  // Ottieni i valori selezionati (array)
+  const teacherFilter = teacherChoices ? teacherChoices.getValue(true) : [];
+  const roomFilter = roomChoices ? roomChoices.getValue(true) : [];
+  const subjectFilter = subjectChoices ? subjectChoices.getValue(true) : [];
+  const dayFilter = dayChoices ? dayChoices.getValue(true) : [];
   const dateFilter = document.getElementById('filter-date').value;
   let filtered = schedules;
   if (courseId) filtered = filtered.filter(s => String(s.course_id) === String(courseId));
-  if (teacherFilter) filtered = filtered.filter(s => s.teacher && s.teacher.toLowerCase().includes(teacherFilter));
-  if (roomFilter) filtered = filtered.filter(s => s.room && s.room.toLowerCase().includes(roomFilter));
-  if (subjectFilter) filtered = filtered.filter(s => s.subject && s.subject.toLowerCase().includes(subjectFilter));
-  if (dayFilter) filtered = filtered.filter(s => s.day === dayFilter);
+  if (teacherFilter.length) filtered = filtered.filter(s => teacherFilter.includes(s.teacher));
+  if (roomFilter.length) filtered = filtered.filter(s => roomFilter.includes(s.room));
+  if (subjectFilter.length) filtered = filtered.filter(s => subjectFilter.includes(s.subject));
+  if (dayFilter.length) filtered = filtered.filter(s => dayFilter.includes(s.day));
   if (dateFilter) filtered = filtered.filter(s => s.date === dateFilter);
   // Ordina per data e ora
   filtered = filtered.slice().sort((a, b) => {
@@ -282,6 +286,25 @@ function setupAutoDayFill() {
   }
 }
 
+function populateFilterOptions() {
+  // Docenti
+  const teachers = [...new Set(schedules.map(s => s.teacher).filter(Boolean))];
+  teacherChoices.clearChoices();
+  teacherChoices.setChoices(teachers.map(t => ({ value: t, label: t })), 'value', 'label', false);
+  // Aule
+  const rooms = [...new Set(schedules.map(s => s.room).filter(Boolean))];
+  roomChoices.clearChoices();
+  roomChoices.setChoices(rooms.map(r => ({ value: r, label: r })), 'value', 'label', false);
+  // Materie
+  const subjects = [...new Set(schedules.map(s => s.subject).filter(Boolean))];
+  subjectChoices.clearChoices();
+  subjectChoices.setChoices(subjects.map(su => ({ value: su, label: su })), 'value', 'label', false);
+  // Giorni
+  const days = [...new Set(schedules.map(s => s.day).filter(Boolean))];
+  dayChoices.clearChoices();
+  dayChoices.setChoices(days.map(d => ({ value: d, label: d })), 'value', 'label', false);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   searchScheduleCourseInput = document.getElementById('search-schedule-course');
   filterScheduleCourseSelect = document.getElementById('filter-schedule-course');
@@ -291,5 +314,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   fetchCourses().then(fetchSchedules);
   setupAutoDayFill();
+  // Inizializza Choices.js per i filtri multipli
+  teacherChoices = new Choices('#filter-teacher', { removeItemButton: true, searchEnabled: true, shouldSort: false, position: 'bottom', placeholder: true });
+  roomChoices = new Choices('#filter-room', { removeItemButton: true, searchEnabled: true, shouldSort: false, position: 'bottom', placeholder: true });
+  subjectChoices = new Choices('#filter-subject', { removeItemButton: true, searchEnabled: true, shouldSort: false, position: 'bottom', placeholder: true });
+  dayChoices = new Choices('#filter-day', { removeItemButton: true, searchEnabled: true, shouldSort: false, position: 'bottom', placeholder: true });
 });
 fetchCoursesAndSchedules(); 

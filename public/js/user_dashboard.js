@@ -1,66 +1,148 @@
-document.addEventListener('DOMContentLoaded', () => {
-  let allSchedules = [];
-  let allCourses = [];
-  // Funzione per filtrare e renderizzare
-  function renderUserCourses(courses, schedules) {
-    const teacherFilter = document.getElementById('filter-teacher-u').value.toLowerCase();
-    const roomFilter = document.getElementById('filter-room-u').value.toLowerCase();
-    const subjectFilter = document.getElementById('filter-subject-u').value.toLowerCase();
-    const dateFilter = document.getElementById('filter-date-u').value;
-    let html = '<h3>🎓 Corsi assegnati</h3>';
-    let debug = '';
-    if (!courses.length) {
-      html += '<div class="hint">Nessun corso assegnato. Contatta un amministratore per essere iscritto a un corso.</div>';
-      debug = 'Nessun corso collegato a questo utente.';
-      document.getElementById('user-courses').innerHTML = html;
-      document.getElementById('user-courses-debug').textContent = debug;
-      return;
-    }
-    html += '<div class="courses-list">' + courses.map(c=>{
-      // Filtra orari per corso e per filtri
-      const scheds = schedules.filter(s=>s.course_id==c.id &&
-        (!teacherFilter || (s.teacher && s.teacher.toLowerCase().includes(teacherFilter))) &&
-        (!roomFilter || (s.room && s.room.toLowerCase().includes(roomFilter))) &&
-        (!subjectFilter || (s.subject && s.subject.toLowerCase().includes(subjectFilter))) &&
-        (!dateFilter || (s.date === dateFilter))
-      );
-      let schedHtml = '<h4 style="margin:1rem 0 0.5rem 0">🗓️ Orari</h4>';
-      if (!scheds.length) {
-        schedHtml += '<div class="hint">Nessun orario trovato per questi filtri.</div>';
-      } else {
-        schedHtml += '<div style="overflow-x:auto"><table class="schedule-table"><tr><th>Docente</th><th>Aula</th><th>Materia</th><th>Giorno</th><th>Data</th><th>Inizio</th><th>Fine</th></tr>' +
-          scheds.map(s=>`<tr><td>${s.teacher}</td><td>${s.room}</td><td>${s.subject||''}</td><td>${s.day}</td><td>${formatDate(s.date)}</td><td>${s.start_time}</td><td>${s.end_time}</td></tr>`).join('') + '</table></div>';
-      }
-      return `<div class='course-card'><h4>${c.name} <span class='badge'>ID: ${c.id}</span></h4><p>${c.description||''}</p><div id='schedule-for-course-${c.id}'>${schedHtml}</div></div>`;
-    }).join('') + '</div>';
-    debug = 'Corsi collegati: ' + courses.map(c=>`${c.name} (ID: ${c.id})`).join(', ');
-    document.getElementById('user-courses').innerHTML = html;
-    document.getElementById('user-courses-debug').textContent = debug;
+let allSchedules = [];
+let allCourses = [];
+// Funzione per filtrare e renderizzare
+function renderUserCourses() {
+  document.getElementById('user-courses').innerHTML = '';
+  document.getElementById('user-courses-debug').textContent = '';
+}
+function renderUserCoursesList(courses) {
+  let html = '';
+  if (!courses.length) {
+    html = '<div class="hint">Nessun corso assegnato. Contatta un amministratore per essere iscritto a un corso.</div>';
+  } else {
+    html = '<div class="user-courses-list"><h3>Corsi a cui sei iscritto:</h3><ul>' +
+      courses.map(c => `<li><b>${c.name}</b>${c.description ? ' - ' + c.description : ''}</li>`).join('') +
+      '</ul></div>';
   }
-  // Fetch dati e setup filtri
+  document.getElementById('user-courses').innerHTML = html;
+}
+function renderUserCoursesBadges(courses) {
+  let html = '';
+  if (!courses.length) {
+    html = '<div class="hint">Nessun corso assegnato. Contatta un amministratore per essere iscritto a un corso.</div>';
+  } else {
+    html = '<div class="user-courses-badges-wrap">' +
+      courses.map(c => `<span class="user-courses-badge">${c.name}</span>`).join('') +
+      '</div>';
+  }
+  document.getElementById('user-courses').innerHTML = html;
+}
+// Inizializza Choices.js per i filtri multipli SOLO per i campi utente
+let teacherChoicesU, roomChoicesU, subjectChoicesU, dayChoicesU;
+teacherChoicesU = new Choices('#filter-teacher-u', { removeItemButton: true, searchEnabled: true, shouldSort: false, position: 'bottom', placeholder: true });
+roomChoicesU = new Choices('#filter-room-u', { removeItemButton: true, searchEnabled: true, shouldSort: false, position: 'bottom', placeholder: true });
+subjectChoicesU = new Choices('#filter-subject-u', { removeItemButton: true, searchEnabled: true, shouldSort: false, position: 'bottom', placeholder: true });
+dayChoicesU = new Choices('#filter-date-u', { removeItemButton: true, searchEnabled: true, shouldSort: false, position: 'bottom', placeholder: true });
+// Dopo aver caricato i dati, popola le opzioni e mostra la tabella unica
+document.addEventListener('DOMContentLoaded', () => {
   fetch('/user/courses').then(r=>r.json()).then(courses => {
     allCourses = courses;
     fetch('/user/schedules').then(r=>r.json()).then(schedules => {
       allSchedules = schedules;
-      renderUserCourses(allCourses, allSchedules);
+      populateFilterOptionsU();
+      renderUserCoursesBadges(allCourses);
+      renderUserSchedulesTable(allCourses, allSchedules);
       // Setup filtri
-      ['filter-teacher-u','filter-room-u','filter-subject-u','filter-date-u'].forEach(id=>{
-        document.getElementById(id).oninput = () => renderUserCourses(allCourses, allSchedules);
+      ['filter-teacher-u','filter-room-u','filter-subject-u','filter-date-u','filter-date-exact-u'].forEach(id=>{
+        document.getElementById(id).onchange = () => {
+          renderUserCoursesBadges(allCourses);
+          renderUserSchedulesTable(allCourses, allSchedules);
+        };
       });
-    }).catch(() => {
-      courses.forEach(c => {
-        document.getElementById('schedule-for-course-'+c.id).innerHTML = '<div class="hint">Errore nel recupero degli orari. Riprova più tardi.</div>';
-      });
+    }).catch(async (err) => {
+      let msg = 'Errore nel recupero degli orari. ';
+      try {
+        const resp = await fetch('/user/schedules');
+        if (resp.status === 403) {
+          msg += 'Sessione scaduta, effettua di nuovo il login.';
+        } else {
+          msg += 'Riprova più tardi.';
+        }
+      } catch (e) {
+        msg += 'Riprova più tardi.';
+      }
+      document.getElementById('user-courses').innerHTML = `<div class="hint">${msg} <button onclick="location.reload()">Riprova</button></div>`;
+      document.getElementById('user-schedules-table').innerHTML = '';
+      console.error('Errore fetch orari:', err);
     });
-  }).catch(() => {
-    document.getElementById('user-courses-debug').textContent = 'Errore nel recupero dei corsi. Riprova più tardi.';
+  }).catch((err) => {
+    document.getElementById('user-courses').innerHTML = '<div class="hint">Errore nel recupero dei corsi. Riprova più tardi. <button onclick="location.reload()">Riprova</button></div>';
+    document.getElementById('user-schedules-table').innerHTML = '';
+    console.error('Errore fetch corsi:', err);
   });
 });
+
+function populateFilterOptionsU() {
+  // Docenti
+  const teachers = [...new Set(allSchedules.map(s => s.teacher).filter(Boolean))];
+  teacherChoicesU.clearChoices();
+  teacherChoicesU.setChoices(teachers.map(t => ({ value: t, label: t })), 'value', 'label', false);
+  // Aule
+  const rooms = [...new Set(allSchedules.map(s => s.room).filter(Boolean))];
+  roomChoicesU.clearChoices();
+  roomChoicesU.setChoices(rooms.map(r => ({ value: r, label: r })), 'value', 'label', false);
+  // Materie
+  const subjects = [...new Set(allSchedules.map(s => s.subject).filter(Boolean))];
+  subjectChoicesU.clearChoices();
+  subjectChoicesU.setChoices(subjects.map(su => ({ value: su, label: su })), 'value', 'label', false);
+  // Giorni
+  const days = [...new Set(allSchedules.map(s => s.day).filter(Boolean))];
+  dayChoicesU.clearChoices();
+  dayChoicesU.setChoices(days.map(d => ({ value: d, label: d })), 'value', 'label', false);
+}
+
 function formatDate(iso) {
   if(!iso) return '-';
   const d = new Date(iso);
   if(isNaN(d)) return '-';
   return d.toLocaleDateString('it-IT', {day:'2-digit', month:'2-digit', year:'numeric'});
+}
+// Funzione per ottenere il giorno della settimana in italiano da una data ISO
+function getItalianDayOfWeek(dateString) {
+  if (!dateString) return '';
+  const giorni = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
+  const d = new Date(dateString);
+  if (isNaN(d)) return '';
+  return giorni[d.getDay()];
+}
+function renderUserSchedulesTable(courses, schedules) {
+  let filtered = schedules.filter(s => courses.some(c => c.id == s.course_id));
+  // Filtri
+  const teacherFilter = teacherChoicesU ? teacherChoicesU.getValue(true) : [];
+  const roomFilter = roomChoicesU ? roomChoicesU.getValue(true) : [];
+  const subjectFilter = subjectChoicesU ? subjectChoicesU.getValue(true) : [];
+  const dayFilter = dayChoicesU ? dayChoicesU.getValue(true) : [];
+  const dateExact = document.getElementById('filter-date-exact-u').value;
+  if (teacherFilter.length) filtered = filtered.filter(s => teacherFilter.includes(s.teacher));
+  if (roomFilter.length) filtered = filtered.filter(s => roomFilter.includes(s.room));
+  if (subjectFilter.length) filtered = filtered.filter(s => subjectFilter.includes(s.subject));
+  if (dayFilter.length) filtered = filtered.filter(s => dayFilter.includes(s.day));
+  if (dateExact) filtered = filtered.filter(s => s.date === dateExact);
+  filtered = filtered.slice().sort((a, b) => {
+    if (a.date === b.date) return a.start_time.localeCompare(b.start_time);
+    return a.date.localeCompare(b.date);
+  });
+  let html = '';
+  if (!courses.length) {
+    html = '<div class="hint">Nessun corso assegnato. Contatta un amministratore per essere iscritto a un corso.</div>';
+  } else if (!filtered.length) {
+    html = '<div class="hint">Nessun orario trovato per questi filtri.</div>';
+  } else {
+    html = `<div class='table-responsive'><table class='modern-table'><thead><tr><th>Docente</th><th>Aula</th><th>Materia</th><th>Giorno</th><th>Data</th><th>Inizio</th><th>Fine</th></tr></thead><tbody>`;
+    filtered.forEach(s => {
+      html += `<tr>`;
+      html += `<td>${s.teacher}</td>`;
+      html += `<td>${s.room}</td>`;
+      html += `<td>${s.subject || ''}</td>`;
+      html += `<td>${s.day || getItalianDayOfWeek(s.date)}</td>`;
+      html += `<td>${formatDate(s.date)}</td>`;
+      html += `<td>${s.start_time}</td>`;
+      html += `<td>${s.end_time}</td>`;
+      html += `</tr>`;
+    });
+    html += '</tbody></table></div>';
+  }
+  document.getElementById('user-schedules-table').innerHTML = html;
 }
 // Modale modifica profilo
 const modal = document.getElementById('edit-profile-modal');

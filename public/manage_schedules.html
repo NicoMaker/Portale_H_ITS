@@ -6,6 +6,8 @@
   <title>Gestione Orari</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/style.css">
+  <!-- Choices.js CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 </head>
 
 <body>
@@ -17,29 +19,20 @@
         <select id="filter-course"></select>
       </div>
       <div class="filter-group">
-        <label for="filter-teacher"><span class="filter-icon">👨‍🏫</span>Docente</label>
-        <input type="text" id="filter-teacher" placeholder="Cerca docente" />
+        <label>👨‍🏫 Docente</label>
+        <select id="filter-teacher" multiple></select>
       </div>
       <div class="filter-group">
-        <label for="filter-room"><span class="filter-icon">🏫</span>Aula</label>
-        <input type="text" id="filter-room" placeholder="Cerca aula" />
+        <label>🏫 Aula</label>
+        <select id="filter-room" multiple></select>
       </div>
       <div class="filter-group">
-        <label for="filter-subject"><span class="filter-icon">📖</span>Materia</label>
-        <input type="text" id="filter-subject" placeholder="Cerca materia" />
+        <label>📖 Materia</label>
+        <select id="filter-subject" multiple></select>
       </div>
       <div class="filter-group">
-        <label for="filter-day"><span class="filter-icon">📅</span>Giorno</label>
-        <select id="filter-day">
-          <option value="">Tutti i giorni</option>
-          <option value="Lunedì">Lunedì</option>
-          <option value="Martedì">Martedì</option>
-          <option value="Mercoledì">Mercoledì</option>
-          <option value="Giovedì">Giovedì</option>
-          <option value="Venerdì">Venerdì</option>
-          <option value="Sabato">Sabato</option>
-          <option value="Domenica">Domenica</option>
-        </select>
+        <label>📅 Giorno</label>
+        <select id="filter-day" multiple></select>
       </div>
       <div class="filter-group">
         <label for="filter-date"><span class="filter-icon">📆</span>Data</label>
@@ -105,6 +98,7 @@
       </form>
     </div>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
   <script src="js/manage_schedules.js"></script>
 </body>
 
