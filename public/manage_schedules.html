@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
   <meta charset="UTF-8">
   <title>Gestione Orari</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/style.css">
 </head>
+
 <body>
   <div class="navbar"><span style="font-size:1.5em;vertical-align:middle;">🗓️</span> Gestione Orari</div>
   <div class="container" style="max-width:900px;">
@@ -46,8 +48,11 @@
       <button id="add-schedule-btn" class="primary-btn">+ Aggiungi Orario</button>
     </div>
     <div style="display:flex;gap:1rem;align-items:center;margin-bottom:1.2rem;">
-      <input type="text" id="search-schedule-course" placeholder="Cerca corso per nome..." style="flex:2 1 200px; display: none;" />
-      <select id="filter-schedule-course" style="flex:1 1 120px; display: none;"><option value="">Tutti i corsi</option></select>
+      <input type="text" id="search-schedule-course" placeholder="Cerca corso per nome..."
+        style="flex:2 1 200px; display: none;" />
+      <select id="filter-schedule-course" style="flex:1 1 120px; display: none;">
+        <option value="">Tutti i corsi</option>
+      </select>
     </div>
     <div id="schedules-list"></div>
     <a href="/admin_dashboard.html" style="display:inline-block;margin-top:2.5rem;">Torna alla Dashboard</a>
@@ -62,7 +67,9 @@
         <input type="text" id="edit-room" placeholder="Aula" required />
         <input type="text" id="edit-subject" placeholder="Materia" required />
         <label for="edit-day">Giorno</label>
-        <div id="edit-day" class="auto-day" style="margin-bottom:0.7rem;height:2.2em;display:flex;align-items:center;padding-left:0.5em;background:#f3f4f6;border-radius:5px;"></div>
+        <div id="edit-day" class="auto-day"
+          style="margin-bottom:0.7rem;height:2.2em;display:flex;align-items:center;padding-left:0.5em;background:#f3f4f6;border-radius:5px;">
+        </div>
         <input type="date" id="edit-date" required />
         <div style="display:flex;gap:1rem;">
           <input type="time" id="edit-start" required style="flex:1;" />
@@ -84,7 +91,9 @@
         <input type="text" id="add-room" placeholder="Aula" required />
         <input type="text" id="add-subject" placeholder="Materia" required />
         <label for="add-day">Giorno</label>
-        <div id="add-day" class="auto-day" style="margin-bottom:0.7rem;height:2.2em;display:flex;align-items:center;padding-left:0.5em;background:#f3f4f6;border-radius:5px;"></div>
+        <div id="add-day" class="auto-day"
+          style="margin-bottom:0.7rem;height:2.2em;display:flex;align-items:center;padding-left:0.5em;background:#f3f4f6;border-radius:5px;">
+        </div>
         <input type="date" id="add-date" required />
         <div style="display:flex;gap:1rem;">
           <input type="time" id="add-start" required style="flex:1;" />
@@ -98,4 +107,5 @@
   </div>
   <script src="js/manage_schedules.js"></script>
 </body>
-</html> 
+
+</html>
