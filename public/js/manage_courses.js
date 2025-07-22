@@ -11,27 +11,43 @@ function renderCoursesList() {
   if (!filtered.length) {
     html = '<div class="hint">Nessun corso trovato.</div>';
   } else {
-    html = `<div class='table-responsive'><table class='modern-table'><thead><tr><th>ID</th><th>Nome</th><th>Descrizione</th><th>Azioni</th></tr></thead><tbody>`;
+    html = `<div class='table-responsive'><table class='modern-table'><thead><tr><th>Nome</th><th>Descrizione</th><th>Azioni</th></tr></thead><tbody>`;
     filtered.forEach(c => {
-      html += `<tr><td><span class='badge' style='background:var(--primary-light);color:#fff;'>${c.id}</span></td>`;
+      html += `<tr>`;
       html += `<td><span class='badge' style='background:#f1f5f9;color:var(--primary);'>${c.name}</span></td>`;
-      html += `<td>${c.description||''}</td>`;
-      html += `<td style='text-align:center;'><button class='icon-btn' title='Modifica' onclick='openEditCourse(${c.id})'>✏️</button> <button class='icon-btn' title='Elimina' onclick='deleteCourse(${c.id})'>🗑️</button></td></tr>`;
+      html += `<td>${c.description || ''}</td>`;
+      html += `<td style='text-align:center;'>
+        <button class='icon-btn' title='Modifica' onclick='openEditCourse(${c.id})'>✏️</button>
+        <button class='icon-btn' title='Elimina' onclick='deleteCourse(${c.id})'>🗑️</button>
+      </td></tr>`;
     });
     html += '</tbody></table></div>';
   }
   document.getElementById('courses-list').innerHTML = html;
 }
-function updateFilterCourseListSelect() {
+
+const updateFilterCourseListSelect = () =>
   filterCourseListSelect.innerHTML = '<option value="">Tutti i corsi</option>' + allCourses.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
-}
+
 function fetchCourses() {
-  fetch('/api/courses').then(r=>r.json()).then(courses => {
-    allCourses = courses;
-    updateFilterCourseListSelect();
-    renderCoursesList();
-  });
+  fetch('/api/courses')
+    .then(async r => {
+      if (!r.ok) {
+        const msg = await r.text();
+        throw new Error(msg);
+      }
+      return r.json();
+    })
+    .then(courses => {
+      allCourses = courses;
+      updateFilterCourseListSelect();
+      renderCoursesList();
+    })
+    .catch(err => {
+      document.getElementById('courses-list').innerHTML = `<div class="hint">Errore nel caricamento corsi: ${err.message}</div>`;
+    });
 }
+
 document.getElementById('add-course-form').onsubmit = function(e) {
   e.preventDefault();
   fetch('/api/courses', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:document.getElementById('course-name').value,description:document.getElementById('course-desc').value})})
