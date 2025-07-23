@@ -91,12 +91,7 @@ function populateFilterOptionsU() {
   dayChoicesU.setChoices(days.map(d => ({ value: d, label: d })), 'value', 'label', false);
 }
 
-function formatDate(iso) {
-  if(!iso) return '-';
-  const d = new Date(iso);
-  if(isNaN(d)) return '-';
-  return d.toLocaleDateString('it-IT', {day:'2-digit', month:'2-digit', year:'numeric'});
-}
+
 // Funzione per ottenere il giorno della settimana in italiano da una data ISO
 function getItalianDayOfWeek(dateString) {
   if (!dateString) return '';
