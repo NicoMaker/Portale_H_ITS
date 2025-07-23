@@ -65,7 +65,6 @@ function renderUsersList() {
       if(adminCount>1) html += `<button onclick='deleteUser(${u.id})'>Elimina</button>`;
     } else {
       html += `<button onclick='openEditUser(${u.id})'>Modifica</button> `;
-      if(u.role==="user" && u.courses && u.courses[0]) html += `<button onclick='showUserSchedules(${u.id},${u.courses[0].id})'>Orari</button> `;
       if(u.role!=="admin") html += `<button onclick='promote(${u.id})'>Rendi Admin</button>`;
       if(u.role==="admin" && adminCount>1) html += `<button onclick='demote(${u.id})'>Rendi Utente</button>`;
       if(adminCount>1 || u.role!=="admin") html += `<button onclick='deleteUser(${u.id})'>Elimina</button>`;
