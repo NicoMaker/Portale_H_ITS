@@ -59,14 +59,32 @@
           <label for="edit-course-select">Corso</label>
           <select id="edit-course-select" required></select>
 
+          <!-- DOCENTE -->
           <label for="edit-teacher">Docente</label>
-          <input type="text" id="edit-teacher" placeholder="Docente" required />
+          <div style="display:flex;gap:0.5rem;">
+            <input type="text" id="edit-teacher" list="teacher-list" placeholder="Docente" required />
+            <button type="button" id="edit-teacher-btn" style="display:none;">+ Aggiungi</button>
+          </div>
 
-          <label for="edit-room">Aula</label>
-          <input type="text" id="edit-room" placeholder="Aula" required />
-
+          <!-- MATERIA -->
           <label for="edit-subject">Materia</label>
-          <input type="text" id="edit-subject" placeholder="Materia" required />
+          <div style="display:flex;gap:0.5rem;">
+            <input type="text" id="edit-subject" list="subject-list" placeholder="Materia" required />
+            <button type="button" id="edit-subject-btn" style="display:none;">+ Aggiungi</button>
+          </div>
+
+          <!-- AULA -->
+          <label for="edit-room">Aula</label>
+          <div style="display:flex;gap:0.5rem;">
+            <input type="text" id="edit-room" list="room-list" placeholder="Aula" required />
+            <button type="button" id="edit-room-btn" style="display:none;">+ Aggiungi</button>
+          </div>
+
+          <!-- Le datalist restano condivise -->
+          <datalist id="teacher-list"></datalist>
+          <datalist id="subject-list"></datalist>
+          <datalist id="room-list"></datalist>
+
 
           <label for="edit-day">Giorno</label>
           <div id="edit-day" class="auto-day"
@@ -106,14 +124,30 @@
           <label for="add-course-select">Corso</label>
           <select id="add-course-select" required></select>
 
+          <!-- DOCENTE -->
           <label for="add-teacher">Docente</label>
-          <input type="text" id="add-teacher" placeholder="Docente" required />
+          <div style="display:flex;gap:0.5rem;">
+            <input type="text" id="add-teacher" list="teacher-list" placeholder="Docente" required />
+            <button type="button" id="add-teacher-btn" style="display:none;">+ Aggiungi</button>
+          </div>
+          <datalist id="teacher-list"></datalist>
 
-          <label for="add-room">Aula</label>
-          <input type="text" id="add-room" placeholder="Aula" required />
-
+          <!-- MATERIA -->
           <label for="add-subject">Materia</label>
-          <input type="text" id="add-subject" placeholder="Materia" required />
+          <div style="display:flex;gap:0.5rem;">
+            <input type="text" id="add-subject" list="subject-list" placeholder="Materia" required />
+            <button type="button" id="add-subject-btn" style="display:none;">+ Aggiungi</button>
+          </div>
+          <datalist id="subject-list"></datalist>
+
+          <!-- AULA -->
+          <label for="add-room">Aula</label>
+          <div style="display:flex;gap:0.5rem;">
+            <input type="text" id="add-room" list="room-list" placeholder="Aula" required />
+            <button type="button" id="add-room-btn" style="display:none;">+ Aggiungi</button>
+          </div>
+          <datalist id="room-list"></datalist>
+
 
           <label for="add-day">Giorno</label>
           <div id="add-day" class="auto-day"

@@ -15,6 +15,7 @@ function fetchCoursesAndSchedules() {
     select.innerHTML = '<option value="">Tutti i corsi</option>' + courses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
     populateFilterOptions();
     renderSchedules();
+    updateDatalists();
   });
 }
 document.getElementById('filter-course').onchange = renderSchedules;
@@ -311,6 +312,14 @@ function populateFilterOptions() {
 document.addEventListener('DOMContentLoaded', () => {
   searchScheduleCourseInput = document.getElementById('search-schedule-course');
   filterScheduleCourseSelect = document.getElementById('filter-schedule-course');
+  setupAddFieldWithButton('add-teacher', 'add-teacher-btn', 'teacher-list');
+  setupAddFieldWithButton('add-room', 'add-room-btn', 'room-list');
+  setupAddFieldWithButton('add-subject', 'add-subject-btn', 'subject-list');
+
+  setupAddFieldWithButton('edit-teacher', 'edit-teacher-btn', 'teacher-list');
+  setupAddFieldWithButton('edit-room', 'edit-room-btn', 'room-list');
+  setupAddFieldWithButton('edit-subject', 'edit-subject-btn', 'subject-list');
+
   if (searchScheduleCourseInput && filterScheduleCourseSelect) {
     searchScheduleCourseInput.addEventListener('input', renderSchedulesList);
     filterScheduleCourseSelect.addEventListener('change', renderSchedulesList);
@@ -323,4 +332,42 @@ document.addEventListener('DOMContentLoaded', () => {
   subjectChoices = new Choices('#filter-subject', { removeItemButton: true, searchEnabled: true, shouldSort: false, position: 'bottom', placeholder: true });
   dayChoices = new Choices('#filter-day', { removeItemButton: true, searchEnabled: true, shouldSort: false, position: 'bottom', placeholder: true });
 });
-fetchCoursesAndSchedules(); 
+fetchCoursesAndSchedules();
+
+function setupAddFieldWithButton(inputId, buttonId, listId) {
+  const input = document.getElementById(inputId);
+  const button = document.getElementById(buttonId);
+  const list = document.getElementById(listId);
+
+  if (!input || !button || !list) return;
+
+  input.addEventListener('input', () => {
+    const val = input.value.trim();
+    const exists = Array.from(list.options).some(opt => opt.value.toLowerCase() === val.toLowerCase());
+    button.style.display = val && !exists ? 'inline-block' : 'none';
+  });
+
+  button.addEventListener('click', () => {
+    const val = input.value.trim();
+    if (!val) return;
+    const opt = document.createElement('option');
+    opt.value = val;
+    list.appendChild(opt);
+    button.style.display = 'none';
+  });
+}
+
+function updateDatalists() {
+  const teachers = [...new Set(schedules.map(s => s.teacher).filter(Boolean))];
+  const rooms = [...new Set(schedules.map(s => s.room).filter(Boolean))];
+  const subjects = [...new Set(schedules.map(s => s.subject).filter(Boolean))];
+
+  const setOptions = (id, values) => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = values.map(v => `<option value="${v}">`).join('');
+  };
+
+  setOptions('teacher-list', teachers);
+  setOptions('room-list', rooms);
+  setOptions('subject-list', subjects);
+}
