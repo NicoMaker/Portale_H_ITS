@@ -106,7 +106,7 @@ const server = http.createServer((req, res) => {
           const params = {};
           body.split('&').forEach(pair => {
             const [k, v] = pair.split('=');
-            if (k) params[decodeURIComponent(k)] = decodeURIComponent(v||'');
+            if (k) params[decodeURIComponent(k)] = decodeURIComponent(v || '');
           });
           cb(params);
         }
@@ -116,10 +116,10 @@ const server = http.createServer((req, res) => {
 
   // Auth: login
   if (req.method === 'POST' && parsedUrl.pathname === '/login') {
-    parseBody(({username, password}) => {
+    parseBody(({ username, password }) => {
       db.get('SELECT * FROM users WHERE username = ?', [username], (err, user) => {
         if (!user || !bcrypt.compareSync(password, user.password)) {
-          res.writeHead(200, {'Content-Type':'text/html'});
+          res.writeHead(200, { 'Content-Type': 'text/html' });
           return res.end('<div class="hint" style="color:red;text-align:center">Credenziali non valide</div>');
         }
         const sid = createSession({ id: user.id, username: user.username, role: user.role });
@@ -133,10 +133,10 @@ const server = http.createServer((req, res) => {
 
   // Auth: register
   if (req.method === 'POST' && parsedUrl.pathname === '/register') {
-    parseBody(({username, password, role}) => {
+    parseBody(({ username, password, role }) => {
       // Password sicura
       if (!password || password.length < 8 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
-        res.writeHead(400, {'Content-Type':'text/html'});
+        res.writeHead(400, { 'Content-Type': 'text/html' });
         return res.end('<script>alert("Password non sicura. Min 8 caratteri, almeno una maiuscola, una minuscola, un numero.");window.location=\'/register.html\';</script>');
       }
       let userRole = 'user';
@@ -147,10 +147,10 @@ const server = http.createServer((req, res) => {
       const hash = bcrypt.hashSync(password, 10);
       db.run('INSERT INTO users (username, password, role) VALUES (?, ?, ?)', [username, hash, userRole], function (err) {
         if (err) {
-          res.writeHead(400, {'Content-Type':'text/html'});
+          res.writeHead(400, { 'Content-Type': 'text/html' });
           return res.end('<script>alert("Username già esistente");window.location=\'/register.html\';</script>');
         }
-        res.writeHead(200, {'Content-Type':'text/plain'});
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
         res.end('Registrazione avvenuta!');
       });
     });
@@ -189,7 +189,7 @@ const server = http.createServer((req, res) => {
     }
     // POST /api/users (creazione utente da admin)
     if (req.method === 'POST' && parsedUrl.pathname === '/api/users') {
-      parseBody(({username, password, role, course_id}) => {
+      parseBody(({ username, password, role, course_id }) => {
         // Validazione password
         if (!password || password.length < 8 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
           res.end('Password non sicura'); return;
@@ -205,7 +205,7 @@ const server = http.createServer((req, res) => {
           }
           // Se è stato passato un corso e il ruolo è user, associalo
           if (userRole === 'user' && course_id) {
-            db.run('INSERT OR IGNORE INTO user_courses (user_id, course_id) VALUES (?, ?)', [this.lastID, course_id], function(err2) {
+            db.run('INSERT OR IGNORE INTO user_courses (user_id, course_id) VALUES (?, ?)', [this.lastID, course_id], function (err2) {
               if (err2) { res.end('Errore DB'); return; }
               res.end('OK');
             });
@@ -219,9 +219,9 @@ const server = http.createServer((req, res) => {
     // POST /api/users/:id/promote
     if (req.method === 'POST' && parsedUrl.pathname.match(/^\/api\/users\/\d+\/promote$/)) {
       const id = parsedUrl.pathname.split('/')[3];
-      db.run('UPDATE users SET role="admin" WHERE id=?', [id], function(err) {
+      db.run('UPDATE users SET role="admin" WHERE id=?', [id], function (err) {
         if (err) { res.writeHead(500); res.end('DB error'); return; }
-        db.run('DELETE FROM user_courses WHERE user_id=?', [id], function(err2) {
+        db.run('DELETE FROM user_courses WHERE user_id=?', [id], function (err2) {
           if (err2) { res.writeHead(500); res.end('DB error'); return; }
           res.end('OK');
         });
@@ -237,13 +237,13 @@ const server = http.createServer((req, res) => {
             if (row && row.n <= 1) {
               res.writeHead(400); res.end("Non puoi eliminare l'ultimo admin"); return;
             }
-            db.run('DELETE FROM users WHERE id=?', [id], function(err) {
+            db.run('DELETE FROM users WHERE id=?', [id], function (err) {
               if (err) { res.writeHead(500); res.end('DB error'); return; }
               res.end('OK');
             });
           });
         } else {
-          db.run('DELETE FROM users WHERE id=?', [id], function(err) {
+          db.run('DELETE FROM users WHERE id=?', [id], function (err) {
             if (err) { res.writeHead(500); res.end('DB error'); return; }
             res.end('OK');
           });
@@ -254,10 +254,10 @@ const server = http.createServer((req, res) => {
     // POST /api/users/:id/assign_course (un solo corso per utente)
     if (req.method === 'POST' && parsedUrl.pathname.match(/^\/api\/users\/\d+\/assign_course$/)) {
       const id = parsedUrl.pathname.split('/')[3];
-      parseBody(({course_id}) => {
-        db.run('DELETE FROM user_courses WHERE user_id=?', [id], function() {
+      parseBody(({ course_id }) => {
+        db.run('DELETE FROM user_courses WHERE user_id=?', [id], function () {
           if (!course_id) return res.end('OK'); // Nessun corso selezionato
-          db.run('INSERT OR IGNORE INTO user_courses (user_id, course_id) VALUES (?, ?)', [id, course_id], function(err) {
+          db.run('INSERT OR IGNORE INTO user_courses (user_id, course_id) VALUES (?, ?)', [id, course_id], function (err) {
             if (err) { res.writeHead(500); res.end('DB error'); return; }
             res.end('OK');
           });
@@ -268,14 +268,14 @@ const server = http.createServer((req, res) => {
     // POST /api/users/:id/edit (modifica credenziali da admin)
     if (req.method === 'POST' && parsedUrl.pathname.match(/^\/api\/users\/\d+\/edit$/)) {
       const id = parsedUrl.pathname.split('/')[3];
-      parseBody(({username, password}) => {
+      parseBody(({ username, password }) => {
         if (!password || password.length < 8 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
           res.end('Password non sicura'); return;
         }
         db.get('SELECT * FROM users WHERE username=? AND id!=?', [username, id], (err, user) => {
           if (user) { res.end('Username già esistente'); return; }
           const hash = bcrypt.hashSync(password, 10);
-          db.run('UPDATE users SET username=?, password=? WHERE id=?', [username, hash, id], function(err) {
+          db.run('UPDATE users SET username=?, password=? WHERE id=?', [username, hash, id], function (err) {
             if (err) { res.end('Errore DB'); return; }
             res.end('OK');
           });
@@ -292,7 +292,7 @@ const server = http.createServer((req, res) => {
           if (row && row.n <= 1) {
             res.writeHead(400); res.end("Non puoi togliere l'ultimo admin"); return;
           }
-          db.run('UPDATE users SET role="user" WHERE id=?', [id], function(err) {
+          db.run('UPDATE users SET role="user" WHERE id=?', [id], function (err) {
             if (err) { res.writeHead(500); res.end('DB error'); return; }
             res.end('OK');
           });
@@ -318,8 +318,8 @@ const server = http.createServer((req, res) => {
     }
     // POST /api/courses
     if (req.method === 'POST' && parsedUrl.pathname === '/api/courses') {
-      parseBody(({name, description}) => {
-        db.run('INSERT INTO courses (name, description) VALUES (?, ?)', [name, description], function(err) {
+      parseBody(({ name, description }) => {
+        db.run('INSERT INTO courses (name, description) VALUES (?, ?)', [name, description], function (err) {
           if (err) { res.writeHead(400); res.end('Nome corso già esistente'); return; }
           res.end('OK');
         });
@@ -329,8 +329,8 @@ const server = http.createServer((req, res) => {
     // PUT /api/courses/:id
     if (req.method === 'PUT' && parsedUrl.pathname.match(/^\/api\/courses\/\d+$/)) {
       const id = parsedUrl.pathname.split('/')[3];
-      parseBody(({name, description}) => {
-        db.run('UPDATE courses SET name=?, description=? WHERE id=?', [name, description, id], function(err) {
+      parseBody(({ name, description }) => {
+        db.run('UPDATE courses SET name=?, description=? WHERE id=?', [name, description, id], function (err) {
           if (err) { res.writeHead(400); res.end('Errore update corso'); return; }
           res.end('OK');
         });
@@ -340,7 +340,7 @@ const server = http.createServer((req, res) => {
     // DELETE /api/courses/:id
     if (req.method === 'DELETE' && parsedUrl.pathname.match(/^\/api\/courses\/\d+$/)) {
       const id = parsedUrl.pathname.split('/')[3];
-      db.run('DELETE FROM courses WHERE id=?', [id], function(err) {
+      db.run('DELETE FROM courses WHERE id=?', [id], function (err) {
         if (err) { res.writeHead(500); res.end('DB error'); return; }
         res.end('OK');
       });
@@ -371,31 +371,31 @@ const server = http.createServer((req, res) => {
     }
     // POST /api/schedules
     if (req.method === 'POST' && parsedUrl.pathname === '/api/schedules') {
-      parseBody(({course_id, teacher, room, subject, day, date, start_time, end_time}) => {
+      parseBody(({ course_id, teacher, room, subject, day, date, start_time, end_time }) => {
         db.run('INSERT INTO schedules (course_id, teacher, room, subject, day, date, start_time, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-          [course_id, teacher, room, subject, day, date, start_time, end_time], function(err) {
-          if (err) { res.writeHead(400); res.end('Errore inserimento orario'); return; }
-          res.end('OK');
-        });
+          [course_id, teacher, room, subject, day, date, start_time, end_time], function (err) {
+            if (err) { res.writeHead(400); res.end('Errore inserimento orario'); return; }
+            res.end('OK');
+          });
       });
       return;
     }
     // PUT /api/schedules/:id
     if (req.method === 'PUT' && parsedUrl.pathname.match(/^\/api\/schedules\/\d+$/)) {
       const id = parsedUrl.pathname.split('/')[3];
-      parseBody(({course_id, teacher, room, subject, day, date, start_time, end_time}) => {
+      parseBody(({ course_id, teacher, room, subject, day, date, start_time, end_time }) => {
         db.run('UPDATE schedules SET course_id=?, teacher=?, room=?, subject=?, day=?, date=?, start_time=?, end_time=? WHERE id=?',
-          [course_id, teacher, room, subject, day, date, start_time, end_time, id], function(err) {
-          if (err) { res.writeHead(400); res.end('Errore update orario'); return; }
-          res.end('OK');
-        });
+          [course_id, teacher, room, subject, day, date, start_time, end_time, id], function (err) {
+            if (err) { res.writeHead(400); res.end('Errore update orario'); return; }
+            res.end('OK');
+          });
       });
       return;
     }
     // DELETE /api/schedules/:id
     if (req.method === 'DELETE' && parsedUrl.pathname.match(/^\/api\/schedules\/\d+$/)) {
       const id = parsedUrl.pathname.split('/')[3];
-      db.run('DELETE FROM schedules WHERE id=?', [id], function(err) {
+      db.run('DELETE FROM schedules WHERE id=?', [id], function (err) {
         if (err) { res.writeHead(500); res.end('DB error'); return; }
         res.end('OK');
       });
@@ -442,14 +442,14 @@ const server = http.createServer((req, res) => {
   if (req.method === 'POST' && parsedUrl.pathname === '/user/profile') {
     const session = getSession(req);
     if (!session) { res.writeHead(403); res.end('Forbidden'); return; }
-    parseBody(({username, password}) => {
+    parseBody(({ username, password }) => {
       if (!password || password.length < 8 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
         res.end('Password non sicura'); return;
       }
       db.get('SELECT * FROM users WHERE username=? AND id!=?', [username, session.user.id], (err, user) => {
         if (user) { res.end('Username già esistente'); return; }
         const hash = bcrypt.hashSync(password, 10);
-        db.run('UPDATE users SET username=?, password=? WHERE id=?', [username, hash, session.user.id], function(err) {
+        db.run('UPDATE users SET username=?, password=? WHERE id=?', [username, hash, session.user.id], function (err) {
           if (err) { res.end('Errore DB'); return; }
           // Aggiorna sessione
           session.user.username = username;
@@ -467,6 +467,27 @@ const server = http.createServer((req, res) => {
       res.writeHead(302, { Location: '/login.html' }); res.end(); return;
     }
     serveStatic(req, res);
+    return;
+  }
+
+  // GET /api/schedules/meta
+  if (req.method === 'GET' && parsedUrl.pathname === '/api/schedules/meta') {
+    const fields = ['teacher', 'room', 'subject'];
+    const results = {};
+    let done = 0;
+
+    fields.forEach(field => {
+      db.all(`SELECT DISTINCT ${field} FROM schedules ORDER BY ${field}`, [], (err, rows) => {
+        if (err) {
+          res.writeHead(500); res.end('DB error'); return;
+        }
+        results[field] = rows.map(r => r[field]);
+        if (++done === fields.length) {
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify(results));
+        }
+      });
+    });
     return;
   }
 

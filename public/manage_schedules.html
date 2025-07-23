@@ -54,39 +54,46 @@
     <div class="modal-content">
       <span class="close" id="close-edit-schedule-modal">&times;</span>
       <h3>Modifica Orario</h3>
-      <div style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
+      <div style="max-height: 400px; overflow-y: auto; padding-right: 0.5rem;">
         <form id="edit-schedule-form">
-          <label for="edit-course-select">Scegli il corso:</label>
+          <label for="edit-course-select">Corso</label>
           <select id="edit-course-select" required></select>
 
-          <label for="edit-teacher">Docente:</label>
+          <label for="edit-teacher">Docente</label>
           <input type="text" id="edit-teacher" placeholder="Docente" required />
 
-          <label for="edit-room">Aula:</label>
+          <label for="edit-room">Aula</label>
           <input type="text" id="edit-room" placeholder="Aula" required />
 
-          <label for="edit-subject">Materia:</label>
+          <label for="edit-subject">Materia</label>
           <input type="text" id="edit-subject" placeholder="Materia" required />
 
-          <label for="edit-day">Giorno:</label>
+          <label for="edit-day">Giorno</label>
           <div id="edit-day" class="auto-day"
             style="margin-bottom:0.7rem;height:2.2em;display:flex;align-items:center;padding-left:0.5em;background:#f3f4f6;border-radius:5px;">
           </div>
 
-          <label for="edit-date">Data:</label>
+          <label for="edit-date">Data</label>
           <input type="date" id="edit-date" required />
 
-          <label>Orario:</label>
           <div style="display:flex;gap:1rem;">
-            <input type="time" id="edit-start" required style="flex:1;" />
-            <input type="time" id="edit-end" required style="flex:1;" />
+            <div style="flex:1;">
+              <label for="edit-start">Ora Inizio</label>
+              <input type="time" id="edit-start" required />
+            </div>
+            <div style="flex:1;">
+              <label for="edit-end">Ora Fine</label>
+              <input type="time" id="edit-end" required />
+            </div>
           </div>
 
           <button type="submit">Salva</button>
           <button type="button" id="cancel-edit-schedule" style="margin-left:1rem">Annulla</button>
+
           <div id="edit-schedule-msg"></div>
         </form>
       </div>
+
 
     </div>
   </div>
@@ -94,36 +101,42 @@
     <div class="modal-content">
       <span class="close" id="close-add-schedule-modal">&times;</span>
       <h3>Aggiungi Orario</h3>
-      <div style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
+      <div style="max-height: 400px; overflow-y: auto; padding-right: 0.5rem;">
         <form id="add-schedule-form">
-          <label for="add-course-select">Scegli il corso:</label>
+          <label for="add-course-select">Corso</label>
           <select id="add-course-select" required></select>
 
-          <label for="add-teacher">Docente:</label>
+          <label for="add-teacher">Docente</label>
           <input type="text" id="add-teacher" placeholder="Docente" required />
 
-          <label for="add-room">Aula:</label>
+          <label for="add-room">Aula</label>
           <input type="text" id="add-room" placeholder="Aula" required />
 
-          <label for="add-subject">Materia:</label>
+          <label for="add-subject">Materia</label>
           <input type="text" id="add-subject" placeholder="Materia" required />
 
-          <label for="add-day">Giorno:</label>
+          <label for="add-day">Giorno</label>
           <div id="add-day" class="auto-day"
             style="margin-bottom:0.7rem;height:2.2em;display:flex;align-items:center;padding-left:0.5em;background:#f3f4f6;border-radius:5px;">
           </div>
 
-          <label for="add-date">Data:</label>
+          <label for="add-date">Data</label>
           <input type="date" id="add-date" required />
 
-          <label>Orario:</label>
           <div style="display:flex;gap:1rem;">
-            <input type="time" id="add-start" required style="flex:1;" />
-            <input type="time" id="add-end" required style="flex:1;" />
+            <div style="flex:1;">
+              <label for="add-start">Ora Inizio</label>
+              <input type="time" id="add-start" required />
+            </div>
+            <div style="flex:1;">
+              <label for="add-end">Ora Fine</label>
+              <input type="time" id="add-end" required />
+            </div>
           </div>
 
           <button type="submit">Salva</button>
           <button type="button" id="cancel-add-schedule" style="margin-left:1rem">Annulla</button>
+
           <div id="add-schedule-msg"></div>
         </form>
       </div>

@@ -155,7 +155,10 @@ function deleteSchedule(id) {
 }
 document.getElementById('add-schedule-btn').onclick = () => {
   const filterVal = document.getElementById('filter-course').value;
-  document.getElementById('add-course-select').innerHTML = courses.map(c => `<option value="${c.id}"${c.id == filterVal ? ' selected' : ''}>${c.name}</option>`).join('');
+  document.getElementById('add-course-select').innerHTML =
+    `<option value="" disabled selected>Seleziona un corso</option>` +
+    courses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+
   document.getElementById('add-teacher').value = '';
   document.getElementById('add-room').value = '';
   document.getElementById('add-subject').value = '';
@@ -239,20 +242,20 @@ function renderSchedulesList() {
     html = `<div class='table-responsive'><table class='modern-table'><thead><tr><th>Corso</th><th>Docente</th><th>Aula</th><th>Materia</th><th>Giorno</th><th>Data</th><th>Inizio</th><th>Fine</th><th>Azioni</th></tr></thead><tbody>`;
     filtered.forEach(s => {
       const course = allCourses.find(c => c.id == s.course_id) || {};
-      html += `<tr><td>${course.name||'-'}</td><td>${s.teacher}</td><td>${s.room}</td><td>${s.subject || ''}</td><td>${s.day}</td><td>${typeof formatDate === 'function' ? formatDate(s.date) : s.date}</td><td>${s.start_time}</td><td>${s.end_time}</td><td style='text-align:center;'><button class='icon-btn' title='Modifica' onclick='openEditSchedule(${s.id})'>✏️</button> <button class='icon-btn' title='Elimina' onclick='deleteSchedule(${s.id})'>🗑️</button></td></tr>`;
+      html += `<tr><td>${course.name || '-'}</td><td>${s.teacher}</td><td>${s.room}</td><td>${s.subject || ''}</td><td>${s.day}</td><td>${typeof formatDate === 'function' ? formatDate(s.date) : s.date}</td><td>${s.start_time}</td><td>${s.end_time}</td><td style='text-align:center;'><button class='icon-btn' title='Modifica' onclick='openEditSchedule(${s.id})'>✏️</button> <button class='icon-btn' title='Elimina' onclick='deleteSchedule(${s.id})'>🗑️</button></td></tr>`;
     });
     html += '</tbody></table></div>';
   }
   document.getElementById('schedules-list').innerHTML = html;
 }
 function updateFilterScheduleCourseSelect() {
-  filterScheduleCourseSelect.innerHTML = '<option value="">Tutti i corsi</option>' + allCourses.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  filterScheduleCourseSelect.innerHTML = '<option value="">Tutti i corsi</option>' + allCourses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
 }
 function fetchCourses() {
-  return fetch('/api/courses').then(r=>r.json()).then(data => { allCourses = data; updateFilterScheduleCourseSelect(); });
+  return fetch('/api/courses').then(r => r.json()).then(data => { allCourses = data; updateFilterScheduleCourseSelect(); });
 }
 function fetchSchedules() {
-  fetch('/api/schedules').then(r=>r.json()).then(data => {
+  fetch('/api/schedules').then(r => r.json()).then(data => {
     allSchedules = data;
     renderSchedulesList();
   });
@@ -271,7 +274,7 @@ function setupAutoDayFill() {
   const addDate = document.getElementById('add-date');
   const addDayDiv = document.getElementById('add-day');
   if (addDate && addDayDiv) {
-    addDate.addEventListener('change', function() {
+    addDate.addEventListener('change', function () {
       const giorno = getItalianDayOfWeek(this.value);
       addDayDiv.textContent = giorno;
     });
@@ -279,7 +282,7 @@ function setupAutoDayFill() {
   const editDate = document.getElementById('edit-date');
   const editDayDiv = document.getElementById('edit-day');
   if (editDate && editDayDiv) {
-    editDate.addEventListener('change', function() {
+    editDate.addEventListener('change', function () {
       const giorno = getItalianDayOfWeek(this.value);
       editDayDiv.textContent = giorno;
     });
@@ -308,7 +311,7 @@ function populateFilterOptions() {
 document.addEventListener('DOMContentLoaded', () => {
   searchScheduleCourseInput = document.getElementById('search-schedule-course');
   filterScheduleCourseSelect = document.getElementById('filter-schedule-course');
-  if(searchScheduleCourseInput && filterScheduleCourseSelect) {
+  if (searchScheduleCourseInput && filterScheduleCourseSelect) {
     searchScheduleCourseInput.addEventListener('input', renderSchedulesList);
     filterScheduleCourseSelect.addEventListener('change', renderSchedulesList);
   }
