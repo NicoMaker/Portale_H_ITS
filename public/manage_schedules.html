@@ -6,40 +6,54 @@
   <title>Gestione Orari</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/style.css">
-  <!-- Choices.js CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 </head>
 
 <body>
-  <div class="navbar"><span style="font-size:1.5em;vertical-align:middle;">🗓️</span> Gestione Orari</div>
+  <div class="navbar">
+    <span style="font-size:1.5em;vertical-align:middle;">🗓️</span> Gestione Orari
+  </div>
+
   <div class="container" style="max-width:900px;">
+    <!-- Sezione FILTRI -->
     <div class="filters-bar">
+      <h2>🔎 Filtra i risultati</h2>
+      <p>Utilizza i seguenti filtri per cercare lezioni, docenti, aule e altro.</p>
+
       <div class="filter-group">
         <label for="filter-course"><span class="filter-icon">📚</span>Corso</label>
         <select id="filter-course"></select>
       </div>
+
       <div class="filter-group">
         <label>👨‍🏫 Docente</label>
         <select id="filter-teacher" multiple></select>
       </div>
+
       <div class="filter-group">
         <label>🏫 Aula</label>
         <select id="filter-room" multiple></select>
       </div>
+
       <div class="filter-group">
         <label>📖 Materia</label>
         <select id="filter-subject" multiple></select>
       </div>
+
       <div class="filter-group">
         <label>📅 Giorno</label>
         <select id="filter-day" multiple></select>
       </div>
+
       <div class="filter-group">
         <label for="filter-date"><span class="filter-icon">📆</span>Data</label>
         <input type="date" id="filter-date" />
       </div>
-      <button id="add-schedule-btn" class="primary-btn">+ Aggiungi Orario</button>
     </div>
+
+    <button id="add-schedule-btn" class="primary-btn">+ Aggiungi Orario</button>
+
+    <!-- Ricerca specifica per corso -->
     <div style="display:flex;gap:1rem;align-items:center;margin-bottom:1.2rem;">
       <input type="text" id="search-schedule-course" placeholder="Cerca corso per nome..."
         style="flex:2 1 200px; display: none;" />
@@ -47,136 +61,133 @@
         <option value="">Tutti i corsi</option>
       </select>
     </div>
+
+    <!-- Elenco orari -->
     <div id="schedules-list"></div>
+
+    <!-- Link a Dashboard -->
     <a href="/admin_dashboard.html" style="display:inline-block;margin-top:2.5rem;">Torna alla Dashboard</a>
-  </div>
-  <div id="edit-schedule-modal" class="modal" style="display:none">
-    <div class="modal-content">
-      <span class="close" id="close-edit-schedule-modal">&times;</span>
-      <h3>Modifica Orario</h3>
-      <div style="max-height: 400px; overflow-y: auto; padding-right: 0.5rem;">
-        <form id="edit-schedule-form">
-          <label for="edit-course-select">Corso</label>
-          <select id="edit-course-select" required></select>
 
-          <!-- DOCENTE -->
-          <label for="edit-teacher">Docente</label>
-          <div style="display:flex;gap:0.5rem;">
-            <input type="text" id="edit-teacher" list="teacher-list" placeholder="Docente" required />
-            <button type="button" id="edit-teacher-btn" style="display:none;">+ Aggiungi</button>
-          </div>
+    <!-- Modale: MODIFICA ORARIO -->
+    <div id="edit-schedule-modal" class="modal" style="display:none">
+      <div class="modal-content">
+        <span class="close" id="close-edit-schedule-modal">&times;</span>
+        <h3>Modifica Orario</h3>
 
-          <!-- MATERIA -->
-          <label for="edit-subject">Materia</label>
-          <div style="display:flex;gap:0.5rem;">
-            <input type="text" id="edit-subject" list="subject-list" placeholder="Materia" required />
-            <button type="button" id="edit-subject-btn" style="display:none;">+ Aggiungi</button>
-          </div>
+        <div style="max-height: 400px; overflow-y: auto; padding-right: 0.5rem;">
+          <form id="edit-schedule-form">
+            <label for="edit-course-select">Corso</label>
+            <select id="edit-course-select" required></select>
 
-          <!-- AULA -->
-          <label for="edit-room">Aula</label>
-          <div style="display:flex;gap:0.5rem;">
-            <input type="text" id="edit-room" list="room-list" placeholder="Aula" required />
-            <button type="button" id="edit-room-btn" style="display:none;">+ Aggiungi</button>
-          </div>
-
-          <!-- Le datalist restano condivise -->
-          <datalist id="teacher-list"></datalist>
-          <datalist id="subject-list"></datalist>
-          <datalist id="room-list"></datalist>
-
-
-          <label for="edit-day">Giorno</label>
-          <div id="edit-day" class="auto-day"
-            style="margin-bottom:0.7rem;height:2.2em;display:flex;align-items:center;padding-left:0.5em;background:#f3f4f6;border-radius:5px;">
-          </div>
-
-          <label for="edit-date">Data</label>
-          <input type="date" id="edit-date" required />
-
-          <div style="display:flex;gap:1rem;">
-            <div style="flex:1;">
-              <label for="edit-start">Ora Inizio</label>
-              <input type="time" id="edit-start" required />
+            <label for="edit-teacher">Docente</label>
+            <div style="display:flex;gap:0.5rem;">
+              <input type="text" id="edit-teacher" list="teacher-list" placeholder="Docente" required />
+              <button type="button" id="edit-teacher-btn" style="display:none;">+ Aggiungi</button>
             </div>
-            <div style="flex:1;">
-              <label for="edit-end">Ora Fine</label>
-              <input type="time" id="edit-end" required />
+
+            <label for="edit-subject">Materia</label>
+            <div style="display:flex;gap:0.5rem;">
+              <input type="text" id="edit-subject" list="subject-list" placeholder="Materia" required />
+              <button type="button" id="edit-subject-btn" style="display:none;">+ Aggiungi</button>
             </div>
-          </div>
 
-          <button type="submit">Salva</button>
-          <button type="button" id="cancel-edit-schedule" style="margin-left:1rem">Annulla</button>
+            <label for="edit-room">Aula</label>
+            <div style="display:flex;gap:0.5rem;">
+              <input type="text" id="edit-room" list="room-list" placeholder="Aula" required />
+              <button type="button" id="edit-room-btn" style="display:none;">+ Aggiungi</button>
+            </div>
 
-          <div id="edit-schedule-msg"></div>
-        </form>
+            <datalist id="teacher-list"></datalist>
+            <datalist id="subject-list"></datalist>
+            <datalist id="room-list"></datalist>
+
+            <label for="edit-day">Giorno</label>
+            <div id="edit-day" class="auto-day"
+              style="margin-bottom:0.7rem;height:2.2em;display:flex;align-items:center;padding-left:0.5em;background:#f3f4f6;border-radius:5px;">
+            </div>
+
+            <label for="edit-date">Data</label>
+            <input type="date" id="edit-date" required />
+
+            <div style="display:flex;gap:1rem;">
+              <div style="flex:1;">
+                <label for="edit-start">Ora Inizio</label>
+                <input type="time" id="edit-start" required />
+              </div>
+              <div style="flex:1;">
+                <label for="edit-end">Ora Fine</label>
+                <input type="time" id="edit-end" required />
+              </div>
+            </div>
+
+            <button type="submit">Salva</button>
+            <button type="button" id="cancel-edit-schedule" style="margin-left:1rem">Annulla</button>
+            <div id="edit-schedule-msg"></div>
+          </form>
+        </div>
       </div>
+    </div>
 
+    <!-- Modale: AGGIUNGI ORARIO -->
+    <div id="add-schedule-modal" class="modal" style="display:none">
+      <div class="modal-content">
+        <span class="close" id="close-add-schedule-modal">&times;</span>
+        <h3>Aggiungi Orario</h3>
 
+        <div style="max-height: 400px; overflow-y: auto; padding-right: 0.5rem;">
+          <form id="add-schedule-form">
+            <label for="add-course-select">Corso</label>
+            <select id="add-course-select" required></select>
+
+            <label for="add-teacher">Docente</label>
+            <div style="display:flex;gap:0.5rem;">
+              <input type="text" id="add-teacher" list="teacher-list" placeholder="Docente" required />
+              <button type="button" id="add-teacher-btn" style="display:none;">+ Aggiungi</button>
+            </div>
+            <datalist id="teacher-list"></datalist>
+
+            <label for="add-subject">Materia</label>
+            <div style="display:flex;gap:0.5rem;">
+              <input type="text" id="add-subject" list="subject-list" placeholder="Materia" required />
+              <button type="button" id="add-subject-btn" style="display:none;">+ Aggiungi</button>
+            </div>
+            <datalist id="subject-list"></datalist>
+
+            <label for="add-room">Aula</label>
+            <div style="display:flex;gap:0.5rem;">
+              <input type="text" id="add-room" list="room-list" placeholder="Aula" required />
+              <button type="button" id="add-room-btn" style="display:none;">+ Aggiungi</button>
+            </div>
+            <datalist id="room-list"></datalist>
+
+            <label for="add-day">Giorno</label>
+            <div id="add-day" class="auto-day"
+              style="margin-bottom:0.7rem;height:2.2em;display:flex;align-items:center;padding-left:0.5em;background:#f3f4f6;border-radius:5px;">
+            </div>
+
+            <label for="add-date">Data</label>
+            <input type="date" id="add-date" required />
+
+            <div style="display:flex;gap:1rem;">
+              <div style="flex:1;">
+                <label for="add-start">Ora Inizio</label>
+                <input type="time" id="add-start" required />
+              </div>
+              <div style="flex:1;">
+                <label for="add-end">Ora Fine</label>
+                <input type="time" id="add-end" required />
+              </div>
+            </div>
+
+            <button type="submit">Salva</button>
+            <button type="button" id="cancel-add-schedule" style="margin-left:1rem">Annulla</button>
+            <div id="add-schedule-msg"></div>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
-  <div id="add-schedule-modal" class="modal" style="display:none">
-    <div class="modal-content">
-      <span class="close" id="close-add-schedule-modal">&times;</span>
-      <h3>Aggiungi Orario</h3>
-      <div style="max-height: 400px; overflow-y: auto; padding-right: 0.5rem;">
-        <form id="add-schedule-form">
-          <label for="add-course-select">Corso</label>
-          <select id="add-course-select" required></select>
 
-          <!-- DOCENTE -->
-          <label for="add-teacher">Docente</label>
-          <div style="display:flex;gap:0.5rem;">
-            <input type="text" id="add-teacher" list="teacher-list" placeholder="Docente" required />
-            <button type="button" id="add-teacher-btn" style="display:none;">+ Aggiungi</button>
-          </div>
-          <datalist id="teacher-list"></datalist>
-
-          <!-- MATERIA -->
-          <label for="add-subject">Materia</label>
-          <div style="display:flex;gap:0.5rem;">
-            <input type="text" id="add-subject" list="subject-list" placeholder="Materia" required />
-            <button type="button" id="add-subject-btn" style="display:none;">+ Aggiungi</button>
-          </div>
-          <datalist id="subject-list"></datalist>
-
-          <!-- AULA -->
-          <label for="add-room">Aula</label>
-          <div style="display:flex;gap:0.5rem;">
-            <input type="text" id="add-room" list="room-list" placeholder="Aula" required />
-            <button type="button" id="add-room-btn" style="display:none;">+ Aggiungi</button>
-          </div>
-          <datalist id="room-list"></datalist>
-
-
-          <label for="add-day">Giorno</label>
-          <div id="add-day" class="auto-day"
-            style="margin-bottom:0.7rem;height:2.2em;display:flex;align-items:center;padding-left:0.5em;background:#f3f4f6;border-radius:5px;">
-          </div>
-
-          <label for="add-date">Data</label>
-          <input type="date" id="add-date" required />
-
-          <div style="display:flex;gap:1rem;">
-            <div style="flex:1;">
-              <label for="add-start">Ora Inizio</label>
-              <input type="time" id="add-start" required />
-            </div>
-            <div style="flex:1;">
-              <label for="add-end">Ora Fine</label>
-              <input type="time" id="add-end" required />
-            </div>
-          </div>
-
-          <button type="submit">Salva</button>
-          <button type="button" id="cancel-add-schedule" style="margin-left:1rem">Annulla</button>
-
-          <div id="add-schedule-msg"></div>
-        </form>
-      </div>
-
-    </div>
-  </div>
   <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
   <script src="js/manage_schedules.js"></script>
 </body>

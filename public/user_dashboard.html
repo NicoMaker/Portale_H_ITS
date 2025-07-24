@@ -12,35 +12,52 @@
 
 <body>
   <div class="navbar">Dashboard Utente</div>
+
   <div class="container">
     <h2>Benvenuto nella tua dashboard</h2>
+
+    <!-- SEZIONE FILTRI -->
     <div class="filters-bar">
+      <h2>🔎 Filtra i risultati</h2>
+      <p>Utilizza i seguenti filtri per cercare le lezioni assegnate in base a docente, aula, materia, giorno o data.
+      </p>
+
+      <br>
       <div class="filter-group">
-        <label>👨‍🏫 Docente</label>
+        <label for="filter-teacher-u">👨‍🏫 Docente</label>
         <select id="filter-teacher-u" multiple></select>
       </div>
+
       <div class="filter-group">
-        <label>🏫 Aula</label>
+        <label for="filter-room-u">🏫 Aula</label>
         <select id="filter-room-u" multiple></select>
       </div>
+
       <div class="filter-group">
-        <label>📖 Materia</label>
+        <label for="filter-subject-u">📖 Materia</label>
         <select id="filter-subject-u" multiple></select>
       </div>
+
       <div class="filter-group">
-        <label>📅 Giorno</label>
+        <label for="filter-date-u">📅 Giorno</label>
         <select id="filter-date-u" multiple></select>
       </div>
+
       <div class="filter-group">
-        <label>📆 Data</label>
+        <label for="filter-date-exact-u">📆 Data</label>
         <input type="date" id="filter-date-exact-u" />
       </div>
     </div>
+
+    <!-- SEZIONE CONTENUTI -->
     <div id="user-schedules-table"></div>
     <div id="user-courses"></div>
     <div id="user-courses-debug" class="hint"></div>
+
     <a href="/logout" style="display:inline-block;margin-bottom:1.5rem;">Logout</a>
     <button id="edit-profile-btn" style="margin-top:1.5rem">Modifica Profilo</button>
+
+    <!-- MODALE MODIFICA PROFILO -->
     <div id="edit-profile-modal" class="modal" style="display:none">
       <div class="modal-content">
         <span class="close" id="close-modal">&times;</span>
@@ -52,11 +69,11 @@
           <button type="submit">Salva</button>
           <div id="edit-profile-msg"></div>
         </form>
-
       </div>
     </div>
   </div>
-  <!-- Choices.js JS -->
+
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
   <script src="js/user_dashboard.js"></script>
 </body>

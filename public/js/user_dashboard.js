@@ -173,3 +173,4 @@ document.getElementById('edit-profile-form').onsubmit = function (e) {
       editMsg.style.color = 'red';
     });
 };
+

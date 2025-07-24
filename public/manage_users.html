@@ -1,14 +1,21 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
   <meta charset="UTF-8">
   <title>Gestione Utenti</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/style.css">
 </head>
+
 <body>
-  <div class="navbar"><a href="/admin_dashboard.html">Dashboard Admin</a> &gt; Gestione Utenti</div>
+  <div class="navbar">
+    <a href="/admin_dashboard.html">Dashboard Admin</a> &gt; Gestione Utenti
+  </div>
+
   <div class="container" style="max-width:900px;">
+
+    <!-- FORM AGGIUNTA UTENTE -->
     <div class="form-container" style="box-shadow:none;margin:0 0 2rem 0;">
       <h3 style="margin-bottom:1.2rem;">Aggiungi Utente</h3>
       <form id="add-user-form">
@@ -24,20 +31,48 @@
         <div id="add-user-msg"></div>
       </form>
     </div>
-    <div style="display:flex;gap:1rem;align-items:center;margin-bottom:1.2rem;">
-      <input type="text" id="search-user" placeholder="Cerca utente per nome..." style="flex:2 1 200px;" />
-      <select id="filter-role" style="flex:1 1 120px;">
-        <option value="">Tutti gli utenti</option>
-        <option value="admin">Solo admin</option>
-        <option value="user">Solo utenti</option>
-      </select>
-      <input type="date" id="filter-user-date" style="flex:1 1 150px; display: none;" />
-      <select id="filter-course" style="flex:1 1 120px;"><option value="">Tutti i corsi</option></select>
+
+    <!-- SEZIONE FILTRI -->
+    <div class="filters-bar">
+      <h2>🔎 Filtra gli utenti</h2>
+      <p>Usa i seguenti filtri per cercare utenti in base a ruolo, corso o nome.</p>
+
+      <div class="filter-group">
+        <label for="search-user">👤 Nome utente</label>
+        <input type="text" id="search-user" placeholder="Cerca utente per nome..." />
+      </div>
+
+      <div class="filter-group">
+        <label for="filter-role">🛡️ Ruolo</label>
+        <select id="filter-role">
+          <option value="">Tutti gli utenti</option>
+          <option value="admin">Solo admin</option>
+          <option value="user">Solo utenti</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filter-course">📚 Corso</label>
+        <select id="filter-course">
+          <option value="">Tutti i corsi</option>
+        </select>
+      </div>
+
+      <div class="filter-group" style="display:none;">
+        <label for="filter-user-date">📅 Data registrazione</label>
+        <input type="date" id="filter-user-date" />
+      </div>
     </div>
+
+    <!-- ELENCO UTENTI -->
     <div id="users-list"></div>
     <div id="assign-msg" class="hint"></div>
-    <a href="/admin_dashboard.html">Torna alla Dashboard</a>
+
+    <!-- TORNA ALLA DASHBOARD -->
+    <a href="/admin_dashboard.html" style="display:inline-block;margin-top:2.5rem;">Torna alla Dashboard</a>
   </div>
+
+  <!-- MODALE MODIFICA UTENTE -->
   <div id="edit-user-modal" class="modal" style="display:none">
     <div class="modal-content">
       <span class="close" id="close-edit-modal">&times;</span>
@@ -51,6 +86,8 @@
       </form>
     </div>
   </div>
+
+  <!-- MODALE ORARI UTENTE -->
   <div id="user-schedules-modal" class="modal" style="display:none">
     <div class="modal-content">
       <span class="close" id="close-schedules-modal">&times;</span>
@@ -58,6 +95,8 @@
       <div id="user-schedules-content"></div>
     </div>
   </div>
+
   <script src="js/manage_users.js"></script>
 </body>
-</html> 
+
+</html>
