@@ -1,423 +1,199 @@
-let courses = [];
-let schedules = [];
-let editingScheduleId = null;
-let searchScheduleCourseInput, filterScheduleCourseSelect, allSchedules = [], allCourses = [];
-// Inizializza Choices.js per i filtri multipli
+function formatDate(iso) {
+  if (!iso) return '-';
+  const d = new Date(iso);
+  if (isNaN(d)) return '-';
+  return d.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+const modal = document.getElementById('edit-profile-modal');
+const usernameDisplay = document.getElementById('new_username');
+const usernameHidden = document.createElement('input');
+usernameHidden.type = 'hidden';
+usernameHidden.id = 'new_username_hidden';
+usernameHidden.name = 'new_username';
+document.getElementById('edit-profile-form').appendChild(usernameHidden);
+const newPassword = document.getElementById('new_password');
+const editHint = document.getElementById('edit-password-hint');
+const editMsg = document.getElementById('edit-profile-msg');
+
+let allCourses = [];
+let allSchedules = [];
+
 let teacherChoices, roomChoices, subjectChoices, dayChoices;
 
-function addOneHourToTime(timeStr) {
-  const [hours, minutes] = timeStr.split(':').map(Number);
-  const date = new Date();
-  date.setHours(hours, minutes || 0);
-  date.setHours(date.getHours() + 1);
-  return date.toTimeString().slice(0, 5);
-}
-
-
-function setupAutoEndTime() {
-  const addStart = document.getElementById('add-start');
-  const addEnd = document.getElementById('add-end');
-  let addEndModified = false;
-
-  addStart.addEventListener('change', () => {
-    if (!addEndModified && addStart.value) {
-      addEnd.value = addOneHourToTime(addStart.value);
-    }
+document.addEventListener('DOMContentLoaded', () => {
+  // Inizializza Choices.js SOLO DOPO che il DOM è pronto
+  teacherChoices = new Choices('#filter-teacher-u', { removeItemButton: true });
+  roomChoices = new Choices('#filter-room-u', { removeItemButton: true });
+  subjectChoices = new Choices('#filter-subject-u', { removeItemButton: true });
+  dayChoices = new Choices('#filter-date-u', {
+    removeItemButton: true,
+    searchEnabled: false,
+    shouldSort: false,
+    placeholder: true,
+    maxItemCount: 1
   });
-  addEnd.addEventListener('input', () => { addEndModified = true; });
 
-  const editStart = document.getElementById('edit-start');
-  const editEnd = document.getElementById('edit-end');
-  let editEndModified = false;
-
-  editStart.addEventListener('change', () => {
-    if (!editEndModified && editStart.value) {
-      editEnd.value = addOneHourToTime(editStart.value);
-    }
-  });
-  editEnd.addEventListener('input', () => { editEndModified = true; });
-}
-
-function fetchCoursesAndSchedules() {
-  Promise.all([
-    fetch('/api/courses').then(r => r.json()),
-    fetch('/api/schedules').then(r => r.json())
-  ]).then(([allCourses, allSchedules]) => {
-    courses = allCourses;
-    schedules = allSchedules;
-    const select = document.getElementById('filter-course');
-    select.innerHTML = '<option value="">Tutti i corsi</option>' + courses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-    populateFilterOptions();
-    renderSchedules();
-    updateDatalists();
-  });
-}
-document.getElementById('filter-course').onchange = renderSchedules;
-// Importa la funzione formatDate
-// Se il browser non supporta import/export, assicuriamoci che formatDate sia globale
-if (typeof window.formatDate !== 'function') {
-  const script = document.createElement('script');
-  script.src = 'js/utils.js';
-  document.head.appendChild(script);
-}
-function renderSchedules() {
-  const courseId = document.getElementById('filter-course').value;
-  // Ottieni i valori selezionati (array)
-  const teacherFilter = teacherChoices ? teacherChoices.getValue(true) : [];
-  const roomFilter = roomChoices ? roomChoices.getValue(true) : [];
-  const subjectFilter = subjectChoices ? subjectChoices.getValue(true) : [];
-  const dayFilter = dayChoices ? dayChoices.getValue(true) : [];
-  const dateFilter = document.getElementById('filter-date').value;
-  let filtered = schedules;
-  if (courseId) filtered = filtered.filter(s => String(s.course_id) === String(courseId));
-  if (teacherFilter.length) filtered = filtered.filter(s => teacherFilter.includes(s.teacher));
-  if (roomFilter.length) filtered = filtered.filter(s => roomFilter.includes(s.room));
-  if (subjectFilter.length) filtered = filtered.filter(s => subjectFilter.includes(s.subject));
-  if (dayFilter.length) filtered = filtered.filter(s => dayFilter.includes(s.day));
-  if (dateFilter) filtered = filtered.filter(s => s.date === dateFilter);
-  // Ordina per data e ora
-  filtered = filtered.slice().sort((a, b) => {
-    if (a.date === b.date) return a.start_time.localeCompare(b.start_time);
-    return a.date.localeCompare(b.date);
-  });
-  let html = '';
-  if (!filtered.length) {
-    html = '<div class="hint">Nessun orario per questi filtri.</div>';
-  } else {
-    html = `<div class='table-responsive'><table class='modern-table'><thead><tr><th>Corso</th><th>Docente</th><th>Aula</th><th>Materia</th><th>Giorno</th><th>Data</th><th>Inizio</th><th>Fine</th><th>Azioni</th></tr></thead><tbody>`;
-    filtered.forEach(s => {
-      const course = courses.find(c => c.id == s.course_id);
-      html += `<tr>`;
-      html += `<td><span class='badge' style='background:#f1f5f9;color:var(--primary);'>${course ? course.name : ''}</span></td>`;
-      html += `<td>${s.teacher}</td>`;
-      html += `<td>${s.room}</td>`;
-      html += `<td>${s.subject || ''}</td>`;
-      html += `<td>${s.day}</td>`;
-      html += `<td>${formatDate(s.date)}</td>`;
-      html += `<td>${s.start_time}</td>`;
-      html += `<td>${s.end_time}</td>`;
-      html += `<td style='text-align:center;'><button class='icon-btn' title='Modifica' onclick='openEditSchedule(${s.id})'>✏️</button> <button class='icon-btn' title='Elimina' onclick='deleteSchedule(${s.id})'>🗑️</button></td></tr>`;
+  fetch('/user/courses').then(r => r.json()).then(courses => {
+    allCourses = courses;
+    fetch('/user/schedules').then(r => r.json()).then(schedules => {
+      allSchedules = schedules;
+      populateFilterOptions();
+      renderCoursesBadges(allCourses);
+      renderSchedulesTable(allCourses, allSchedules);
     });
-    html += '</tbody></table></div>';
+  });
+
+  // Se usi un filtro corso e vuoi mostrare il nome del corso selezionato in alto
+  const filterCourseSelect = document.getElementById('filter-course-u');
+  if (filterCourseSelect) {
+    filterCourseSelect.onchange = () => {
+      const selectedName = filterCourseSelect.options[filterCourseSelect.selectedIndex]?.text || 'Tutti i corsi';
+      document.getElementById('selected-course-name').textContent = selectedName;
+      renderCoursesBadges(allCourses);
+      renderSchedulesTable(allCourses, allSchedules);
+    };
   }
-  document.getElementById('schedules-list').innerHTML = html;
-}
-// Aggiorna i filtri per ricerca live
-['filter-teacher', 'filter-room', 'filter-subject', 'filter-day', 'filter-date'].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) {
-    if (el.tagName === 'SELECT') {
-      el.onchange = renderSchedules;
-    } else {
-      el.oninput = renderSchedules;
+
+  // Altri filtri
+  ['filter-teacher-u', 'filter-room-u', 'filter-subject-u', 'filter-date-u', 'filter-date-exact-u'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.onchange = () => {
+        renderCoursesBadges(allCourses);
+        renderSchedulesTable(allCourses, allSchedules);
+      };
     }
-  }
+  });
 });
-function openEditSchedule(id) {
-  editingScheduleId = id;
-  const s = schedules.find(x => x.id == id);
-  document.getElementById('edit-course-select').innerHTML = courses.map(c => `<option value="${c.id}"${c.id == s.course_id ? ' selected' : ''}>${c.name}</option>`).join('');
-  document.getElementById('edit-teacher').value = s.teacher;
-  document.getElementById('edit-room').value = s.room;
-  document.getElementById('edit-subject').value = s.subject || '';
-  document.getElementById('edit-day').textContent = s.day;
-  document.getElementById('edit-date').value = s.date;
-  document.getElementById('edit-start').value = s.start_time;
-  document.getElementById('edit-end').value = s.end_time;
-  document.getElementById('edit-schedule-msg').textContent = '';
-  document.getElementById('edit-schedule-modal').style.display = 'flex';
-}
-document.getElementById('close-edit-schedule-modal').onclick = () => {
-  document.getElementById('edit-schedule-modal').style.display = 'none';
-};
-document.getElementById('cancel-edit-schedule').onclick = function () {
-  document.getElementById('edit-schedule-modal').style.display = 'none';
-};
-window.onclick = e => {
-  if (e.target === document.getElementById('edit-schedule-modal'))
-    document.getElementById('edit-schedule-modal').style.display = 'none';
-};
-document.getElementById('edit-schedule-form').onsubmit = async function (e) {
-  e.preventDefault();
-  await fetch('/api/schedules').then(r => r.json()).then(data => { schedules = data; });
-  const course_id = document.getElementById('edit-course-select').value;
-  const teacher = document.getElementById('edit-teacher').value;
-  const room = document.getElementById('edit-room').value;
-  const subject = document.getElementById('edit-subject').value;
-  const day = document.getElementById('edit-day').textContent;
-  const date = document.getElementById('edit-date').value;
-  const start_time = document.getElementById('edit-start').value;
-  const end_time = document.getElementById('edit-end').value;
-
-  if (start_time >= end_time) {
-    el.textContent = 'L\'ora di inizio deve essere precedente a quella di fine.';
-    el.className = 'hint';
-    return;
-  }
-  const overlap = schedules.some(s => String(s.course_id) === String(course_id) && s.date === date && s.start_time === start_time && s.id != editingScheduleId);
-  const el = document.getElementById('edit-schedule-msg');
-  if (overlap) {
-    el.textContent = 'Esiste già un orario per questo corso, data e ora di inizio.';
-    el.className = 'hint';
-    return;
-  }
-  fetch(`/api/schedules/${editingScheduleId}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      course_id,
-      teacher,
-      room,
-      subject,
-      day,
-      date,
-      start_time,
-      end_time
-    })
-  }).then(r => r.text()).then(msg => {
-    fetchCoursesAndSchedules();
-    if (msg === 'OK') {
-      el.textContent = 'Orario aggiornato!';
-      el.className = 'success';
-      document.getElementById('filter-course').value = course_id;
-      renderSchedules();
-      setTimeout(() => {
-        document.getElementById('edit-schedule-modal').style.display = 'none';
-      }, 1000);
-    } else {
-      el.textContent = msg;
-      el.className = 'hint';
-    }
-  });
-};
-function deleteSchedule(id) {
-  if (confirm('Sei sicuro di voler eliminare questo orario?'))
-    fetch(`/api/schedules/${id}`, { method: 'DELETE' }).then(() => fetchCoursesAndSchedules());
-}
-document.getElementById('add-schedule-btn').onclick = () => {
-  const filterVal = document.getElementById('filter-course').value;
-  document.getElementById('add-course-select').innerHTML =
-    `<option value="" disabled selected>Seleziona un corso</option>` +
-    courses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-
-  document.getElementById('add-teacher').value = '';
-  document.getElementById('add-room').value = '';
-  document.getElementById('add-subject').value = '';
-  document.getElementById('add-day').textContent = '';
-  document.getElementById('add-date').value = '';
-  document.getElementById('add-start').value = '';
-  document.getElementById('add-end').value = '';
-  document.getElementById('add-schedule-msg').textContent = '';
-  document.getElementById('add-schedule-modal').style.display = 'flex';
-};
-document.getElementById('close-add-schedule-modal').onclick = () => {
-  document.getElementById('add-schedule-modal').style.display = 'none';
-};
-document.getElementById('cancel-add-schedule').onclick = function () {
-  document.getElementById('add-schedule-modal').style.display = 'none';
-};
-window.addEventListener('click', function (e) {
-  if (e.target === document.getElementById('add-schedule-modal'))
-    document.getElementById('add-schedule-modal').style.display = 'none';
-});
-document.getElementById('add-schedule-form').onsubmit = async function (e) {
-  e.preventDefault();
-  await fetch('/api/schedules').then(r => r.json()).then(data => { schedules = data; });
-  const course_id = document.getElementById('add-course-select').value;
-  const teacher = document.getElementById('add-teacher').value;
-  const room = document.getElementById('add-room').value;
-  const subject = document.getElementById('add-subject').value;
-  const day = document.getElementById('add-day').textContent;
-  const date = document.getElementById('add-date').value;
-  const start_time = document.getElementById('add-start').value;
-  const end_time = document.getElementById('add-end').value;
-
-  if (start_time >= end_time) {
-    el.textContent = 'L\'ora di inizio deve essere precedente a quella di fine.';
-    el.className = 'hint';
-    return;
-  }
-  const overlap = schedules.some(s => String(s.course_id) === String(course_id) && s.date === date && s.start_time === start_time);
-  const el = document.getElementById('add-schedule-msg');
-  if (overlap) {
-    el.textContent = 'Esiste già un orario per questo corso, data e ora di inizio.';
-    el.className = 'hint';
-    return;
-  }
-  fetch('/api/schedules', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      course_id,
-      teacher,
-      room,
-      subject,
-      day,
-      date,
-      start_time,
-      end_time
-    })
-  }).then(r => r.text()).then(msg => {
-    fetchCoursesAndSchedules();
-    if (msg === 'OK') {
-      el.textContent = 'Orario aggiunto!';
-      el.className = 'success';
-      document.getElementById('filter-course').value = course_id;
-      renderSchedules();
-      setTimeout(() => {
-        document.getElementById('add-schedule-modal').style.display = 'none';
-      }, 1000);
-    } else {
-      el.textContent = msg;
-      el.className = 'hint';
-    }
-  });
-};
-function renderSchedulesList() {
-  const search = searchScheduleCourseInput.value.toLowerCase();
-  const courseId = filterScheduleCourseSelect.value;
-  let html = '';
-  const filtered = allSchedules.filter(s => {
-    const course = allCourses.find(c => c.id == s.course_id) || {};
-    const matchName = (course.name || '').toLowerCase().includes(search);
-    const matchId = !courseId || s.course_id == courseId;
-    return matchName && matchId;
-  });
-  if (!filtered.length) {
-    html = '<div class="hint">Nessun orario trovato.';
-  } else {
-    html = `<div class='table-responsive'><table class='modern-table'><thead><tr><th>Corso</th><th>Docente</th><th>Aula</th><th>Materia</th><th>Giorno</th><th>Data</th><th>Inizio</th><th>Fine</th><th>Azioni</th></tr></thead><tbody>`;
-    filtered.forEach(s => {
-      const course = allCourses.find(c => c.id == s.course_id) || {};
-      html += `<tr><td>${course.name || '-'}</td><td>${s.teacher}</td><td>${s.room}</td><td>${s.subject || ''}</td><td>${s.day}</td><td>${typeof formatDate === 'function' ? formatDate(s.date) : s.date}</td><td>${s.start_time}</td><td>${s.end_time}</td><td style='text-align:center;'><button class='icon-btn' title='Modifica' onclick='openEditSchedule(${s.id})'>✏️</button> <button class='icon-btn' title='Elimina' onclick='deleteSchedule(${s.id})'>🗑️</button></td></tr>`;
-    });
-    html += '</tbody></table></div>';
-  }
-  document.getElementById('schedules-list').innerHTML = html;
-}
-function updateFilterScheduleCourseSelect() {
-  filterScheduleCourseSelect.innerHTML = '<option value="">Tutti i corsi</option>' + allCourses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-}
-function fetchCourses() {
-  return fetch('/api/courses').then(r => r.json()).then(data => { allCourses = data; updateFilterScheduleCourseSelect(); });
-}
-function fetchSchedules() {
-  fetch('/api/schedules').then(r => r.json()).then(data => {
-    allSchedules = data;
-    renderSchedulesList();
-  });
-}
-// Funzione per ottenere il giorno della settimana in italiano da una data ISO
-function getItalianDayOfWeek(dateString) {
-  if (!dateString) return '';
-  const giorni = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
-  const d = new Date(dateString);
-  if (isNaN(d)) return '';
-  return giorni[d.getDay()];
-}
-
-// Collega il calcolo automatico del giorno ai campi data nei modali di aggiunta e modifica
-function setupAutoDayFill() {
-  const addDate = document.getElementById('add-date');
-  const addDayDiv = document.getElementById('add-day');
-  if (addDate && addDayDiv) {
-    addDate.addEventListener('change', function () {
-      const giorno = getItalianDayOfWeek(this.value);
-      addDayDiv.textContent = giorno;
-    });
-  }
-  const editDate = document.getElementById('edit-date');
-  const editDayDiv = document.getElementById('edit-day');
-  if (editDate && editDayDiv) {
-    editDate.addEventListener('change', function () {
-      const giorno = getItalianDayOfWeek(this.value);
-      editDayDiv.textContent = giorno;
-    });
-  }
-}
 
 function populateFilterOptions() {
   const settimana = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
 
-  const teachers = [...new Set(schedules.map(s => s.teacher).filter(Boolean))];
+  const unique = (arr, key) => [...new Set(arr.map(i => i[key]).filter(Boolean))];
+
   teacherChoices.clearChoices();
-  teacherChoices.setChoices(teachers.map(t => ({ value: t, label: t })), 'value', 'label', false);
+  teacherChoices.setChoices(unique(allSchedules, 'teacher').map(v => ({ value: v, label: v })), 'value', 'label', false);
 
-  const rooms = [...new Set(schedules.map(s => s.room).filter(Boolean))];
   roomChoices.clearChoices();
-  roomChoices.setChoices(rooms.map(r => ({ value: r, label: r })), 'value', 'label', false);
+  roomChoices.setChoices(unique(allSchedules, 'room').map(v => ({ value: v, label: v })), 'value', 'label', false);
 
-  const subjects = [...new Set(schedules.map(s => s.subject).filter(Boolean))];
   subjectChoices.clearChoices();
-  subjectChoices.setChoices(subjects.map(su => ({ value: su, label: su })), 'value', 'label', false);
+  subjectChoices.setChoices(unique(allSchedules, 'subject').map(v => ({ value: v, label: v })), 'value', 'label', false);
 
-  const giorniPresenti = new Set(schedules.map(s => s.day).filter(Boolean));
-  const giorniOrdinati = settimana.filter(g => giorniPresenti.has(g));
   dayChoices.clearChoices();
-  dayChoices.setChoices(giorniOrdinati.map(d => ({ value: d, label: d })), 'value', 'label', false);
+  dayChoices.setChoices(settimana.map(g => ({ value: g, label: g })), 'value', 'label', false);
 }
 
-
-document.addEventListener('DOMContentLoaded', () => {
-  searchScheduleCourseInput = document.getElementById('search-schedule-course');
-  filterScheduleCourseSelect = document.getElementById('filter-schedule-course');
-  setupAddFieldWithButton('add-teacher', 'add-teacher-btn', 'teacher-list');
-  setupAddFieldWithButton('add-room', 'add-room-btn', 'room-list');
-  setupAddFieldWithButton('add-subject', 'add-subject-btn', 'subject-list');
-
-  setupAddFieldWithButton('edit-teacher', 'edit-teacher-btn', 'teacher-list');
-  setupAddFieldWithButton('edit-room', 'edit-room-btn', 'room-list');
-  setupAddFieldWithButton('edit-subject', 'edit-subject-btn', 'subject-list');
-
-  if (searchScheduleCourseInput && filterScheduleCourseSelect) {
-    searchScheduleCourseInput.addEventListener('input', renderSchedulesList);
-    filterScheduleCourseSelect.addEventListener('change', renderSchedulesList);
+function renderCoursesBadges(courses) {
+  const container = document.getElementById('user-courses');
+  if (!courses.length) {
+    container.innerHTML = '<div class="hint">Nessun corso assegnato.</div>';
+    return;
   }
-  fetchCourses().then(fetchSchedules);
-  setupAutoDayFill();
-  setupAutoEndTime();
-  // Inizializza Choices.js per i filtri multipli
-  teacherChoices = new Choices('#filter-teacher', { removeItemButton: true, searchEnabled: true, shouldSort: false, position: 'bottom', placeholder: true });
-  roomChoices = new Choices('#filter-room', { removeItemButton: true, searchEnabled: true, shouldSort: false, position: 'bottom', placeholder: true });
-  subjectChoices = new Choices('#filter-subject', { removeItemButton: true, searchEnabled: true, shouldSort: false, position: 'bottom', placeholder: true });
-  dayChoices = new Choices('#filter-day', { removeItemButton: true, searchEnabled: true, shouldSort: false, position: 'bottom', placeholder: true });
+  container.innerHTML = '<div class="user-courses-badges-wrap">' +
+    courses.map(c => `<span class="user-courses-badge">${c.name}</span>`).join('') +
+    '</div>';
+}
+
+function renderSchedulesTable(courses, schedules) {
+  let filtered = schedules.filter(s => courses.some(c => c.id == s.course_id));
+
+  const getVals = id => new Choices(`#${id}`).getValue(true);
+  const teacherFilter = getVals('filter-teacher-u');
+  const roomFilter = getVals('filter-room-u');
+  const subjectFilter = getVals('filter-subject-u');
+  const dayFilter = getVals('filter-date-u');
+  const dateExact = document.getElementById('filter-date-exact-u').value;
+
+  if (teacherFilter.length) filtered = filtered.filter(s => teacherFilter.includes(s.teacher));
+  if (roomFilter.length) filtered = filtered.filter(s => roomFilter.includes(s.room));
+  if (subjectFilter.length) filtered = filtered.filter(s => subjectFilter.includes(s.subject));
+  if (dayFilter.length) filtered = filtered.filter(s => dayFilter.includes(s.day));
+  if (dateExact) filtered = filtered.filter(s => s.date === dateExact);
+
+  filtered = filtered.sort((a, b) => a.date.localeCompare(b.date) || a.start_time.localeCompare(b.start_time));
+
+  let html = '';
+  if (!filtered.length) {
+    html = '<div class="hint">Nessun orario trovato per questi filtri.</div>';
+  } else {
+    html = `<table class="modern-table"><thead><tr>
+      <th>Docente</th><th>Aula</th><th>Materia</th><th>Giorno</th><th>Data</th><th>Inizio</th><th>Fine</th>
+    </tr></thead><tbody>`;
+    for (const s of filtered) {
+      html += `<tr><td>${s.teacher}</td><td>${s.room}</td><td>${s.subject}</td>
+        <td>${s.day}</td><td>${formatDate(s.date)}</td><td>${s.start_time}</td><td>${s.end_time}</td></tr>`;
+    }
+    html += '</tbody></table>';
+  }
+  document.getElementById('user-schedules-table').innerHTML = html;
+}
+
+// ------------------------------
+// Modale modifica profilo
+// ------------------------------
+document.getElementById('edit-profile-btn').onclick = () => {
+  modal.style.display = 'flex';
+  fetch('/user/current')
+    .then(r => r.json())
+    .then(data => {
+      usernameDisplay.value = data.username;
+      usernameHidden.value = data.username;
+    })
+    .catch(() => {
+      editMsg.textContent = 'Errore nel recupero username';
+    });
+};
+
+document.getElementById('close-modal').onclick = () => {
+  modal.style.display = 'none';
+};
+window.onclick = e => {
+  if (e.target === modal) modal.style.display = 'none';
+};
+
+// ------------------------------
+// Validazione password live
+// ------------------------------
+newPassword.addEventListener('input', () => {
+  const val = newPassword.value;
+  let msg = '';
+  if (val.length < 8) msg += 'Min 8 caratteri. ';
+  if (!/[A-Z]/.test(val)) msg += 'Almeno una maiuscola. ';
+  if (!/[a-z]/.test(val)) msg += 'Almeno una minuscola. ';
+  if (!/[0-9]/.test(val)) msg += 'Almeno un numero. ';
+  editHint.textContent = msg;
+  editHint.style.color = msg ? 'var(--accent)' : 'green';
 });
-fetchCoursesAndSchedules();
 
-function setupAddFieldWithButton(inputId, buttonId, listId) {
-  const input = document.getElementById(inputId);
-  const button = document.getElementById(buttonId);
-  const list = document.getElementById(listId);
+// ------------------------------
+// Submit modifica profilo
+// ------------------------------
+document.getElementById('edit-profile-form').onsubmit = function (e) {
+  e.preventDefault();
+  if (editHint.textContent) {
+    editHint.style.color = 'red';
+    return;
+  }
 
-  if (!input || !button || !list) return;
-
-  input.addEventListener('input', () => {
-    const val = input.value.trim();
-    const exists = Array.from(list.options).some(opt => opt.value.toLowerCase() === val.toLowerCase());
-    button.style.display = val && !exists ? 'inline-block' : 'none';
-  });
-
-  button.addEventListener('click', () => {
-    const val = input.value.trim();
-    if (!val) return;
-    const opt = document.createElement('option');
-    opt.value = val;
-    list.appendChild(opt);
-    button.style.display = 'none';
-  });
-}
-
-function updateDatalists() {
-  const teachers = [...new Set(schedules.map(s => s.teacher).filter(Boolean))];
-  const rooms = [...new Set(schedules.map(s => s.room).filter(Boolean))];
-  const subjects = [...new Set(schedules.map(s => s.subject).filter(Boolean))];
-
-  const setOptions = (id, values) => {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = values.map(v => `<option value="${v}">`).join('');
-  };
-
-  setOptions('teacher-list', teachers);
-  setOptions('room-list', rooms);
-  setOptions('subject-list', subjects);
-}
+  fetch('/user/profile', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      username: usernameHidden.value,
+      password: newPassword.value
+    })
+  })
+    .then(r => r.text())
+    .then(msg => {
+      editMsg.textContent = msg;
+      editMsg.style.color = msg === 'OK' ? 'green' : 'red';
+      if (msg === 'OK') setTimeout(() => location.reload(), 1000);
+    })
+    .catch(err => {
+      console.error('Errore modifica profilo', err);
+      editMsg.textContent = 'Errore durante il salvataggio.';
+      editMsg.style.color = 'red';
+    });
+};
