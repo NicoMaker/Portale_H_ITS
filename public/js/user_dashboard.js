@@ -53,12 +53,18 @@ const subjectChoices = new Choices('#filter-subject-u', { removeItemButton: true
 const dayChoices = new Choices('#filter-date-u', { removeItemButton: true });
 
 function populateFilterOptions() {
+  const settimana = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
+
   const unique = (arr, key) => [...new Set(arr.map(i => i[key]).filter(Boolean))];
   teacherChoices.setChoices(unique(allSchedules, 'teacher').map(v => ({ value: v, label: v })), 'value', 'label', false);
   roomChoices.setChoices(unique(allSchedules, 'room').map(v => ({ value: v, label: v })), 'value', 'label', false);
   subjectChoices.setChoices(unique(allSchedules, 'subject').map(v => ({ value: v, label: v })), 'value', 'label', false);
-  dayChoices.setChoices(unique(allSchedules, 'day').map(v => ({ value: v, label: v })), 'value', 'label', false);
+
+  const giorniPresenti = new Set(allSchedules.map(s => s.day).filter(Boolean));
+  const giorniOrdinati = settimana.filter(g => giorniPresenti.has(g));
+  dayChoices.setChoices(giorniOrdinati.map(d => ({ value: d, label: d })), 'value', 'label', false);
 }
+
 
 // ------------------------------
 // Rendering corsi e orari

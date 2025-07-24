@@ -148,7 +148,7 @@ document.getElementById('edit-schedule-form').onsubmit = async function (e) {
   const date = document.getElementById('edit-date').value;
   const start_time = document.getElementById('edit-start').value;
   const end_time = document.getElementById('edit-end').value;
-  
+
   if (start_time >= end_time) {
     el.textContent = 'L\'ora di inizio deve essere precedente a quella di fine.';
     el.className = 'hint';
@@ -231,7 +231,7 @@ document.getElementById('add-schedule-form').onsubmit = async function (e) {
   const date = document.getElementById('add-date').value;
   const start_time = document.getElementById('add-start').value;
   const end_time = document.getElementById('add-end').value;
-  
+
   if (start_time >= end_time) {
     el.textContent = 'L\'ora di inizio deve essere precedente a quella di fine.';
     el.className = 'hint';
@@ -337,23 +337,26 @@ function setupAutoDayFill() {
 }
 
 function populateFilterOptions() {
-  // Docenti
+  const settimana = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
+
   const teachers = [...new Set(schedules.map(s => s.teacher).filter(Boolean))];
   teacherChoices.clearChoices();
   teacherChoices.setChoices(teachers.map(t => ({ value: t, label: t })), 'value', 'label', false);
-  // Aule
+
   const rooms = [...new Set(schedules.map(s => s.room).filter(Boolean))];
   roomChoices.clearChoices();
   roomChoices.setChoices(rooms.map(r => ({ value: r, label: r })), 'value', 'label', false);
-  // Materie
+
   const subjects = [...new Set(schedules.map(s => s.subject).filter(Boolean))];
   subjectChoices.clearChoices();
   subjectChoices.setChoices(subjects.map(su => ({ value: su, label: su })), 'value', 'label', false);
-  // Giorni
-  const days = [...new Set(schedules.map(s => s.day).filter(Boolean))];
+
+  const giorniPresenti = new Set(schedules.map(s => s.day).filter(Boolean));
+  const giorniOrdinati = settimana.filter(g => giorniPresenti.has(g));
   dayChoices.clearChoices();
-  dayChoices.setChoices(days.map(d => ({ value: d, label: d })), 'value', 'label', false);
+  dayChoices.setChoices(giorniOrdinati.map(d => ({ value: d, label: d })), 'value', 'label', false);
 }
+
 
 document.addEventListener('DOMContentLoaded', () => {
   searchScheduleCourseInput = document.getElementById('search-schedule-course');
