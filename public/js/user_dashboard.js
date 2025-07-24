@@ -21,19 +21,25 @@ const editMsg = document.getElementById('edit-profile-msg');
 
 let allCourses = [];
 let allSchedules = [];
+let teacherChoices, roomChoices, subjectChoices, dayChoices;
 
 // ------------------------------
 // Caricamento iniziale dati
 // ------------------------------
 document.addEventListener('DOMContentLoaded', () => {
+  teacherChoices = new Choices('#filter-teacher-u', { removeItemButton: true });
+  roomChoices = new Choices('#filter-room-u', { removeItemButton: true });
+  subjectChoices = new Choices('#filter-subject-u', { removeItemButton: true });
+  dayChoices = new Choices('#filter-date-u', { removeItemButton: true, searchEnabled: false, shouldSort: false, placeholder: true });
+
   fetch('/user/courses').then(r => r.json()).then(courses => {
     allCourses = courses;
     fetch('/user/schedules').then(r => r.json()).then(schedules => {
       allSchedules = schedules;
-      populateFilterOptions();
+      populateFilterOptions();  // Popola i filtri
       renderCoursesBadges(allCourses);
       renderSchedulesTable(allCourses, allSchedules);
-      // Setup filtri
+      // Imposta i filtri
       ['filter-teacher-u', 'filter-room-u', 'filter-subject-u', 'filter-date-u', 'filter-date-exact-u'].forEach(id => {
         document.getElementById(id).onchange = () => {
           renderCoursesBadges(allCourses);
@@ -45,23 +51,32 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ------------------------------
-// Filtri multipli con Choices.js
+// Popola opzioni di filtro
 // ------------------------------
-const teacherChoices = new Choices('#filter-teacher-u', { removeItemButton: true });
-const roomChoices = new Choices('#filter-room-u', { removeItemButton: true });
-const subjectChoices = new Choices('#filter-subject-u', { removeItemButton: true });
-const dayChoices = new Choices('#filter-date-u', { removeItemButton: true });
-
 function populateFilterOptions() {
+  // Ordine fisso dei giorni
   const settimana = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
 
   const unique = (arr, key) => [...new Set(arr.map(i => i[key]).filter(Boolean))];
+
+  // Popola i filtri per insegnante, aula, materia
+  teacherChoices.clearChoices();
   teacherChoices.setChoices(unique(allSchedules, 'teacher').map(v => ({ value: v, label: v })), 'value', 'label', false);
+
+  roomChoices.clearChoices();
   roomChoices.setChoices(unique(allSchedules, 'room').map(v => ({ value: v, label: v })), 'value', 'label', false);
+
+  subjectChoices.clearChoices();
   subjectChoices.setChoices(unique(allSchedules, 'subject').map(v => ({ value: v, label: v })), 'value', 'label', false);
 
+  // Estrai i giorni presenti nei dati
   const giorniPresenti = new Set(allSchedules.map(s => s.day).filter(Boolean));
-  const giorniOrdinati = settimana.filter(g => giorniPresenti.has(g));
+
+  // Ordina i giorni in base all'ordine fisso, ma mostra tutti i giorni
+  const giorniOrdinati = settimana.filter(g => giorniPresenti.has(g) || true); // Aggiungi 'true' per mostrare tutti i giorni
+
+  // Popola il filtro dei giorni con l'ordine fisso
+  dayChoices.clearChoices();
   dayChoices.setChoices(giorniOrdinati.map(d => ({ value: d, label: d })), 'value', 'label', false);
 }
 
@@ -82,6 +97,8 @@ function renderCoursesBadges(courses) {
 
 function renderSchedulesTable(courses, schedules) {
   let filtered = schedules.filter(s => courses.some(c => c.id == s.course_id));
+
+  // Ottieni i valori selezionati nei filtri
   const getVals = id => new Choices(`#${id}`).getValue(true);
   const teacherFilter = getVals('filter-teacher-u');
   const roomFilter = getVals('filter-room-u');
@@ -89,6 +106,7 @@ function renderSchedulesTable(courses, schedules) {
   const dayFilter = getVals('filter-date-u');
   const dateExact = document.getElementById('filter-date-exact-u').value;
 
+  // Applica i filtri
   if (teacherFilter.length) filtered = filtered.filter(s => teacherFilter.includes(s.teacher));
   if (roomFilter.length) filtered = filtered.filter(s => roomFilter.includes(s.room));
   if (subjectFilter.length) filtered = filtered.filter(s => subjectFilter.includes(s.subject));
@@ -113,7 +131,6 @@ function renderSchedulesTable(courses, schedules) {
   document.getElementById('user-schedules-table').innerHTML = html;
 }
 
-
 // ------------------------------
 // Modale modifica profilo
 // ------------------------------
@@ -133,7 +150,9 @@ document.getElementById('edit-profile-btn').onclick = () => {
 document.getElementById('close-modal').onclick = () => {
   modal.style.display = 'none';
 };
-window.onclick = e => { if (e.target === modal) modal.style.display = 'none'; };
+window.onclick = e => {
+  if (e.target === modal) modal.style.display = 'none';
+};
 
 // ------------------------------
 // Validazione password live
@@ -179,4 +198,3 @@ document.getElementById('edit-profile-form').onsubmit = function (e) {
       editMsg.style.color = 'red';
     });
 };
-
