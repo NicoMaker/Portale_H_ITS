@@ -580,3 +580,37 @@ a:hover {
   cursor: pointer;
   color: var(--error); /* Colore rosso per il bottone di chiusura */
 }
+
+/* Stile per il link */
+#edit-profile-link {
+  text-decoration: none; /* Rimuove la sottolineatura */
+  display: inline-block; /* Permette di stilizzare il bottone come un link */
+}
+
+/* Stile per il bottone */
+#edit-profile-btn {
+  background: var(--primary); /* Colore di sfondo primario */
+  color: white;
+  font-size: 1.3rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: var(--shadow);
+  display: inline-block; /* Per farlo comportare come un elemento inline */
+}
+
+/* Effetto hover per il bottone */
+#edit-profile-btn:hover {
+  background-color: var(--accent); /* Verde per hover */
+  transform: scale(1.05); /* Ingrossa leggermente il bottone */
+}
+
+/* Stato attivo del bottone */
+#edit-profile-btn:active {
+  background-color: var(--accent); /* Verde anche per il bottone attivo */
+  color: white; /* Colore del testo attivo bianco */
+  font-weight: 700; /* Testo attivo più marcato */
+}
