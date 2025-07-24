@@ -11,7 +11,13 @@
 </head>
 
 <body>
-  <div class="navbar">Dashboard Utente</div>
+  <div class="navbar">
+    <div>
+      <a href="/user_dashboard.html" class="active">Dashboard User</a>
+      <button id="edit-profile-btn" style="margin-top:1.5rem">Modifica Profilo</button>
+      <a href="/logout" style="display:inline-block;margin-bottom:1.5rem;">Logout</a>
+    </div>
+  </div>
 
   <div class="container">
     <h2>Benvenuto nella tua dashboard</h2>
@@ -60,9 +66,6 @@
     <div id="user-schedules-table"></div>
     <div id="user-courses"></div>
     <div id="user-courses-debug" class="hint"></div>
-
-    <a href="/logout" style="display:inline-block;margin-bottom:1.5rem;">Logout</a>
-    <button id="edit-profile-btn" style="margin-top:1.5rem">Modifica Profilo</button>
 
     <!-- MODALE MODIFICA PROFILO -->
     <div id="edit-profile-modal" class="modal" style="display:none">
