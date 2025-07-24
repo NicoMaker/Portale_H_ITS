@@ -500,3 +500,83 @@ a:hover {
   outline: 2px solid #4d90fe; /* Bordo blu per il focus (migliora l'accessibilità) */
   outline-offset: 2px; /* Distanza tra il bordo e il badge */
 }
+
+/* ======== NAVBAR ======== */
+.navbar {
+  background: var(--primary); /* Colore di sfondo primario */
+  color: white;
+  padding: 1rem 2rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.navbar a:hover {
+  background-color: var(--accent); /* Verde per hover */
+  color: #fff; /* Colore del testo verde */
+  transform: scale(1.05); /* Ingrossa leggermente il link */
+}
+
+.navbar a.active {
+  background-color: var(--accent); /* Verde anche per il link attivo */
+  color: white; /* Colore del testo attivo bianco */
+  font-weight: 700; /* Testo attivo più marcato */
+}
+
+/* Per il titolo della navbar */
+.navbar .navbar-title {
+  font-weight: bold;
+  color: var(--primary-dark); /* Colore scuro per il titolo */
+}
+
+.navbar .navbar-title:hover {
+  color: var(--accent); /* Verde al passaggio del mouse sul titolo */
+}
+
+/* Modale */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  background-color: var(--bg); /* Colore di sfondo principale */
+  margin: 15% auto;
+  padding: 2rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  top: 1rem;
+  right: 1.2rem;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--error); /* Colore rosso per il bottone di chiusura */
+}
