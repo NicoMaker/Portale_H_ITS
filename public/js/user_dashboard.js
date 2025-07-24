@@ -76,7 +76,7 @@ function renderCoursesBadges(courses) {
     return;
   }
   container.innerHTML = '<div class="user-courses-badges-wrap">' +
-    courses.map(c => `<span class="user-courses-badge">${c.name}</span>`).join('') +
+    courses.map(c => `<span class="user-courses-badge">corso: ${c.name}</span>`).join('') +
     '</div>';
 }
 

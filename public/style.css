@@ -463,3 +463,40 @@ a:hover {
   border-radius: 8px;
 }
 
+/* Contenitore per i badge dei corsi */
+.user-courses-badges-wrap {
+  display: flex;
+  flex-wrap: wrap; /* Rende i badge flessibili e a capo se necessario */
+  justify-content: flex-start; /* Allinea i badge a sinistra (puoi cambiarlo con 'center' o 'space-between' se vuoi altri allineamenti) */
+  margin-top: 20px; /* Distanza superiore dal contenitore precedente, puoi regolarlo */
+  gap: 10px; /* Distanza tra i badge, puoi regolarla come preferisci */
+  margin-bottom: 20px; /* Distanza inferiore dal contenitore successivo, puoi regolarlo */
+}
+
+/* Styling per ogni badge del corso */
+.user-courses-badge {
+  background-color: #f0f0f0; /* Colore di sfondo (puoi cambiarlo se preferisci) */
+  padding: 5px 15px; /* Aggiungi più spazio orizzontale per rendere il badge più largo */
+  border-radius: 15px; /* Rende gli angoli arrotondati */
+  font-size: 14px; /* Imposta la dimensione del testo */
+  color: #333; /* Colore del testo */
+  border: 1px solid #ccc; /* Colore del bordo */
+  cursor: pointer; /* Cambia il cursore quando il mouse passa sopra il badge */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Aggiungi transizioni morbide per l'effetto hover */
+  text-transform: capitalize; /* Rende la prima lettera di ogni parola maiuscola */
+  margin-bottom: 10px; /* Distanza tra i badge se sono disposti su più righe */
+}
+
+/* Effetto hover per ogni badge */
+.user-courses-badge:hover {
+  background-color: #dcdcdc; /* Cambia il colore di sfondo al passaggio del mouse */
+  transform: scale(
+    1.05
+  ); /* Aumenta leggermente le dimensioni del badge per un effetto interattivo */
+}
+
+/* Effetto focus per migliorare l'accessibilità */
+.user-courses-badge:focus {
+  outline: 2px solid #4d90fe; /* Bordo blu per il focus (migliora l'accessibilità) */
+  outline-offset: 2px; /* Distanza tra il bordo e il badge */
+}
