@@ -1,6 +1,13 @@
 // ------------------------------
 // Selettori e inizializzazione
 // ------------------------------
+function formatDate(iso) {
+  if (!iso) return '-';
+  const d = new Date(iso);
+  if (isNaN(d)) return '-';
+  return d.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
 const modal = document.getElementById('edit-profile-modal');
 const usernameDisplay = document.getElementById('new_username');
 const usernameHidden = document.createElement('input');
@@ -93,12 +100,13 @@ function renderSchedulesTable(courses, schedules) {
     </tr></thead><tbody>`;
     for (const s of filtered) {
       html += `<tr><td>${s.teacher}</td><td>${s.room}</td><td>${s.subject}</td>
-        <td>${s.day}</td><td>${s.date}</td><td>${s.start_time}</td><td>${s.end_time}</td></tr>`;
+        <td>${s.day}</td><td>${formatDate(s.date)}</td><td>${s.start_time}</td><td>${s.end_time}</td></tr>`;
     }
     html += '</tbody></table>';
   }
   document.getElementById('user-schedules-table').innerHTML = html;
 }
+
 
 // ------------------------------
 // Modale modifica profilo
