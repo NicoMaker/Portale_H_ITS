@@ -1,55 +1,65 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
   <meta charset="UTF-8">
   <title>Gestione Corsi</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/style.css">
-
-
-  <style>
-    #search-course{
-      display: none;
-    }
-  </style>
 </head>
+
 <body>
-  <div class="navbar"><span style="font-size:1.5em;vertical-align:middle;">📚</span> Gestione Corsi</div>
+  <div class="navbar">
+    <span style="font-size:1.5em;vertical-align:middle;">📚</span> Gestione Corsi
+  </div>
+
   <div class="container" style="max-width:900px;">
-    <div style="display:flex;flex-wrap:wrap;gap:2.5rem;align-items:flex-start;justify-content:space-between;">
-      <div class="form-container" style="flex:1 1 320px;min-width:290px;max-width:370px;box-shadow:none;margin:0;">
-        <h3 style="margin-bottom:1.2rem;">Aggiungi Corso</h3>
+    <div class="courses-wrapper">
+      <!-- Aggiungi Corso -->
+      <div class="form-container" style="flex:1 1 320px;min-width:290px;max-width:370px;">
+        <h3>➕ Aggiungi Corso</h3>
         <form id="add-course-form">
           <input type="text" id="course-name" placeholder="Nome corso" required />
-          <input type="text" id="course-desc" placeholder="Descrizione" />
+          <input type="text" id="course-desc" placeholder="Descrizione (facoltativa)" />
           <button type="submit">Aggiungi Corso</button>
           <div id="course-msg" class="hint"></div>
         </form>
       </div>
-      <div style="flex:2 1 400px;min-width:320px;">
-        <h3 style="margin-bottom:1.2rem;">Lista Corsi</h3>
+
+      <!-- Lista Corsi -->
+      <div class="course-list">
+        <h3>📋 Lista Corsi</h3>
         <div style="display:flex;gap:1rem;align-items:center;margin-bottom:1.2rem;">
           <input type="text" id="search-course" placeholder="Cerca corso per nome..." style="flex:2 1 200px;" />
-          <select id="filter-course-list" style="flex:1 1 120px; display: none;"><option value="">Tutti i corsi</option></select>
+          <select id="filter-course-list" style="flex:1 1 120px; display: none;">
+            <option value="">Tutti i corsi</option>
+          </select>
         </div>
         <div id="courses-list"></div>
       </div>
     </div>
-    <a href="/admin_dashboard.html" style="display:inline-block;margin-top:2.5rem;">Torna alla Dashboard</a>
+
+    <a href="/admin_dashboard.html" style="display:inline-block;margin-top:2.5rem;">← Torna alla Dashboard</a>
   </div>
+
+  <!-- Modale Modifica Corso -->
   <div id="edit-course-modal" class="modal" style="display:none">
     <div class="modal-content">
       <span class="close" id="close-edit-course-modal">&times;</span>
-      <h3>Modifica Corso</h3>
+      <h3>✏️ Modifica Corso</h3>
       <form id="edit-course-form">
         <input type="text" id="edit-course-name" placeholder="Nome corso" required />
         <input type="text" id="edit-course-desc" placeholder="Descrizione" />
-        <button type="submit">Salva</button>
-        <button type="button" id="cancel-edit-course" style="margin-left:1rem">Annulla</button>
+        <div class="form-actions">
+          <button type="submit">Salva</button>
+          <button type="button" id="cancel-edit-course">Annulla</button>
+        </div>
         <div id="edit-course-msg"></div>
       </form>
     </div>
   </div>
+
   <script src="js/manage_courses.js"></script>
 </body>
-</html> 
+
+</html>
