@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard Admin</title>
   <link rel="stylesheet" href="/style.css">
 </head>
+
 <body>
   <div class="navbar">Dashboard Admin</div>
   <div class="container">
@@ -24,7 +26,8 @@
         <span class="close" id="close-modal">&times;</span>
         <h3>Modifica Profilo</h3>
         <form id="edit-profile-form">
-          <input type="text" name="new_username" id="new_username" placeholder="Nuovo username" required />
+          <input type="text" id="new_username" disabled />
+          <input type="hidden" id="new_username_hidden" name="new_username" />
           <input type="password" name="new_password" id="new_password" placeholder="Nuova password" required />
           <div id="edit-password-hint" class="hint"></div>
           <button type="submit">Salva</button>
@@ -35,4 +38,5 @@
   </div>
   <script src="js/admin_dashboard.js"></script>
 </body>
+
 </html>

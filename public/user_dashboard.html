@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
   <!-- Choices.js CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 </head>
+
 <body>
   <div class="navbar">Dashboard Utente</div>
   <div class="container">
@@ -44,12 +46,13 @@
         <span class="close" id="close-modal">&times;</span>
         <h3>Modifica Profilo</h3>
         <form id="edit-profile-form">
-          <input type="text" name="new_username" id="new_username" placeholder="Nuovo username" required />
+          <input type="text" id="new_username" disabled />
           <input type="password" name="new_password" id="new_password" placeholder="Nuova password" required />
           <div id="edit-password-hint" class="hint"></div>
           <button type="submit">Salva</button>
           <div id="edit-profile-msg"></div>
         </form>
+
       </div>
     </div>
   </div>
@@ -57,4 +60,5 @@
   <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
   <script src="js/user_dashboard.js"></script>
 </body>
+
 </html>

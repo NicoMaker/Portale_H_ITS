@@ -491,6 +491,17 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // API: restituisce l'utente loggato
+  if (req.method === 'GET' && parsedUrl.pathname === '/user/current') {
+    const session = getSession(req);
+    if (!session) {
+      res.writeHead(403); res.end('Forbidden'); return;
+    }
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ username: session.user.username }));
+    return;
+  }
+
   // Default: 404
   res.writeHead(404, { 'Content-Type': 'text/plain' });
   res.end('Not found');
