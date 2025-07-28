@@ -28,6 +28,7 @@ const editMsg = document.getElementById("edit-profile-msg");
 
 let allCourses = [];
 let allSchedules = [];
+
 let teacherChoices, roomChoices, subjectChoices, dayChoices;
 
 // ------------------------------
@@ -43,6 +44,7 @@ function normalize(str) {
 // Caricamento dati e inizializzazione Choices.js
 // ------------------------------
 document.addEventListener("DOMContentLoaded", () => {
+  // Inizializza Choices una sola volta per ciascun filtro
   teacherChoices = new Choices("#filter-teacher-u", { removeItemButton: true });
   roomChoices = new Choices("#filter-room-u", { removeItemButton: true });
   subjectChoices = new Choices("#filter-subject-u", { removeItemButton: true });
@@ -53,6 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
     placeholder: true,
   });
 
+  // Carica dati
   fetch("/user/courses")
     .then((r) => r.json())
     .then((courses) => {
@@ -62,22 +65,26 @@ document.addEventListener("DOMContentLoaded", () => {
     .then((r) => r.json())
     .then((schedules) => {
       allSchedules = schedules;
+
       populateFilterOptions();
       renderCoursesBadges(allCourses);
       renderSchedulesTable(allCourses, allSchedules);
 
-      // Aggiorna tabella quando i filtri cambiano
+      // Aggiungi event listener per i filtri (usa istanze Choices già create)
       [
-        "filter-teacher-u",
-        "filter-room-u",
-        "filter-subject-u",
-        "filter-date-u",
-        "filter-date-exact-u",
-      ].forEach((id) => {
-        document.getElementById(id).onchange = () => {
-          renderCoursesBadges(allCourses);
+        teacherChoices,
+        roomChoices,
+        subjectChoices,
+        dayChoices,
+      ].forEach((choiceInstance) => {
+        choiceInstance.passedElement.element.addEventListener("change", () => {
           renderSchedulesTable(allCourses, allSchedules);
-        };
+        });
+      });
+
+      // Listener per input data esatta
+      document.getElementById("filter-date-exact-u").addEventListener("change", () => {
+        renderSchedulesTable(allCourses, allSchedules);
       });
     })
     .catch((e) => {
@@ -101,7 +108,7 @@ function populateFilterOptions() {
 
   const unique = (arr, key) => [...new Set(arr.map((i) => i[key]).filter(Boolean))];
 
-  // Filtri insegnanti, aula, materia
+  // Insegnanti
   teacherChoices.clearChoices();
   teacherChoices.setChoices(
     unique(allSchedules, "teacher").map((v) => ({ value: v, label: v })),
@@ -110,6 +117,7 @@ function populateFilterOptions() {
     false
   );
 
+  // Aule
   roomChoices.clearChoices();
   roomChoices.setChoices(
     unique(allSchedules, "room").map((v) => ({ value: v, label: v })),
@@ -118,6 +126,7 @@ function populateFilterOptions() {
     false
   );
 
+  // Materie
   subjectChoices.clearChoices();
   subjectChoices.setChoices(
     unique(allSchedules, "subject").map((v) => ({ value: v, label: v })),
@@ -126,15 +135,11 @@ function populateFilterOptions() {
     false
   );
 
-  // Giorni presenti nei dati (normalize per uniformità)
+  // Giorni (solo quelli presenti, ordinati)
   const giorniPresentiSet = new Set(
     allSchedules.map((s) => normalize(s.day)).filter(Boolean)
   );
-
-  // Ordina i giorni presenti secondo la settimana, ma mantenendo solo quelli effettivamente presenti
-  const giorniOrdinati = settimana.filter(
-    (g) => giorniPresentiSet.has(normalize(g))
-  );
+  const giorniOrdinati = settimana.filter((g) => giorniPresentiSet.has(normalize(g)));
 
   dayChoices.clearChoices();
   dayChoices.setChoices(
@@ -168,12 +173,11 @@ function renderSchedulesTable(courses, schedules) {
     courses.some((c) => c.id == s.course_id)
   );
 
-  // Ottieni valori selezionati nei filtri
-  const getVals = (id) => new Choices(`#${id}`).getValue(true);
-  const teacherFilter = getVals("filter-teacher-u");
-  const roomFilter = getVals("filter-room-u");
-  const subjectFilter = getVals("filter-subject-u");
-  const dayFilter = getVals("filter-date-u");
+  // Prendi valori selezionati dai filtri (usa le istanze scelte)
+  const teacherFilter = teacherChoices.getValue(true);
+  const roomFilter = roomChoices.getValue(true);
+  const subjectFilter = subjectChoices.getValue(true);
+  const dayFilter = dayChoices.getValue(true);
   const dateExact = document.getElementById("filter-date-exact-u").value;
 
   // Applica filtri
@@ -188,7 +192,10 @@ function renderSchedulesTable(courses, schedules) {
       dayFilter.map(normalize).includes(normalize(s.day))
     );
   }
-  if (dateExact) filtered = filtered.filter((s) => s.date === dateExact);
+  if (dateExact) {
+    // filtro per data esatta, override filtri giorni
+    filtered = filtered.filter((s) => s.date === dateExact);
+  }
 
   filtered = filtered.sort(
     (a, b) => a.date.localeCompare(b.date) || a.start_time.localeCompare(b.start_time)
@@ -253,11 +260,11 @@ newPassword.addEventListener("input", () => {
 // ------------------------------
 document.getElementById("edit-profile-form").onsubmit = function (e) {
   e.preventDefault();
-  if (editHint.textContent) {
-    editHint.style.color = "red";
+  if (editHint.textContent !== "") {
+    editMsg.textContent = "Correggi la password prima di salvare.";
+    editMsg.style.color = "var(--accent)";
     return;
   }
-
   fetch("/user/profile", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -266,15 +273,20 @@ document.getElementById("edit-profile-form").onsubmit = function (e) {
       password: newPassword.value,
     }),
   })
-    .then((r) => r.text())
-    .then((msg) => {
-      editMsg.textContent = msg;
-      editMsg.style.color = msg === "OK" ? "green" : "red";
-      if (msg === "OK") setTimeout(() => location.reload(), 1000);
+    .then((r) => r.json())
+    .then((resp) => {
+      if (resp.success) {
+        editMsg.textContent = "Profilo aggiornato con successo!";
+        editMsg.style.color = "green";
+        newPassword.value = "";
+        editHint.textContent = "";
+      } else {
+        editMsg.textContent = resp.message || "Errore sconosciuto";
+        editMsg.style.color = "var(--accent)";
+      }
     })
-    .catch((err) => {
-      console.error("Errore modifica profilo", err);
-      editMsg.textContent = "Errore durante il salvataggio.";
-      editMsg.style.color = "red";
+    .catch(() => {
+      editMsg.textContent = "Errore di rete.";
+      editMsg.style.color = "var(--accent)";
     });
 };
