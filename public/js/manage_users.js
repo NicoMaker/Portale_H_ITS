@@ -14,16 +14,18 @@ const fetchCourses = () =>
 
 function updateNewCourseSelect() {
   const select = document.getElementById('new-course');
-  if (document.getElementById('new-role').value === 'user') {
+  const role = document.getElementById('new-role').value;
+  if (role === 'user') {
     select.style.display = '';
     select.innerHTML = '<option value="">Nessun corso</option>' +
       courses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
   } else {
     select.style.display = 'none';
+    select.innerHTML = '';
   }
 }
 
-document.getElementById('new-role').onchange = updateNewCourseSelect;
+document.getElementById('new-role').addEventListener('change', updateNewCourseSelect);
 
 function updateFilterCourseSelect() {
   filterCourseSelect.innerHTML = '<option value="">Tutti i corsi</option>' +
@@ -33,7 +35,7 @@ function updateFilterCourseSelect() {
 function toggleFilterCourseVisibility() {
   const filterRole = document.getElementById('filter-role').value;
   const filterCourseGroup = document.getElementById('filter-course').closest('.filter-group');
-  if (filterRole === 'user' || filterRole === '') {
+  if (filterRole === 'user') {
     filterCourseGroup.style.display = '';
   } else {
     filterCourseGroup.style.display = 'none';
@@ -53,12 +55,11 @@ function fetchUsers() {
 function renderUsersList() {
   const search = searchUserInput.value.toLowerCase();
   const courseId = filterCourseSelect.value;
-  const filterRoleSelect = document.getElementById('filter-role');
-  const filterRole = filterRoleSelect ? filterRoleSelect.value : '';
+  const filterRole = document.getElementById('filter-role').value;
   const dateFilter = document.getElementById('filter-user-date').value;
   const adminCount = users.filter(u => u.role === "admin").length;
-
   let html = '<table><tr><th>Username</th><th>Ruolo</th><th>Corso</th><th>Azioni</th></tr>';
+
   users
     .slice().sort((a, b) => a.username.localeCompare(b.username))
     .filter(u => {
@@ -74,6 +75,7 @@ function renderUsersList() {
       html += `<tr><td>${u.username}</td><td>`;
       html += `<span class='badge ${u.role}'>${u.role === 'admin' ? 'Admin' : 'Utente'}</span>`;
       html += `</td><td>`;
+
       if (filterRole === 'admin') {
         html += '<span style="color:#888">-</span>';
       } else if (u.role === "user") {
@@ -87,11 +89,14 @@ function renderUsersList() {
       } else {
         html += '<span style="color:#888">-</span>';
       }
+
       html += `</td><td>`;
       html += `<button onclick='openEditUser(${u.id})'>Modifica</button> `;
+
       if (u.role !== "admin") html += `<button onclick='promote(${u.id})'>Rendi Admin</button>`;
       if (u.role === "admin" && adminCount > 1) html += `<button onclick='demote(${u.id})'>Rendi Utente</button>`;
       if (adminCount > 1 || u.role !== "admin") html += `<button onclick='deleteUser(${u.id})'>Elimina</button>`;
+
       html += `</td></tr>`;
     });
 
@@ -108,9 +113,8 @@ function demote(id) {
 }
 
 function deleteUser(id) {
-  if (confirm('Sei sicuro di voler eliminare questo utente?')) {
+  if (confirm('Sei sicuro di voler eliminare questo utente?'))
     fetch(`/api/users/${id}`, { method: 'DELETE' }).then(fetchUsers);
-  }
 }
 
 function assignCourse(id, courseId) {
@@ -123,8 +127,8 @@ function assignCourse(id, courseId) {
     .then(msg => {
       fetchUsers();
       const el = document.getElementById('assign-msg');
-      el.textContent = (msg === 'OK') ? 'Corso assegnato con successo!' : msg;
-      el.className = (msg === 'OK') ? 'success' : 'hint';
+      el.textContent = msg === 'OK' ? 'Corso assegnato con successo!' : msg;
+      el.className = msg === 'OK' ? 'success' : 'hint';
       setTimeout(() => { el.textContent = ''; }, 2500);
     });
 }
@@ -150,48 +154,10 @@ window.onclick = e => {
     document.getElementById('user-schedules-modal').style.display = 'none';
 };
 
-// Validazione password edit
-const editPassword = document.getElementById('edit_password');
-const editHint = document.getElementById('edit-user-password-hint');
-editPassword.addEventListener('input', () => {
-  const val = editPassword.value;
-  let msg = '';
-  if (val.length < 8) msg += 'Min 8 caratteri. ';
-  if (!/[A-Z]/.test(val)) msg += 'Almeno una maiuscola. ';
-  if (!/[a-z]/.test(val)) msg += 'Almeno una minuscola. ';
-  if (!/[0-9]/.test(val)) msg += 'Almeno un numero. ';
-  editHint.textContent = msg;
-  editHint.style.color = msg ? 'var(--accent)' : 'green';
-});
-
-document.getElementById('edit-user-form').onsubmit = function (e) {
-  if (editHint.textContent) {
-    e.preventDefault();
-    editHint.style.color = 'red';
-    return false;
-  }
-  e.preventDefault();
-  fetch(`/api/users/${editingUserId}/edit`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      username: document.getElementById('edit_username').value,
-      password: editPassword.value
-    })
-  }).then(r => r.text()).then(msg => {
-    document.getElementById('edit-user-msg').textContent = msg;
-    if (msg === 'OK') {
-      setTimeout(() => {
-        document.getElementById('edit-user-modal').style.display = 'none';
-        fetchUsers();
-      }, 1000);
-    }
-  });
-};
-
-// Validazione password nuovo utente
+// Validazione password live
 const newPassword = document.getElementById('new-password');
 const addHint = document.getElementById('add-password-hint');
+
 newPassword.addEventListener('input', () => {
   const val = newPassword.value;
   let msg = '';
@@ -223,12 +189,12 @@ document.getElementById('add-user-form').onsubmit = function (e) {
     document.getElementById('add-user-msg').textContent = msg;
     if (msg === 'OK') {
       this.reset();
+      updateNewCourseSelect();
       fetchUsers();
     }
   });
 };
 
-// DOM ready
 document.addEventListener('DOMContentLoaded', () => {
   searchUserInput = document.getElementById('search-user');
   filterCourseSelect = document.getElementById('filter-course');
@@ -238,12 +204,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (searchUserInput && filterCourseSelect) {
     searchUserInput.addEventListener('input', renderUsersList);
     filterCourseSelect.addEventListener('change', renderUsersList);
-    if (filterRoleSelect) {
-      filterRoleSelect.addEventListener('change', () => {
-        toggleFilterCourseVisibility();
-        renderUsersList();
-      });
-    }
+    if (filterRoleSelect) filterRoleSelect.addEventListener('change', () => {
+      toggleFilterCourseVisibility();
+      renderUsersList();
+    });
     if (filterUserDate) filterUserDate.addEventListener('input', renderUsersList);
   }
 
@@ -251,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchCourses().then(fetchUsers);
 });
 
-// Carica util.js se manca formatDate
+// Importa la funzione formatDate se non esiste
 if (typeof window.formatDate !== 'function') {
   const script = document.createElement('script');
   script.src = 'js/utils.js';
