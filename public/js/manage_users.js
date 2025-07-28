@@ -35,11 +35,14 @@ function updateFilterCourseSelect() {
 function toggleFilterCourseVisibility() {
   const filterRole = document.getElementById('filter-role').value;
   const filterCourseGroup = document.getElementById('filter-course').closest('.filter-group');
-  if (filterRole === 'user') {
-    filterCourseGroup.style.display = '';
-  } else {
+
+  if (filterRole === 'admin') {
+    // Nascondi solo se si seleziona "Solo admin"
     filterCourseGroup.style.display = 'none';
     document.getElementById('filter-course').value = '';
+  } else {
+    // Mostra se ruolo è "Tutti gli utenti" o "Solo utenti"
+    filterCourseGroup.style.display = '';
   }
 }
 
