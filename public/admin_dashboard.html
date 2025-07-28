@@ -1,55 +1,59 @@
 <!doctype html>
 <html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Admin</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard Admin</title>
-  <link rel="stylesheet" href="/style.css" />
-</head>
-
-<body>
-  <div class="navbar">
-    <div>
-      <a href="/admin_dashboard.html" class="active">Dashboard Admin</a>
-      <a href="/manage_users.html">Gestione Utenti</a>
-      <a href="/manage_courses.html">Gestione Corsi</a>
-      <a href="/manage_schedules.html">Gestione Orari</a>
-      <button id="edit-profile-btn">Modifica Profilo</button>
-      <a href="/logout">Logout</a>
-    </div>
-  </div>
-
-  <div class="container" style="max-width: 700px">
-    <h2 class="section-title">Benvenuto, Admin</h2>
-
-    <!-- Navigazione principale -->
-    <nav>
-      <ul class="admin-links">
-        <li><a href="/manage_users.html">👤 Gestione Utenti</a></li>
-        <li><a href="/manage_courses.html">📚 Gestione Corsi</a></li>
-        <li><a href="/manage_schedules.html">🗓️ Gestione Orari</a></li>
-      </ul>
-    </nav>
-
-    <!-- Modale modifica profilo -->
-    <div id="edit-profile-modal" class="modal" style="display: none">
-      <div class="modal-content">
-        <span class="close" id="close-modal">&times;</span>
-        <h3>Modifica Profilo</h3>
-        <form id="edit-profile-form">
-          <input type="text" id="new_username" disabled />
-          <input type="hidden" id="new_username_hidden" name="new_username" />
-          <input type="password" name="new_password" id="new_password" placeholder="Nuova password" required />
-          <div id="edit-password-hint" class="hint"></div>
-          <button type="submit">Salva</button>
-          <div id="edit-profile-msg"></div>
-        </form>
+  <body>
+    <div class="navbar">
+      <div>
+        <a href="/admin_dashboard.html" class="active">Dashboard Admin</a>
+        <a href="/manage_users.html">Gestione Utenti</a>
+        <a href="/manage_courses.html">Gestione Corsi</a>
+        <a href="/manage_schedules.html">Gestione Orari</a>
+        <button id="edit-profile-btn">Modifica Profilo</button>
+        <a href="/logout">Logout</a>
       </div>
     </div>
-  </div>
 
-  <script src="js/admin_dashboard.js"></script>
-</body>
+    <div class="container" style="max-width: 700px">
+      <h2 class="section-title">Benvenuto, Admin</h2>
 
+      <!-- Navigazione principale -->
+      <nav>
+        <ul class="admin-links">
+          <li><a href="/manage_users.html">👤 Gestione Utenti</a></li>
+          <li><a href="/manage_courses.html">📚 Gestione Corsi</a></li>
+          <li><a href="/manage_schedules.html">🗓️ Gestione Orari</a></li>
+        </ul>
+      </nav>
+
+      <!-- Modale modifica profilo -->
+      <div id="edit-profile-modal" class="modal" style="display: none">
+        <div class="modal-content">
+          <span class="close" id="close-modal">&times;</span>
+          <h3>Modifica Profilo</h3>
+          <form id="edit-profile-form">
+            <input type="text" id="new_username" disabled />
+            <input type="hidden" id="new_username_hidden" name="new_username" />
+            <input
+              type="password"
+              name="new_password"
+              id="new_password"
+              placeholder="Nuova password"
+              required
+            />
+            <div id="edit-password-hint" class="hint"></div>
+            <button type="submit">Salva</button>
+            <div id="edit-profile-msg"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/admin_dashboard.js"></script>
+  </body>
 </html>

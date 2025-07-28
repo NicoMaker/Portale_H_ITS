@@ -36,7 +36,10 @@ let teacherChoices, roomChoices, subjectChoices, dayChoices;
 // ------------------------------
 function normalize(str) {
   return str
-    ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+    ? str
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
     : "";
 }
 
@@ -71,21 +74,23 @@ document.addEventListener("DOMContentLoaded", () => {
       renderSchedulesTable(allCourses, allSchedules);
 
       // Aggiungi event listener per i filtri (usa istanze Choices già create)
-      [
-        teacherChoices,
-        roomChoices,
-        subjectChoices,
-        dayChoices,
-      ].forEach((choiceInstance) => {
-        choiceInstance.passedElement.element.addEventListener("change", () => {
-          renderSchedulesTable(allCourses, allSchedules);
-        });
-      });
+      [teacherChoices, roomChoices, subjectChoices, dayChoices].forEach(
+        (choiceInstance) => {
+          choiceInstance.passedElement.element.addEventListener(
+            "change",
+            () => {
+              renderSchedulesTable(allCourses, allSchedules);
+            },
+          );
+        },
+      );
 
       // Listener per input data esatta
-      document.getElementById("filter-date-exact-u").addEventListener("change", () => {
-        renderSchedulesTable(allCourses, allSchedules);
-      });
+      document
+        .getElementById("filter-date-exact-u")
+        .addEventListener("change", () => {
+          renderSchedulesTable(allCourses, allSchedules);
+        });
     })
     .catch((e) => {
       console.error("Errore nel caricamento dati:", e);
@@ -106,7 +111,9 @@ function populateFilterOptions() {
     "Domenica",
   ];
 
-  const unique = (arr, key) => [...new Set(arr.map((i) => i[key]).filter(Boolean))];
+  const unique = (arr, key) => [
+    ...new Set(arr.map((i) => i[key]).filter(Boolean)),
+  ];
 
   // Insegnanti
   teacherChoices.clearChoices();
@@ -114,7 +121,7 @@ function populateFilterOptions() {
     unique(allSchedules, "teacher").map((v) => ({ value: v, label: v })),
     "value",
     "label",
-    false
+    false,
   );
 
   // Aule
@@ -123,7 +130,7 @@ function populateFilterOptions() {
     unique(allSchedules, "room").map((v) => ({ value: v, label: v })),
     "value",
     "label",
-    false
+    false,
   );
 
   // Materie
@@ -132,21 +139,23 @@ function populateFilterOptions() {
     unique(allSchedules, "subject").map((v) => ({ value: v, label: v })),
     "value",
     "label",
-    false
+    false,
   );
 
   // Giorni (solo quelli presenti, ordinati)
   const giorniPresentiSet = new Set(
-    allSchedules.map((s) => normalize(s.day)).filter(Boolean)
+    allSchedules.map((s) => normalize(s.day)).filter(Boolean),
   );
-  const giorniOrdinati = settimana.filter((g) => giorniPresentiSet.has(normalize(g)));
+  const giorniOrdinati = settimana.filter((g) =>
+    giorniPresentiSet.has(normalize(g)),
+  );
 
   dayChoices.clearChoices();
   dayChoices.setChoices(
     giorniOrdinati.map((d) => ({ value: d, label: d })),
     "value",
     "label",
-    false
+    false,
   );
 }
 
@@ -161,7 +170,9 @@ function renderCoursesBadges(courses) {
   }
   container.innerHTML =
     '<div class="user-courses-badges-wrap">' +
-    courses.map((c) => `<span class="user-courses-badge">corso: ${c.name}</span>`).join("") +
+    courses
+      .map((c) => `<span class="user-courses-badge">corso: ${c.name}</span>`)
+      .join("") +
     "</div>";
 }
 
@@ -170,7 +181,7 @@ function renderCoursesBadges(courses) {
 // ------------------------------
 function renderSchedulesTable(courses, schedules) {
   let filtered = schedules.filter((s) =>
-    courses.some((c) => c.id == s.course_id)
+    courses.some((c) => c.id == s.course_id),
   );
 
   // Prendi valori selezionati dai filtri (usa le istanze scelte)
@@ -189,7 +200,7 @@ function renderSchedulesTable(courses, schedules) {
     filtered = filtered.filter((s) => subjectFilter.includes(s.subject));
   if (dayFilter.length) {
     filtered = filtered.filter((s) =>
-      dayFilter.map(normalize).includes(normalize(s.day))
+      dayFilter.map(normalize).includes(normalize(s.day)),
     );
   }
   if (dateExact) {
@@ -198,7 +209,8 @@ function renderSchedulesTable(courses, schedules) {
   }
 
   filtered = filtered.sort(
-    (a, b) => a.date.localeCompare(b.date) || a.start_time.localeCompare(b.start_time)
+    (a, b) =>
+      a.date.localeCompare(b.date) || a.start_time.localeCompare(b.start_time),
   );
 
   let html = "";
