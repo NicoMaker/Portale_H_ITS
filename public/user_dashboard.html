@@ -1,91 +1,104 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Utente</title>
+    <link rel="stylesheet" href="/style.css" />
+    <!-- Choices.js CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"
+    />
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Utente</title>
-  <link rel="stylesheet" href="/style.css">
-  <!-- Choices.js CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
-</head>
-
-<body>
-  <div class="navbar">
-    <div>
-      <a href="/user_dashboard.html" class="active">Dashboard User</a>
-      <button id="edit-profile-btn" style="margin-top:1.5rem">Modifica Profilo</button>
-      <a href="/logout" style="display:inline-block;margin-bottom:1.5rem;">Logout</a>
-    </div>
-  </div>
-
-  <div class="container">
-    <h2>Benvenuto nella tua dashboard</h2>
-
-    <!-- Sezione per i badge dei corsi -->
-    <div id="courses-section">
-      <div class="user-courses-badges-wrap" id="user-courses">
-        <!-- I badge dei corsi saranno inseriti dinamicamente qui -->
+  <body>
+    <div class="navbar">
+      <div>
+        <a href="/user_dashboard.html" class="active">Dashboard User</a>
+        <button id="edit-profile-btn" style="margin-top: 1.5rem">
+          Modifica Profilo
+        </button>
+        <a href="/logout" style="display: inline-block; margin-bottom: 1.5rem"
+          >Logout</a
+        >
       </div>
     </div>
 
-    <!-- SEZIONE FILTRI -->
-    <div class="filters-bar">
-      <h2>🔎 Filtra i risultati</h2>
-      <p>Utilizza i seguenti filtri per cercare le lezioni assegnate in base a docente, aula, materia, giorno o data.
-      </p>
+    <div class="container">
+      <h2>Benvenuto nella tua dashboard</h2>
 
-      <br>
-      <div class="filter-group">
-        <label for="filter-teacher-u">👨‍🏫 Docente</label>
-        <select id="filter-teacher-u" multiple></select>
+      <!-- Sezione per i badge dei corsi -->
+      <div id="courses-section">
+        <div class="user-courses-badges-wrap" id="user-courses">
+          <!-- I badge dei corsi saranno inseriti dinamicamente qui -->
+        </div>
       </div>
 
-      <div class="filter-group">
-        <label for="filter-room-u">🏫 Aula</label>
-        <select id="filter-room-u" multiple></select>
+      <!-- SEZIONE FILTRI -->
+      <div class="filters-bar">
+        <h2>🔎 Filtra i risultati</h2>
+        <p>
+          Utilizza i seguenti filtri per cercare le lezioni assegnate in base a
+          docente, aula, materia, giorno o data.
+        </p>
+
+        <br />
+        <div class="filter-group">
+          <label for="filter-teacher-u">👨‍🏫 Docente</label>
+          <select id="filter-teacher-u" multiple></select>
+        </div>
+
+        <div class="filter-group">
+          <label for="filter-room-u">🏫 Aula</label>
+          <select id="filter-room-u" multiple></select>
+        </div>
+
+        <div class="filter-group">
+          <label for="filter-subject-u">📖 Materia</label>
+          <select id="filter-subject-u" multiple></select>
+        </div>
+
+        <div class="filter-group">
+          <label for="filter-date-u">📅 Giorno</label>
+          <select id="filter-date-u" multiple></select>
+        </div>
+
+        <div class="filter-group">
+          <label for="filter-date-exact-u">📆 Data</label>
+          <input type="date" id="filter-date-exact-u" />
+        </div>
       </div>
 
-      <div class="filter-group">
-        <label for="filter-subject-u">📖 Materia</label>
-        <select id="filter-subject-u" multiple></select>
-      </div>
+      <!-- SEZIONE CONTENUTI -->
+      <div id="user-schedules-table"></div>
+      <div id="user-courses"></div>
+      <div id="user-courses-debug" class="hint"></div>
 
-      <div class="filter-group">
-        <label for="filter-date-u">📅 Giorno</label>
-        <select id="filter-date-u" multiple></select>
-      </div>
-
-      <div class="filter-group">
-        <label for="filter-date-exact-u">📆 Data</label>
-        <input type="date" id="filter-date-exact-u" />
+      <!-- MODALE MODIFICA PROFILO -->
+      <div id="edit-profile-modal" class="modal" style="display: none">
+        <div class="modal-content">
+          <span class="close" id="close-modal">&times;</span>
+          <h3>Modifica Profilo</h3>
+          <form id="edit-profile-form">
+            <input type="text" id="new_username" disabled />
+            <input
+              type="password"
+              name="new_password"
+              id="new_password"
+              placeholder="Nuova password"
+              required
+            />
+            <div id="edit-password-hint" class="hint"></div>
+            <button type="submit">Salva</button>
+            <div id="edit-profile-msg"></div>
+          </form>
+        </div>
       </div>
     </div>
 
-    <!-- SEZIONE CONTENUTI -->
-    <div id="user-schedules-table"></div>
-    <div id="user-courses"></div>
-    <div id="user-courses-debug" class="hint"></div>
-
-    <!-- MODALE MODIFICA PROFILO -->
-    <div id="edit-profile-modal" class="modal" style="display:none">
-      <div class="modal-content">
-        <span class="close" id="close-modal">&times;</span>
-        <h3>Modifica Profilo</h3>
-        <form id="edit-profile-form">
-          <input type="text" id="new_username" disabled />
-          <input type="password" name="new_password" id="new_password" placeholder="Nuova password" required />
-          <div id="edit-password-hint" class="hint"></div>
-          <button type="submit">Salva</button>
-          <div id="edit-profile-msg"></div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-  <script src="js/user_dashboard.js"></script>
-</body>
-
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script src="js/user_dashboard.js"></script>
+  </body>
 </html>

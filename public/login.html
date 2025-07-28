@@ -1,23 +1,40 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
-<head>
-  <meta charset="UTF-8">
-  <title>Login</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/style.css">
-</head>
-<body>
-  <div class="navbar"><span style="font-size:1.5em;vertical-align:middle;">🔐</span> Portale ITS - Login</div>
-  <div class="form-container">
-    <h2>Accedi al tuo account</h2>
-    <form id="login-form" method="POST" action="/login">
-      <input type="text" name="username" id="username" placeholder="Username" required autocomplete="username" />
-      <input type="password" name="password" id="password" placeholder="Password" required autocomplete="current-password" />
-      <button type="submit">Login</button>
-      <div id="login-msg"></div>
-    </form>
-    <p>Non hai un account? <a href="/register.html">Registrati</a></p>
-  </div>
-  <script src="js/login.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div class="navbar">
+      <span style="font-size: 1.5em; vertical-align: middle">🔐</span> Portale
+      ITS - Login
+    </div>
+    <div class="form-container">
+      <h2>Accedi al tuo account</h2>
+      <form id="login-form" method="POST" action="/login">
+        <input
+          type="text"
+          name="username"
+          id="username"
+          placeholder="Username"
+          required
+          autocomplete="username"
+        />
+        <input
+          type="password"
+          name="password"
+          id="password"
+          placeholder="Password"
+          required
+          autocomplete="current-password"
+        />
+        <button type="submit">Login</button>
+        <div id="login-msg"></div>
+      </form>
+      <p>Non hai un account? <a href="/register.html">Registrati</a></p>
+    </div>
+    <script src="js/login.js"></script>
+  </body>
 </html>

@@ -1,71 +1,99 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Gestione Corsi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <title>Gestione Corsi</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/style.css">
-</head>
-
-<body>
-  <div class="navbar">
-    <div>
-      <a href="/admin_dashboard.html">Dashboard Admin</a>
-      <a href="/manage_users.html">Gestione Utenti</a>
-      <a href="/manage_courses.html" class="active">Gestione Corsi</a>
-      <a href="/manage_schedules.html">Gestione Orari</a>
-      <a href="/logout">Logout</a>
-      
+  <body>
+    <div class="navbar">
+      <div>
+        <a href="/admin_dashboard.html">Dashboard Admin</a>
+        <a href="/manage_users.html">Gestione Utenti</a>
+        <a href="/manage_courses.html" class="active">Gestione Corsi</a>
+        <a href="/manage_schedules.html">Gestione Orari</a>
+        <a href="/logout">Logout</a>
+      </div>
     </div>
-  </div>
 
-  <div class="container" style="max-width:900px;">
-    <div class="courses-wrapper">
-      <!-- Aggiungi Corso -->
-      <div class="form-container" style="flex:1 1 320px;min-width:290px;max-width:370px;">
-        <h3>➕ Aggiungi Corso</h3>
-        <form id="add-course-form">
-          <input type="text" id="course-name" placeholder="Nome corso" required />
-          <input type="text" id="course-desc" placeholder="Descrizione (facoltativa)" />
-          <button type="submit">Aggiungi Corso</button>
-          <div id="course-msg" class="hint"></div>
+    <div class="container" style="max-width: 900px">
+      <div class="courses-wrapper">
+        <!-- Aggiungi Corso -->
+        <div
+          class="form-container"
+          style="flex: 1 1 320px; min-width: 290px; max-width: 370px"
+        >
+          <h3>➕ Aggiungi Corso</h3>
+          <form id="add-course-form">
+            <input
+              type="text"
+              id="course-name"
+              placeholder="Nome corso"
+              required
+            />
+            <input
+              type="text"
+              id="course-desc"
+              placeholder="Descrizione (facoltativa)"
+            />
+            <button type="submit">Aggiungi Corso</button>
+            <div id="course-msg" class="hint"></div>
+          </form>
+        </div>
+
+        <!-- Lista Corsi -->
+        <div class="course-list">
+          <h3>📋 Lista Corsi</h3>
+          <div
+            style="
+              display: flex;
+              gap: 1rem;
+              align-items: center;
+              margin-bottom: 1.2rem;
+            "
+          >
+            <input
+              type="text"
+              id="search-course"
+              placeholder="Cerca corso per nome..."
+              style="flex: 2 1 200px"
+            />
+            <select
+              id="filter-course-list"
+              style="flex: 1 1 120px; display: none"
+            >
+              <option value="">Tutti i corsi</option>
+            </select>
+          </div>
+          <div id="courses-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modale Modifica Corso -->
+    <div id="edit-course-modal" class="modal" style="display: none">
+      <div class="modal-content">
+        <span class="close" id="close-edit-course-modal">&times;</span>
+        <h3>✏️ Modifica Corso</h3>
+        <form id="edit-course-form">
+          <input
+            type="text"
+            id="edit-course-name"
+            placeholder="Nome corso"
+            required
+          />
+          <input type="text" id="edit-course-desc" placeholder="Descrizione" />
+          <div class="form-actions">
+            <button type="submit">Salva</button>
+            <button type="button" id="cancel-edit-course">Annulla</button>
+          </div>
+          <div id="edit-course-msg"></div>
         </form>
       </div>
-
-      <!-- Lista Corsi -->
-      <div class="course-list">
-        <h3>📋 Lista Corsi</h3>
-        <div style="display:flex;gap:1rem;align-items:center;margin-bottom:1.2rem;">
-          <input type="text" id="search-course" placeholder="Cerca corso per nome..." style="flex:2 1 200px;" />
-          <select id="filter-course-list" style="flex:1 1 120px; display: none;">
-            <option value="">Tutti i corsi</option>
-          </select>
-        </div>
-        <div id="courses-list"></div>
-      </div>
     </div>
 
-  </div>
-
-  <!-- Modale Modifica Corso -->
-  <div id="edit-course-modal" class="modal" style="display:none">
-    <div class="modal-content">
-      <span class="close" id="close-edit-course-modal">&times;</span>
-      <h3>✏️ Modifica Corso</h3>
-      <form id="edit-course-form">
-        <input type="text" id="edit-course-name" placeholder="Nome corso" required />
-        <input type="text" id="edit-course-desc" placeholder="Descrizione" />
-        <div class="form-actions">
-          <button type="submit">Salva</button>
-          <button type="button" id="cancel-edit-course">Annulla</button>
-        </div>
-        <div id="edit-course-msg"></div>
-      </form>
-    </div>
-  </div>
-
-  <script src="js/manage_courses.js"></script>
-</body>
-
+    <script src="js/manage_courses.js"></script>
+  </body>
 </html>

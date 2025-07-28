@@ -1,24 +1,41 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
-<head>
-  <meta charset="UTF-8">
-  <title>Registrazione</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/style.css">
-</head>
-<body>
-  <div class="navbar"><span style="font-size:1.5em;vertical-align:middle;">📝</span> Portale ITS - Registrazione</div>
-  <div class="form-container">
-    <h2>Crea un nuovo account</h2>
-    <form id="register-form" method="POST" action="/register">
-      <input type="text" name="username" id="username" placeholder="Username" required autocomplete="username" />
-      <input type="password" name="password" id="password" placeholder="Password" required autocomplete="new-password" />
-      <div id="password-hint" class="hint"></div>
-      <button type="submit">Registrati</button>
-      <div id="register-msg"></div>
-    </form>
-    <p>Hai già un account? <a href="/login.html">Accedi</a></p>
-  </div>
-  <script src="js/register.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Registrazione</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div class="navbar">
+      <span style="font-size: 1.5em; vertical-align: middle">📝</span> Portale
+      ITS - Registrazione
+    </div>
+    <div class="form-container">
+      <h2>Crea un nuovo account</h2>
+      <form id="register-form" method="POST" action="/register">
+        <input
+          type="text"
+          name="username"
+          id="username"
+          placeholder="Username"
+          required
+          autocomplete="username"
+        />
+        <input
+          type="password"
+          name="password"
+          id="password"
+          placeholder="Password"
+          required
+          autocomplete="new-password"
+        />
+        <div id="password-hint" class="hint"></div>
+        <button type="submit">Registrati</button>
+        <div id="register-msg"></div>
+      </form>
+      <p>Hai già un account? <a href="/login.html">Accedi</a></p>
+    </div>
+    <script src="js/register.js"></script>
+  </body>
 </html>

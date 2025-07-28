@@ -1,112 +1,139 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Gestione Utenti</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <title>Gestione Utenti</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/style.css">
-</head>
-
-<body>
-
-  <!-- MENU IN ALTO (HEADER) -->
-  <div class="navbar">
-    <div>
-      <a href="/admin_dashboard.html">Dashboard Admin</a>
-      <a href="/manage_users.html" class="active">Gestione Utenti</a>
-      <a href="/manage_courses.html">Gestione Corsi</a>
-      <a href="/manage_schedules.html">Gestione Orari</a>
-      <a href="/logout">Logout</a>
+  <body>
+    <!-- MENU IN ALTO (HEADER) -->
+    <div class="navbar">
+      <div>
+        <a href="/admin_dashboard.html">Dashboard Admin</a>
+        <a href="/manage_users.html" class="active">Gestione Utenti</a>
+        <a href="/manage_courses.html">Gestione Corsi</a>
+        <a href="/manage_schedules.html">Gestione Orari</a>
+        <a href="/logout">Logout</a>
+      </div>
     </div>
-  </div>
 
-  <!-- CONTENUTO PRINCIPALE -->
-  <div class="content">
+    <!-- CONTENUTO PRINCIPALE -->
+    <div class="content">
+      <div class="container" style="max-width: 900px">
+        <!-- FORM AGGIUNTA UTENTE -->
+        <div
+          class="form-container"
+          style="box-shadow: none; margin: 0 0 2rem 0"
+        >
+          <h3 style="margin-bottom: 1.2rem">Aggiungi Utente</h3>
+          <form id="add-user-form">
+            <input
+              type="text"
+              id="new-username"
+              placeholder="Username"
+              required
+            />
+            <input
+              type="password"
+              id="new-password"
+              placeholder="Password"
+              required
+            />
+            <div id="add-password-hint" class="hint"></div>
+            <select id="new-role" required>
+              <option value="user">Utente</option>
+              <option value="admin">Amministratore</option>
+            </select>
+            <select id="new-course" style="display: none"></select>
+            <button type="submit">Crea Utente</button>
+            <div id="add-user-msg"></div>
+          </form>
+        </div>
 
-    <div class="container" style="max-width:900px;">
-      <!-- FORM AGGIUNTA UTENTE -->
-      <div class="form-container" style="box-shadow:none;margin:0 0 2rem 0;">
-        <h3 style="margin-bottom:1.2rem;">Aggiungi Utente</h3>
-        <form id="add-user-form">
-          <input type="text" id="new-username" placeholder="Username" required />
-          <input type="password" id="new-password" placeholder="Password" required />
-          <div id="add-password-hint" class="hint"></div>
-          <select id="new-role" required>
-            <option value="user">Utente</option>
-            <option value="admin">Amministratore</option>
-          </select>
-          <select id="new-course" style="display:none;"></select>
-          <button type="submit">Crea Utente</button>
-          <div id="add-user-msg"></div>
+        <!-- SEZIONE FILTRI -->
+        <div class="filters-bar">
+          <h2>🔎 Filtra gli utenti</h2>
+          <p>
+            Usa i seguenti filtri per cercare utenti in base a ruolo, corso o
+            nome.
+          </p>
+          <br />
+
+          <div class="filter-group">
+            <label for="search-user">👤 Nome utente</label>
+            <input
+              type="text"
+              id="search-user"
+              placeholder="Cerca utente per nome..."
+            />
+          </div>
+
+          <div class="filter-group">
+            <label for="filter-role">🛡️ Ruolo</label>
+            <select id="filter-role">
+              <option value="">Tutti gli utenti</option>
+              <option value="admin">Solo admin</option>
+              <option value="user">Solo utenti</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="filter-course">📚 Corso</label>
+            <select id="filter-course">
+              <option value="">Tutti i corsi</option>
+            </select>
+          </div>
+
+          <div class="filter-group" style="display: none">
+            <label for="filter-user-date">📅 Data registrazione</label>
+            <input type="date" id="filter-user-date" />
+          </div>
+        </div>
+
+        <!-- ELENCO UTENTI -->
+        <div id="users-list"></div>
+        <div id="assign-msg" class="hint"></div>
+      </div>
+    </div>
+
+    <!-- MODALE MODIFICA UTENTE -->
+    <div id="edit-user-modal" class="modal" style="display: none">
+      <div class="modal-content">
+        <span class="close" id="close-edit-modal">&times;</span>
+        <h3>Modifica Utente</h3>
+        <form id="edit-user-form">
+          <input
+            type="text"
+            name="edit_username"
+            id="edit_username"
+            placeholder="Nuovo username"
+            required
+          />
+          <input
+            type="password"
+            name="edit_password"
+            id="edit_password"
+            placeholder="Nuova password"
+            required
+          />
+          <div id="edit-user-password-hint" class="hint"></div>
+          <button type="submit">Salva</button>
+          <div id="edit-user-msg"></div>
         </form>
       </div>
+    </div>
 
-      <!-- SEZIONE FILTRI -->
-      <div class="filters-bar">
-        <h2>🔎 Filtra gli utenti</h2>
-        <p>Usa i seguenti filtri per cercare utenti in base a ruolo, corso o nome.</p>
-        <br>
-
-        <div class="filter-group">
-          <label for="search-user">👤 Nome utente</label>
-          <input type="text" id="search-user" placeholder="Cerca utente per nome..." />
-        </div>
-
-        <div class="filter-group">
-          <label for="filter-role">🛡️ Ruolo</label>
-          <select id="filter-role">
-            <option value="">Tutti gli utenti</option>
-            <option value="admin">Solo admin</option>
-            <option value="user">Solo utenti</option>
-          </select>
-        </div>
-
-        <div class="filter-group">
-          <label for="filter-course">📚 Corso</label>
-          <select id="filter-course">
-            <option value="">Tutti i corsi</option>
-          </select>
-        </div>
-
-        <div class="filter-group" style="display:none;">
-          <label for="filter-user-date">📅 Data registrazione</label>
-          <input type="date" id="filter-user-date" />
-        </div>
+    <!-- MODALE ORARI UTENTE -->
+    <div id="user-schedules-modal" class="modal" style="display: none">
+      <div class="modal-content">
+        <span class="close" id="close-schedules-modal">&times;</span>
+        <h3>Orari assegnati all'utente</h3>
+        <div id="user-schedules-content"></div>
       </div>
-
-      <!-- ELENCO UTENTI -->
-      <div id="users-list"></div>
-      <div id="assign-msg" class="hint"></div>
-
     </div>
-  </div>
 
-  <!-- MODALE MODIFICA UTENTE -->
-  <div id="edit-user-modal" class="modal" style="display:none">
-    <div class="modal-content">
-      <span class="close" id="close-edit-modal">&times;</span>
-      <h3>Modifica Utente</h3>
-      <form id="edit-user-form">
-        <input type="text" name="edit_username" id="edit_username" placeholder="Nuovo username" required />
-        <input type="password" name="edit_password" id="edit_password" placeholder="Nuova password" required />
-        <div id="edit-user-password-hint" class="hint"></div>
-        <button type="submit">Salva</button>
-        <div id="edit-user-msg"></div>
-      </form>
-    </div>
-  </div>
-
-  <!-- MODALE ORARI UTENTE -->
-  <div id="user-schedules-modal" class="modal" style="display:none">
-    <div class="modal-content">
-      <span class="close" id="close-schedules-modal">&times;</span>
-      <h3>Orari assegnati all'utente</h3>
-      <div id="user-schedules-content"></div>
-    </div>
-  </div>
-
-  <script src="js/manage_users.js"></script>
-</body>
-
+    <script src="js/manage_users.js"></script>
+  </body>
 </html>
