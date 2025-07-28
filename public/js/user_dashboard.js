@@ -1,5 +1,5 @@
 // ------------------------------
-// Utils
+// Funzione di formattazione data
 // ------------------------------
 function formatDate(iso) {
   if (!iso) return "-";
@@ -13,7 +13,7 @@ function formatDate(iso) {
 }
 
 // ------------------------------
-// Elementi DOM
+// Variabili globali e riferimenti DOM
 // ------------------------------
 const modal = document.getElementById("edit-profile-modal");
 const usernameDisplay = document.getElementById("new_username");
@@ -28,11 +28,19 @@ const editMsg = document.getElementById("edit-profile-msg");
 
 let allCourses = [];
 let allSchedules = [];
-
 let teacherChoices, roomChoices, subjectChoices, dayChoices;
 
 // ------------------------------
-// Caricamento iniziale dati
+// Funzione per normalizzare stringhe (rimuove accenti e minuscola)
+// ------------------------------
+function normalize(str) {
+  return str
+    ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+    : "";
+}
+
+// ------------------------------
+// Caricamento dati e inizializzazione Choices.js
 // ------------------------------
 document.addEventListener("DOMContentLoaded", () => {
   teacherChoices = new Choices("#filter-teacher-u", { removeItemButton: true });
@@ -49,36 +57,36 @@ document.addEventListener("DOMContentLoaded", () => {
     .then((r) => r.json())
     .then((courses) => {
       allCourses = courses;
-      fetch("/user/schedules")
-        .then((r) => r.json())
-        .then((schedules) => {
-          allSchedules = schedules;
-          populateFilterOptions();
+      return fetch("/user/schedules");
+    })
+    .then((r) => r.json())
+    .then((schedules) => {
+      allSchedules = schedules;
+      populateFilterOptions();
+      renderCoursesBadges(allCourses);
+      renderSchedulesTable(allCourses, allSchedules);
+
+      // Aggiorna tabella quando i filtri cambiano
+      [
+        "filter-teacher-u",
+        "filter-room-u",
+        "filter-subject-u",
+        "filter-date-u",
+        "filter-date-exact-u",
+      ].forEach((id) => {
+        document.getElementById(id).onchange = () => {
           renderCoursesBadges(allCourses);
           renderSchedulesTable(allCourses, allSchedules);
-
-          // Event listeners per i filtri
-          [
-            teacherChoices,
-            roomChoices,
-            subjectChoices,
-            dayChoices,
-            document.getElementById("filter-date-exact-u"),
-          ].forEach((el) => {
-            el.passedElement
-              ? el.passedElement.element.addEventListener("change", () => {
-                  renderSchedulesTable(allCourses, allSchedules);
-                })
-              : el.addEventListener("change", () => {
-                  renderSchedulesTable(allCourses, allSchedules);
-                });
-          });
-        });
+        };
+      });
+    })
+    .catch((e) => {
+      console.error("Errore nel caricamento dati:", e);
     });
 });
 
 // ------------------------------
-// Popola opzioni dei filtri
+// Popola i filtri con dati univoci
 // ------------------------------
 function populateFilterOptions() {
   const settimana = [
@@ -91,16 +99,15 @@ function populateFilterOptions() {
     "Domenica",
   ];
 
-  const unique = (arr, key) => [
-    ...new Set(arr.map((i) => i[key]).filter(Boolean)),
-  ];
+  const unique = (arr, key) => [...new Set(arr.map((i) => i[key]).filter(Boolean))];
 
+  // Filtri insegnanti, aula, materia
   teacherChoices.clearChoices();
   teacherChoices.setChoices(
     unique(allSchedules, "teacher").map((v) => ({ value: v, label: v })),
     "value",
     "label",
-    false,
+    false
   );
 
   roomChoices.clearChoices();
@@ -108,7 +115,7 @@ function populateFilterOptions() {
     unique(allSchedules, "room").map((v) => ({ value: v, label: v })),
     "value",
     "label",
-    false,
+    false
   );
 
   subjectChoices.clearChoices();
@@ -116,23 +123,30 @@ function populateFilterOptions() {
     unique(allSchedules, "subject").map((v) => ({ value: v, label: v })),
     "value",
     "label",
-    false,
+    false
   );
 
-  const giorniPresenti = new Set(allSchedules.map((s) => s.day).filter(Boolean));
-  const giorniOrdinati = settimana.filter((g) => giorniPresenti.has(g) || true);
+  // Giorni presenti nei dati (normalize per uniformità)
+  const giorniPresentiSet = new Set(
+    allSchedules.map((s) => normalize(s.day)).filter(Boolean)
+  );
+
+  // Ordina i giorni presenti secondo la settimana, ma mantenendo solo quelli effettivamente presenti
+  const giorniOrdinati = settimana.filter(
+    (g) => giorniPresentiSet.has(normalize(g))
+  );
 
   dayChoices.clearChoices();
   dayChoices.setChoices(
     giorniOrdinati.map((d) => ({ value: d, label: d })),
     "value",
     "label",
-    false,
+    false
   );
 }
 
 // ------------------------------
-// Rendering corsi e orari
+// Render badge corsi
 // ------------------------------
 function renderCoursesBadges(courses) {
   const container = document.getElementById("user-courses");
@@ -140,39 +154,44 @@ function renderCoursesBadges(courses) {
     container.innerHTML = '<div class="hint">Nessun corso assegnato.</div>';
     return;
   }
-
   container.innerHTML =
     '<div class="user-courses-badges-wrap">' +
-    courses
-      .map((c) => `<span class="user-courses-badge">corso: ${c.name}</span>`)
-      .join("") +
+    courses.map((c) => `<span class="user-courses-badge">corso: ${c.name}</span>`).join("") +
     "</div>";
 }
 
+// ------------------------------
+// Render tabella orari con filtri applicati
+// ------------------------------
 function renderSchedulesTable(courses, schedules) {
   let filtered = schedules.filter((s) =>
-    courses.some((c) => c.id == s.course_id),
+    courses.some((c) => c.id == s.course_id)
   );
 
-  const teacherFilter = teacherChoices.getValue(true);
-  const roomFilter = roomChoices.getValue(true);
-  const subjectFilter = subjectChoices.getValue(true);
-  const dayFilter = dayChoices.getValue(true);
+  // Ottieni valori selezionati nei filtri
+  const getVals = (id) => new Choices(`#${id}`).getValue(true);
+  const teacherFilter = getVals("filter-teacher-u");
+  const roomFilter = getVals("filter-room-u");
+  const subjectFilter = getVals("filter-subject-u");
+  const dayFilter = getVals("filter-date-u");
   const dateExact = document.getElementById("filter-date-exact-u").value;
 
+  // Applica filtri
   if (teacherFilter.length)
     filtered = filtered.filter((s) => teacherFilter.includes(s.teacher));
   if (roomFilter.length)
     filtered = filtered.filter((s) => roomFilter.includes(s.room));
   if (subjectFilter.length)
     filtered = filtered.filter((s) => subjectFilter.includes(s.subject));
-  if (dayFilter.length)
-    filtered = filtered.filter((s) => dayFilter.includes(s.day));
+  if (dayFilter.length) {
+    filtered = filtered.filter((s) =>
+      dayFilter.map(normalize).includes(normalize(s.day))
+    );
+  }
   if (dateExact) filtered = filtered.filter((s) => s.date === dateExact);
 
-  filtered.sort(
-    (a, b) =>
-      a.date.localeCompare(b.date) || a.start_time.localeCompare(b.start_time),
+  filtered = filtered.sort(
+    (a, b) => a.date.localeCompare(b.date) || a.start_time.localeCompare(b.start_time)
   );
 
   let html = "";
@@ -183,24 +202,16 @@ function renderSchedulesTable(courses, schedules) {
       <th>Docente</th><th>Aula</th><th>Materia</th><th>Giorno</th><th>Data</th><th>Inizio</th><th>Fine</th>
     </tr></thead><tbody>`;
     for (const s of filtered) {
-      html += `<tr>
-        <td>${s.teacher}</td>
-        <td>${s.room}</td>
-        <td>${s.subject}</td>
-        <td>${s.day}</td>
-        <td>${formatDate(s.date)}</td>
-        <td>${s.start_time}</td>
-        <td>${s.end_time}</td>
-      </tr>`;
+      html += `<tr><td>${s.teacher}</td><td>${s.room}</td><td>${s.subject}</td>
+        <td>${s.day}</td><td>${formatDate(s.date)}</td><td>${s.start_time}</td><td>${s.end_time}</td></tr>`;
     }
     html += "</tbody></table>";
   }
-
   document.getElementById("user-schedules-table").innerHTML = html;
 }
 
 // ------------------------------
-// Modale modifica profilo
+// Apertura e chiusura modale modifica profilo
 // ------------------------------
 document.getElementById("edit-profile-btn").onclick = () => {
   modal.style.display = "flex";
@@ -218,12 +229,13 @@ document.getElementById("edit-profile-btn").onclick = () => {
 document.getElementById("close-modal").onclick = () => {
   modal.style.display = "none";
 };
+
 window.onclick = (e) => {
   if (e.target === modal) modal.style.display = "none";
 };
 
 // ------------------------------
-// Validazione live della password
+// Validazione password live
 // ------------------------------
 newPassword.addEventListener("input", () => {
   const val = newPassword.value;
