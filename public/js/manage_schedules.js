@@ -381,6 +381,26 @@ document.addEventListener('DOMContentLoaded', () => {
   roomChoices = new Choices('#filter-room', { removeItemButton: true, searchEnabled: true, shouldSort: false, position: 'bottom', placeholder: true });
   subjectChoices = new Choices('#filter-subject', { removeItemButton: true, searchEnabled: true, shouldSort: false, position: 'bottom', placeholder: true });
   dayChoices = new Choices('#filter-day', { removeItemButton: true, searchEnabled: true, shouldSort: false, position: 'bottom', placeholder: true });
+
+  document.getElementById('add-schedule-form').addEventListener('submit', function (e) {
+    const start = document.getElementById('add-start').value;
+    const end = document.getElementById('add-end').value;
+    if (end <= start) {
+      e.preventDefault();
+      alert("Non è possibile inserire orario perché ore di fine maggiore di ore di inizio");
+      return false;
+    }
+  });
+
+  document.getElementById('edit-schedule-form').addEventListener('submit', function (e) {
+    const start = document.getElementById('edit-start').value;
+    const end = document.getElementById('edit-end').value;
+    if (end <= start) {
+      e.preventDefault();
+      alert("Non è possibile inserire orario perché ore di fine maggiore di ore di inizio");
+      return false;
+    }
+  });
 });
 fetchCoursesAndSchedules();
 
