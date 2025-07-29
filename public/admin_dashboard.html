@@ -11,50 +11,55 @@
   </head>
 
   <body class="bg-gray-100 font-sans antialiased">
+    <!-- Header fisso -->
     <nav
-      class="bg-white shadow-lg border-b border-gray-200 backdrop-blur-sm bg-white/95 sticky top-0 z-50"
+      class="bg-white/90 backdrop-blur shadow-md border-b border-gray-200 sticky top-0 z-50"
     >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16 items-center">
-          <!-- Menu sinistro -->
-          <div class="flex space-x-8">
+        <div
+          class="flex flex-col md:flex-row justify-between h-16 items-center space-y-2 md:space-y-0"
+        >
+          <!-- Navigazione principale -->
+          <div
+            class="flex flex-wrap justify-center md:justify-start space-x-4 sm:space-x-6"
+          >
             <a
               href="/admin_dashboard.html"
-              class="inline-flex items-center px-1 pt-1 text-sm font-medium text-blue-600 border-b-2 border-blue-500 transition-all duration-200"
+              class="inline-flex items-center px-2 pt-1 text-sm font-semibold text-blue-600 border-b-2 border-blue-500"
             >
               🏠 Dashboard Admin
             </a>
             <a
               href="/manage_users.html"
-              class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-700 hover:text-blue-600 hover:border-blue-300 border-b-2 border-transparent transition-all duration-200"
+              class="inline-flex items-center px-2 pt-1 text-sm font-medium text-gray-700 hover:text-blue-600 hover:border-blue-300 border-b-2 border-transparent transition"
             >
               👥 Gestione Utenti
             </a>
             <a
               href="/manage_courses.html"
-              class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-700 hover:text-blue-600 hover:border-blue-300 border-b-2 border-transparent transition-all duration-200"
+              class="inline-flex items-center px-2 pt-1 text-sm font-medium text-gray-700 hover:text-blue-600 hover:border-blue-300 border-b-2 border-transparent transition"
             >
               📚 Gestione Corsi
             </a>
             <a
               href="/manage_schedules.html"
-              class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-700 hover:text-blue-600 hover:border-blue-300 border-b-2 border-transparent transition-all duration-200"
+              class="inline-flex items-center px-2 pt-1 text-sm font-medium text-gray-700 hover:text-blue-600 hover:border-blue-300 border-b-2 border-transparent transition"
             >
               📅 Gestione Orari
             </a>
           </div>
 
-          <!-- Menu destro (Modifica profilo e Logout) -->
-          <div class="flex space-x-6 items-center">
+          <!-- Azioni utente -->
+          <div class="flex items-center space-x-4">
             <button
               id="edit-profile-btn"
-              class="text-sm font-medium text-gray-700 hover:text-blue-600 border-b-2 border-transparent hover:border-blue-300 transition-all duration-200 px-1 pt-1"
+              class="text-sm font-medium text-gray-700 hover:text-blue-600 transition px-1 pt-1"
             >
               ⚙️ Modifica Profilo
             </button>
             <a
               href="/logout"
-              class="text-sm font-medium text-gray-700 hover:text-blue-600 border-b-2 border-transparent hover:border-blue-300 transition-all duration-200 px-1 pt-1"
+              class="text-sm font-medium text-gray-700 hover:text-red-500 transition px-1 pt-1"
             >
               🚪 Logout
             </a>
@@ -63,91 +68,109 @@
       </div>
     </nav>
 
-    <!-- Colored Section for Current Page Indicator (Dashboard Admin) -->
-    <div class="bg-blue-600 text-white py-4 mt-24">
-      <div class="container mx-auto text-center">
-        <h2 class="text-3xl font-semibold">Sei nella Dashboard Admin</h2>
-        <p class="mt-2">Gestisci utenti, corsi e orari facilmente.</p>
+    <!-- Sezione evidenziata -->
+    <section class="bg-blue-600 text-white py-6 md:py-8">
+      <div class="max-w-4xl mx-auto text-center px-4">
+        <h1 class="text-2xl md:text-3xl font-bold">
+          Sei nella Dashboard Admin
+        </h1>
+        <p class="mt-2 text-base md:text-lg text-blue-100">
+          Gestisci utenti, corsi e orari in modo semplice e intuitivo.
+        </p>
       </div>
-    </div>
+    </section>
 
-    <!-- Main Container (Content below the colored section) -->
-    <div class="container mx-auto p-8 max-w-3xl">
-      <!-- Navigation links -->
-      <nav class="bg-white p-6 rounded-xl shadow-lg mb-8">
+    <!-- Contenuto principale -->
+    <main class="max-w-4xl mx-auto mt-8 p-4 md:p-6">
+      <div class="bg-white p-6 rounded-xl shadow-md">
+        <h2 class="text-lg md:text-xl font-semibold text-gray-800 mb-4">
+          Navigazione Rapida
+        </h2>
         <ul class="space-y-4">
           <li>
             <a
               href="/manage_users.html"
-              class="text-lg text-gray-700 hover:text-blue-500 flex items-center transition duration-200"
+              class="flex items-center text-gray-700 hover:text-blue-600 text-base md:text-lg transition"
             >
-              <span class="mr-2">👤</span>Gestione Utenti
+              <span class="mr-2">👤</span> Gestione Utenti
             </a>
           </li>
           <li>
             <a
               href="/manage_courses.html"
-              class="text-lg text-gray-700 hover:text-blue-500 flex items-center transition duration-200"
+              class="flex items-center text-gray-700 hover:text-blue-600 text-base md:text-lg transition"
             >
-              <span class="mr-2">📚</span>Gestione Corsi
+              <span class="mr-2">📚</span> Gestione Corsi
             </a>
           </li>
           <li>
             <a
               href="/manage_schedules.html"
-              class="text-lg text-gray-700 hover:text-blue-500 flex items-center transition duration-200"
+              class="flex items-center text-gray-700 hover:text-blue-600 text-base md:text-lg transition"
             >
-              <span class="mr-2">🗓️</span>Gestione Orari
+              <span class="mr-2">🗓️</span> Gestione Orari
             </a>
           </li>
         </ul>
-      </nav>
+      </div>
+    </main>
 
-      <!-- Modale modifica profilo -->
-      <div
-        id="edit-profile-modal"
-        class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-      >
-        <div class="modal-content bg-white p-6 rounded-lg w-96">
-          <span
-            class="close absolute top-2 right-2 text-gray-500 text-2xl cursor-pointer"
-            id="close-modal"
-            >&times;</span
-          >
-          <h3 class="text-xl font-semibold mb-4">Modifica Profilo</h3>
-          <form id="edit-profile-form">
-            <div class="mb-4">
-              <input
-                type="text"
-                id="new_username"
-                disabled
-                class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <input type="hidden" id="new_username_hidden" name="new_username" />
-            <div class="mb-4">
-              <input
-                type="password"
-                name="new_password"
-                id="new_password"
-                placeholder="Nuova password"
-                required
-                class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <div
-                id="edit-password-hint"
-                class="text-sm text-gray-500 mt-1"
-              ></div>
-            </div>
-            <button
-              type="submit"
-              class="w-full bg-blue-600 text-white p-3 rounded hover:bg-blue-700"
+    <!-- Modale Modifica Profilo -->
+    <div
+      id="edit-profile-modal"
+      class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4"
+    >
+      <div class="bg-white p-6 rounded-xl shadow-xl w-full max-w-md relative">
+        <button
+          id="close-modal"
+          class="absolute top-3 right-3 text-gray-500 hover:text-red-500 text-2xl font-bold"
+        >
+          &times;
+        </button>
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">
+          Modifica Profilo
+        </h3>
+        <form id="edit-profile-form">
+          <div class="mb-4">
+            <label
+              for="new_username"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >Nome utente</label
             >
-              Salva
-            </button>
-            <div id="edit-profile-msg" class="mt-4 text-red-500"></div>
-          </form>
-        </div>
+            <input
+              type="text"
+              id="new_username"
+              name="new_username"
+              readonly
+              class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 bg-gray-100"
+            />
+          </div>
+          <div class="mb-4">
+            <label
+              for="new_password"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >Nuova password</label
+            >
+            <input
+              type="password"
+              name="new_password"
+              id="new_password"
+              placeholder="Nuova password"
+              required
+              class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+            />
+            <div id="edit-password-hint" class="text-sm text-gray-500 mt-1">
+              Deve contenere almeno 8 caratteri.
+            </div>
+          </div>
+          <button
+            type="submit"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg transition font-semibold"
+          >
+            Salva modifiche
+          </button>
+          <div id="edit-profile-msg" class="mt-4 text-red-500 text-sm"></div>
+        </form>
       </div>
     </div>
 

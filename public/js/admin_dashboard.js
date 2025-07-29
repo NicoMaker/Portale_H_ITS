@@ -17,8 +17,12 @@ document.getElementById("edit-profile-btn").onclick = () => {
   fetch("/user/current")
     .then((r) => r.json())
     .then((data) => {
-      usernameDisplay.value = data.username;
-      usernameHidden.value = data.username;
+      if (data.username) {
+        usernameDisplay.value = data.username;
+        usernameHidden.value = data.username;
+      } else {
+        throw new Error("Username non trovato");
+      }
     })
     .catch((err) => {
       console.error("Errore nel recupero dello username:", err);
