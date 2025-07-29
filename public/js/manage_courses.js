@@ -1,10 +1,10 @@
 let allCourses = [];
 
 function renderCoursesList() {
-    let html = "";
+  let html = "";
 
-    if (!allCourses.length) {
-        html = `
+  if (!allCourses.length) {
+    html = `
           <div class="col-span-full flex flex-col items-center justify-center py-20 text-gray-500">
             <div class="relative mb-8">
               <div class="text-8xl mb-4 float-animation">📚</div>
@@ -21,19 +21,19 @@ function renderCoursesList() {
             </button>
           </div>
         `;
-    } else {
-        allCourses.forEach((course) => {
-            const gradients = [
-                'from-purple-500 to-pink-500',
-                'from-blue-500 to-cyan-500',
-                'from-green-500 to-teal-500',
-                'from-orange-500 to-red-500',
-                'from-indigo-500 to-purple-500',
-                'from-pink-500 to-rose-500'
-            ];
-            const gradient = gradients[course.id % gradients.length];
+  } else {
+    allCourses.forEach((course) => {
+      const gradients = [
+        "from-purple-500 to-pink-500",
+        "from-blue-500 to-cyan-500",
+        "from-green-500 to-teal-500",
+        "from-orange-500 to-red-500",
+        "from-indigo-500 to-purple-500",
+        "from-pink-500 to-rose-500",
+      ];
+      const gradient = gradients[course.id % gradients.length];
 
-            html += `
+      html += `
             <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-2 transition-all duration-300 overflow-hidden border border-gray-100 pulse-on-hover course-card-hover">
               <!-- Course Header with Gradient -->
               <div class="bg-gradient-to-r ${gradient} p-6 relative overflow-hidden">
@@ -65,8 +65,8 @@ function renderCoursesList() {
                     <span class="mr-2">📝</span>
                     Descrizione
                   </h4>
-                  <p class="text-gray-600 leading-relaxed ${!course.description ? 'italic text-gray-400' : ''}">
-                    ${course.description || 'Nessuna descrizione disponibile per questo corso'}
+                  <p class="text-gray-600 leading-relaxed ${!course.description ? "italic text-gray-400" : ""}">
+                    ${course.description || "Nessuna descrizione disponibile per questo corso"}
                   </p>
                 </div>
                 
@@ -86,27 +86,27 @@ function renderCoursesList() {
               </div>
             </div>
           `;
-        });
-    }
+    });
+  }
 
-    document.getElementById("courses-list").innerHTML = html;
+  document.getElementById("courses-list").innerHTML = html;
 }
 
 function fetchCourses() {
-    fetch("/api/courses")
-        .then(async (r) => {
-            if (!r.ok) {
-                const msg = await r.text();
-                throw new Error(msg);
-            }
-            return r.json();
-        })
-        .then((courses) => {
-            allCourses = courses;
-            renderCoursesList();
-        })
-        .catch((err) => {
-            document.getElementById("courses-list").innerHTML = `
+  fetch("/api/courses")
+    .then(async (r) => {
+      if (!r.ok) {
+        const msg = await r.text();
+        throw new Error(msg);
+      }
+      return r.json();
+    })
+    .then((courses) => {
+      allCourses = courses;
+      renderCoursesList();
+    })
+    .catch((err) => {
+      document.getElementById("courses-list").innerHTML = `
             <div class="col-span-full flex flex-col items-center justify-center py-20 text-red-500">
               <div class="text-8xl mb-6">⚠️</div>
               <h3 class="text-2xl font-bold mb-3">Errore nel caricamento</h3>
@@ -117,125 +117,134 @@ function fetchCourses() {
               </button>
             </div>
           `;
-        });
+    });
 }
 
 function showMessage(elementId, message, type) {
-    const el = document.getElementById(elementId);
-    if (el) {
-        el.textContent = message;
-        el.className = `mt-4 p-4 rounded-2xl text-sm font-medium ${type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
-        el.classList.remove('hidden');
+  const el = document.getElementById(elementId);
+  if (el) {
+    el.textContent = message;
+    el.className = `mt-4 p-4 rounded-2xl text-sm font-medium ${type === "success" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`;
+    el.classList.remove("hidden");
 
-        setTimeout(() => {
-            el.classList.add('hidden');
-        }, 3000);
-    }
+    setTimeout(() => {
+      el.classList.add("hidden");
+    }, 3000);
+  }
 }
 
 // Modal functions
 document.getElementById("add-course-btn").onclick = () => {
-    document.getElementById("add-course-modal").style.display = "flex";
-    document.getElementById("course-msg").classList.add('hidden');
+  document.getElementById("add-course-modal").style.display = "flex";
+  document.getElementById("course-msg").classList.add("hidden");
 };
 
 document.getElementById("close-add-course-modal").onclick = () => {
-    document.getElementById("add-course-modal").style.display = "none";
+  document.getElementById("add-course-modal").style.display = "none";
 };
 
 document.getElementById("cancel-add-course").onclick = function () {
-    document.getElementById("add-course-modal").style.display = "none";
+  document.getElementById("add-course-modal").style.display = "none";
 };
 
 document.getElementById("add-course-form").onsubmit = function (e) {
-    e.preventDefault();
+  e.preventDefault();
 
-    const name = document.getElementById("course-name").value;
-    const description = document.getElementById("course-desc").value;
+  const name = document.getElementById("course-name").value;
+  const description = document.getElementById("course-desc").value;
 
-    fetch("/api/courses", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, description }),
-    })
-        .then((r) => r.text())
-        .then((msg) => {
-            fetchCourses();
-            if (msg === "OK") {
-                showMessage("course-msg", "Corso aggiunto con successo!", "success");
-                this.reset();
-                setTimeout(() => {
-                    document.getElementById("add-course-modal").style.display = "none";
-                }, 1500);
-            } else {
-                showMessage("course-msg", msg, "error");
-            }
-        });
+  fetch("/api/courses", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, description }),
+  })
+    .then((r) => r.text())
+    .then((msg) => {
+      fetchCourses();
+      if (msg === "OK") {
+        showMessage("course-msg", "Corso aggiunto con successo!", "success");
+        this.reset();
+        setTimeout(() => {
+          document.getElementById("add-course-modal").style.display = "none";
+        }, 1500);
+      } else {
+        showMessage("course-msg", msg, "error");
+      }
+    });
 };
 
 let editingCourseId = null;
 
 function openEditCourse(id) {
-    editingCourseId = id;
-    fetch("/api/courses")
-        .then((r) => r.json())
-        .then((courses) => {
-            const course = courses.find((c) => c.id == id);
-            document.getElementById("edit-course-name").value = course ? course.name : "";
-            document.getElementById("edit-course-desc").value = course ? course.description : "";
-            document.getElementById("edit-course-msg").classList.add('hidden');
-            document.getElementById("edit-course-modal").style.display = "flex";
-        });
+  editingCourseId = id;
+  fetch("/api/courses")
+    .then((r) => r.json())
+    .then((courses) => {
+      const course = courses.find((c) => c.id == id);
+      document.getElementById("edit-course-name").value = course
+        ? course.name
+        : "";
+      document.getElementById("edit-course-desc").value = course
+        ? course.description
+        : "";
+      document.getElementById("edit-course-msg").classList.add("hidden");
+      document.getElementById("edit-course-modal").style.display = "flex";
+    });
 }
 
 document.getElementById("close-edit-course-modal").onclick = () => {
-    document.getElementById("edit-course-modal").style.display = "none";
+  document.getElementById("edit-course-modal").style.display = "none";
 };
 
 document.getElementById("cancel-edit-course").onclick = function () {
-    document.getElementById("edit-course-modal").style.display = "none";
+  document.getElementById("edit-course-modal").style.display = "none";
 };
 
 window.onclick = (e) => {
-    if (e.target === document.getElementById("edit-course-modal"))
-        document.getElementById("edit-course-modal").style.display = "none";
-    if (e.target === document.getElementById("add-course-modal"))
-        document.getElementById("add-course-modal").style.display = "none";
+  if (e.target === document.getElementById("edit-course-modal"))
+    document.getElementById("edit-course-modal").style.display = "none";
+  if (e.target === document.getElementById("add-course-modal"))
+    document.getElementById("add-course-modal").style.display = "none";
 };
 
 document.getElementById("edit-course-form").onsubmit = function (e) {
-    e.preventDefault();
+  e.preventDefault();
 
-    const name = document.getElementById("edit-course-name").value;
-    const description = document.getElementById("edit-course-desc").value;
+  const name = document.getElementById("edit-course-name").value;
+  const description = document.getElementById("edit-course-desc").value;
 
-    fetch(`/api/courses/${editingCourseId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, description }),
-    })
-        .then((r) => r.text())
-        .then((msg) => {
-            fetchCourses();
-            if (msg === "OK") {
-                showMessage("edit-course-msg", "Corso aggiornato!", "success");
-                setTimeout(() => {
-                    document.getElementById("edit-course-modal").style.display = "none";
-                }, 1500);
-            } else {
-                showMessage("edit-course-msg", msg, "error");
-            }
-        });
+  fetch(`/api/courses/${editingCourseId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, description }),
+  })
+    .then((r) => r.text())
+    .then((msg) => {
+      fetchCourses();
+      if (msg === "OK") {
+        showMessage("edit-course-msg", "Corso aggiornato!", "success");
+        setTimeout(() => {
+          document.getElementById("edit-course-modal").style.display = "none";
+        }, 1500);
+      } else {
+        showMessage("edit-course-msg", msg, "error");
+      }
+    });
 };
 
 function deleteCourse(id) {
-    if (confirm("Sei sicuro di voler eliminare questo corso? Questa azione non può essere annullata.")) {
-        fetch(`/api/courses/${id}`, { method: "DELETE" })
-            .then(() => fetchCourses());
-    }
+  if (
+    confirm(
+      "Sei sicuro di voler eliminare questo corso? Questa azione non può essere annullata.",
+    )
+  ) {
+    fetch(`/api/courses/${id}`, { method: "DELETE" }).then(() =>
+      fetchCourses(),
+    );
+  }
 }
 
 // Initialize
 document.addEventListener("DOMContentLoaded", () => {
-    fetchCourses();
+  fetchCourses();
 });
