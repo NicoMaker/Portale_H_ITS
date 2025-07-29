@@ -1,16 +1,11 @@
-// ------------------------------
 // Selettori base
-// ------------------------------
 const modal = document.getElementById("edit-profile-modal");
 const usernameDisplay = document.getElementById("new_username");
-const usernameHidden = document.getElementById("new_username_hidden");
 const newPassword = document.getElementById("new_password");
 const editHint = document.getElementById("edit-password-hint");
 const editMsg = document.getElementById("edit-profile-msg");
 
-// ------------------------------
 // Apri il modale e carica username
-// ------------------------------
 document.getElementById("edit-profile-btn").onclick = () => {
   modal.style.display = "flex";
 
@@ -19,7 +14,6 @@ document.getElementById("edit-profile-btn").onclick = () => {
     .then((data) => {
       if (data.username) {
         usernameDisplay.value = data.username;
-        usernameHidden.value = data.username;
       } else {
         throw new Error("Username non trovato");
       }
@@ -30,9 +24,7 @@ document.getElementById("edit-profile-btn").onclick = () => {
     });
 };
 
-// ------------------------------
 // Chiudi modale
-// ------------------------------
 document.getElementById("close-modal").onclick = () => {
   modal.style.display = "none";
 };
@@ -41,9 +33,7 @@ window.onclick = (e) => {
   if (e.target === modal) modal.style.display = "none";
 };
 
-// ------------------------------
 // Validazione password in tempo reale
-// ------------------------------
 newPassword.addEventListener("input", () => {
   const val = newPassword.value;
   let msg = "";
@@ -55,9 +45,7 @@ newPassword.addEventListener("input", () => {
   editHint.style.color = msg ? "var(--accent)" : "green";
 });
 
-// ------------------------------
 // Submit form modifica profilo
-// ------------------------------
 document.getElementById("edit-profile-form").onsubmit = function (e) {
   e.preventDefault();
 
@@ -70,7 +58,6 @@ document.getElementById("edit-profile-form").onsubmit = function (e) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      username: usernameHidden.value,
       password: newPassword.value,
     }),
   })
