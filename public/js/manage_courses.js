@@ -1,7 +1,5 @@
 let allCourses = [];
 
-
-
 function fetchCourses() {
   fetch("/api/courses")
     .then(async (r) => {
