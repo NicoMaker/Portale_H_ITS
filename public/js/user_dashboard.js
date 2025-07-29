@@ -28,8 +28,15 @@ const editMsg = document.getElementById("edit-profile-msg");
 
 let allCourses = [];
 let allSchedules = [];
-
 let teacherChoices, roomChoices, subjectChoices, dayChoices;
+
+// ------------------------------
+// Mobile menu toggle
+// ------------------------------
+document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+  const mobileMenu = document.getElementById('mobile-menu');
+  mobileMenu.classList.toggle('hidden');
+});
 
 // ------------------------------
 // Funzione per normalizzare stringhe (rimuove accenti e minuscola)
@@ -37,9 +44,9 @@ let teacherChoices, roomChoices, subjectChoices, dayChoices;
 function normalize(str) {
   return str
     ? str
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
     : "";
 }
 
@@ -58,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
     placeholder: true,
   });
 
-  // Carica dati
+  // Carica dati dalle API
   fetch("/user/courses")
     .then((r) => r.json())
     .then((courses) => {
@@ -102,13 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // ------------------------------
 function populateFilterOptions() {
   const settimana = [
-    "Lunedì",
-    "Martedì",
-    "Mercoledì",
-    "Giovedì",
-    "Venerdì",
-    "Sabato",
-    "Domenica",
+    "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica",
   ];
 
   const unique = (arr, key) => [
@@ -142,7 +143,7 @@ function populateFilterOptions() {
     false,
   );
 
-  // Giorni (solo quelli presenti, ordinati)
+  // Giorni
   const giorniPresentiSet = new Set(
     allSchedules.map((s) => normalize(s.day)).filter(Boolean),
   );
@@ -165,15 +166,16 @@ function populateFilterOptions() {
 function renderCoursesBadges(courses) {
   const container = document.getElementById("user-courses");
   if (!courses.length) {
-    container.innerHTML = '<div class="hint">Nessun corso assegnato.</div>';
+    container.innerHTML = '<div class="text-gray-500 text-center py-8">Nessun corso assegnato.</div>';
     return;
   }
-  container.innerHTML =
-    '<div class="user-courses-badges-wrap">' +
-    courses
-      .map((c) => `<span class="user-courses-badge">corso: ${c.name}</span>`)
-      .join("") +
-    "</div>";
+  container.innerHTML = courses
+    .map((c) => `
+                    <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 hover:from-blue-200 hover:to-purple-200 transition-all duration-200 transform hover:scale-105">
+                        📚 corso: ${c.name}
+                    </span>
+                `)
+    .join("");
 }
 
 // ------------------------------
@@ -184,7 +186,7 @@ function renderSchedulesTable(courses, schedules) {
     courses.some((c) => c.id == s.course_id),
   );
 
-  // Prendi valori selezionati dai filtri (usa le istanze scelte)
+  // Prendi valori selezionati dai filtri
   const teacherFilter = teacherChoices.getValue(true);
   const roomFilter = roomChoices.getValue(true);
   const subjectFilter = subjectChoices.getValue(true);
@@ -204,7 +206,6 @@ function renderSchedulesTable(courses, schedules) {
     );
   }
   if (dateExact) {
-    // filtro per data esatta, override filtri giorni
     filtered = filtered.filter((s) => s.date === dateExact);
   }
 
@@ -215,25 +216,47 @@ function renderSchedulesTable(courses, schedules) {
 
   let html = "";
   if (!filtered.length) {
-    html = '<div class="hint">Nessun orario trovato per questi filtri.</div>';
+    html = '<div class="text-center py-12 text-gray-500"><div class="text-6xl mb-4">📅</div><p class="text-xl">Nessun orario trovato per questi filtri.</p></div>';
   } else {
-    html = `<table class="modern-table"><thead><tr>
-      <th>Docente</th><th>Aula</th><th>Materia</th><th>Giorno</th><th>Data</th><th>Inizio</th><th>Fine</th>
-    </tr></thead><tbody>`;
+    html = `
+                    <div class="overflow-hidden rounded-xl border border-gray-200 modern-table">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="gradient-bg">
+                                <tr class="text-white">
+                                    <th class="px-6 py-4 text-left text-sm font-semibold">👨‍🏫 Docente</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold">🏫 Aula</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold">📖 Materia</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold">📅 Giorno</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold">📆 Data</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold">🕘 Inizio</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold">🕘 Fine</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                `;
     for (const s of filtered) {
-      html += `<tr><td>${s.teacher}</td><td>${s.room}</td><td>${s.subject}</td>
-        <td>${s.day}</td><td>${formatDate(s.date)}</td><td>${s.start_time}</td><td>${s.end_time}</td></tr>`;
+      html += `
+                        <tr class="hover:bg-blue-50 transition-all duration-200">
+                            <td class="px-6 py-4 text-sm text-gray-900 font-medium">${s.teacher}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">${s.room}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">${s.subject}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">${s.day}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">${formatDate(s.date)}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700 font-mono">${s.start_time}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700 font-mono">${s.end_time}</td>
+                        </tr>
+                    `;
     }
-    html += "</tbody></table>";
+    html += "</tbody></table></div>";
   }
   document.getElementById("user-schedules-table").innerHTML = html;
 }
 
 // ------------------------------
-// Apertura e chiusura modale modifica profilo
+// Modal functionality
 // ------------------------------
-document.getElementById("edit-profile-btn").onclick = () => {
-  modal.style.display = "flex";
+function openModal() {
+  modal.classList.remove('hidden');
   fetch("/user/current")
     .then((r) => r.json())
     .then((data) => {
@@ -242,19 +265,28 @@ document.getElementById("edit-profile-btn").onclick = () => {
     })
     .catch(() => {
       editMsg.textContent = "Errore nel recupero username";
+      editMsg.className = "text-center text-sm font-medium text-red-500";
     });
-};
+}
 
-document.getElementById("close-modal").onclick = () => {
-  modal.style.display = "none";
-};
+function closeModal() {
+  modal.classList.add('hidden');
+  newPassword.value = "";
+  editHint.textContent = "";
+  editMsg.textContent = "";
+}
 
-window.onclick = (e) => {
-  if (e.target === modal) modal.style.display = "none";
-};
+// Event listeners for modal
+document.getElementById("edit-profile-btn").addEventListener('click', openModal);
+document.getElementById("edit-profile-btn-mobile").addEventListener('click', openModal);
+document.getElementById("close-modal").addEventListener('click', closeModal);
+
+window.addEventListener('click', (e) => {
+  if (e.target === modal) closeModal();
+});
 
 // ------------------------------
-// Validazione password live
+// Password validation
 // ------------------------------
 newPassword.addEventListener("input", () => {
   const val = newPassword.value;
@@ -264,19 +296,20 @@ newPassword.addEventListener("input", () => {
   if (!/[a-z]/.test(val)) msg += "Almeno una minuscola. ";
   if (!/[0-9]/.test(val)) msg += "Almeno un numero. ";
   editHint.textContent = msg;
-  editHint.style.color = msg ? "var(--accent)" : "green";
+  editHint.className = msg ? "text-sm mt-2 text-red-500" : "text-sm mt-2 text-green-500";
 });
 
 // ------------------------------
-// Submit modifica profilo
+// Form submission
 // ------------------------------
-document.getElementById("edit-profile-form").onsubmit = function (e) {
+document.getElementById("edit-profile-form").addEventListener('submit', function (e) {
   e.preventDefault();
-  if (editHint.textContent !== "") {
+  if (editHint.textContent !== "" && !editHint.className.includes('green')) {
     editMsg.textContent = "Correggi la password prima di salvare.";
-    editMsg.style.color = "var(--accent)";
+    editMsg.className = "text-center text-sm font-medium text-red-500";
     return;
   }
+
   fetch("/user/profile", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -289,16 +322,16 @@ document.getElementById("edit-profile-form").onsubmit = function (e) {
     .then((resp) => {
       if (resp.success) {
         editMsg.textContent = "Profilo aggiornato con successo!";
-        editMsg.style.color = "green";
+        editMsg.className = "text-center text-sm font-medium text-green-500";
         newPassword.value = "";
         editHint.textContent = "";
       } else {
         editMsg.textContent = resp.message || "Errore sconosciuto";
-        editMsg.style.color = "var(--accent)";
+        editMsg.className = "text-center text-sm font-medium text-red-500";
       }
     })
     .catch(() => {
       editMsg.textContent = "Errore di rete.";
-      editMsg.style.color = "var(--accent)";
+      editMsg.className = "text-center text-sm font-medium text-red-500";
     });
-};
+});
