@@ -1,91 +1,6 @@
 let allCourses = [];
 
-function renderCoursesList() {
-  let html = "";
 
-  if (!allCourses.length) {
-    html = `
-          <div class="col-span-full flex flex-col items-center justify-center py-20 text-gray-500">
-            <div class="relative mb-8">
-              <div class="text-8xl mb-4 float-animation">📚</div>
-              <div class="absolute -top-2 -right-2 text-3xl animate-bounce">✨</div>
-            </div>
-            <h3 class="text-2xl font-bold text-gray-700 mb-3">Nessun corso presente</h3>
-            <p class="text-lg text-gray-500 mb-6 text-center max-w-md">
-              Inizia creando il tuo primo corso per iniziare a gestire la tua istituzione educativa
-            </p>
-          </div>
-        `;
-  } else {
-    allCourses.forEach((course) => {
-      const gradients = [
-        "from-purple-500 to-pink-500",
-        "from-blue-500 to-cyan-500",
-        "from-green-500 to-teal-500",
-        "from-orange-500 to-red-500",
-        "from-indigo-500 to-purple-500",
-        "from-pink-500 to-rose-500",
-      ];
-      const gradient = gradients[course.id % gradients.length];
-
-      html += `
-            <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-2 transition-all duration-300 overflow-hidden border border-gray-100 pulse-on-hover course-card-hover">
-              <!-- Course Header with Gradient -->
-              <div class="bg-gradient-to-r ${gradient} p-6 relative overflow-hidden">
-                <div class="shimmer absolute inset-0"></div>
-                <div class="relative z-10">
-                  <div class="flex items-center justify-between mb-4">
-                    <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-3">
-                      <span class="text-3xl">📚</span>
-                    </div>
-                    <div class="flex space-x-2">
-                      <button class="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-3 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105" 
-                              title="Modifica corso" onclick="openEditCourse(${course.id})">
-                        <span class="text-lg">✏️</span>
-                      </button>
-                      <button class="bg-white/20 hover:bg-red-500/30 backdrop-blur-sm text-white p-3 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105" 
-                              title="Elimina corso" onclick="deleteCourse(${course.id})">
-                        <span class="text-lg">🗑️</span>
-                      </button>
-                    </div>
-                  </div>
-                  <h3 class="text-2xl font-bold text-white mb-2 truncate">${course.name}</h3>
-                </div>
-              </div>
-              
-              <!-- Course Content -->
-              <div class="p-8">
-                <div class="mb-6">
-                  <h4 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3 flex items-center">
-                    <span class="mr-2">📝</span>
-                    Descrizione
-                  </h4>
-                  <p class="text-gray-600 leading-relaxed ${!course.description ? "italic text-gray-400" : ""}">
-                    ${course.description || "Nessuna descrizione disponibile per questo corso"}
-                  </p>
-                </div>
-                
-                
-                <!-- Action Buttons -->
-                <div class="flex space-x-3">
-                  <button onclick="openEditCourse(${course.id})" 
-                    class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-4 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
-                    <span>✏️</span>
-                    <span>Modifica</span>
-                  </button>
-                  <button onclick="deleteCourse(${course.id})" 
-                    class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold py-3 px-4 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center">
-                    <span>🗑️</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          `;
-    });
-  }
-
-  document.getElementById("courses-list").innerHTML = html;
-}
 
 function fetchCourses() {
   fetch("/api/courses")
@@ -252,14 +167,13 @@ document.getElementById("search-course").addEventListener("input", function () {
   renderCoursesList();
 });
 
-// Funzione per rendere i corsi
 function renderCoursesList() {
   let html = "";
 
   // Filtra i corsi in base alla query di ricerca
-  const filteredCourses = allCourses.filter((course) =>
-    course.name.toLowerCase().includes(searchQuery),
-  );
+  const filteredCourses = allCourses
+    .filter((course) => course.name.toLowerCase().includes(searchQuery))
+    .sort((a, b) => a.name.localeCompare(b.name)); // Ordina i corsi in ordine alfabetico
 
   if (!filteredCourses.length) {
     html = `
