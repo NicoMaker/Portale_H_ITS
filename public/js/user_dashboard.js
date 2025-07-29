@@ -33,9 +33,9 @@ let teacherChoices, roomChoices, subjectChoices, dayChoices;
 // ------------------------------
 // Mobile menu toggle
 // ------------------------------
-document.getElementById('mobile-menu-btn').addEventListener('click', () => {
-  const mobileMenu = document.getElementById('mobile-menu');
-  mobileMenu.classList.toggle('hidden');
+document.getElementById("mobile-menu-btn").addEventListener("click", () => {
+  const mobileMenu = document.getElementById("mobile-menu");
+  mobileMenu.classList.toggle("hidden");
 });
 
 // ------------------------------
@@ -44,9 +44,9 @@ document.getElementById('mobile-menu-btn').addEventListener('click', () => {
 function normalize(str) {
   return str
     ? str
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
     : "";
 }
 
@@ -109,7 +109,13 @@ document.addEventListener("DOMContentLoaded", () => {
 // ------------------------------
 function populateFilterOptions() {
   const settimana = [
-    "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica",
+    "Lunedì",
+    "Martedì",
+    "Mercoledì",
+    "Giovedì",
+    "Venerdì",
+    "Sabato",
+    "Domenica",
   ];
 
   const unique = (arr, key) => [
@@ -166,15 +172,18 @@ function populateFilterOptions() {
 function renderCoursesBadges(courses) {
   const container = document.getElementById("user-courses");
   if (!courses.length) {
-    container.innerHTML = '<div class="text-gray-500 text-center py-8">Nessun corso assegnato.</div>';
+    container.innerHTML =
+      '<div class="text-gray-500 text-center py-8">Nessun corso assegnato.</div>';
     return;
   }
   container.innerHTML = courses
-    .map((c) => `
+    .map(
+      (c) => `
                     <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 hover:from-blue-200 hover:to-purple-200 transition-all duration-200 transform hover:scale-105">
                         📚 corso: ${c.name}
                     </span>
-                `)
+                `,
+    )
     .join("");
 }
 
@@ -216,7 +225,8 @@ function renderSchedulesTable(courses, schedules) {
 
   let html = "";
   if (!filtered.length) {
-    html = '<div class="text-center py-12 text-gray-500"><div class="text-6xl mb-4">📅</div><p class="text-xl">Nessun orario trovato per questi filtri.</p></div>';
+    html =
+      '<div class="text-center py-12 text-gray-500"><div class="text-6xl mb-4">📅</div><p class="text-xl">Nessun orario trovato per questi filtri.</p></div>';
   } else {
     html = `
                     <div class="overflow-hidden rounded-xl border border-gray-200 modern-table">
@@ -256,7 +266,7 @@ function renderSchedulesTable(courses, schedules) {
 // Modal functionality
 // ------------------------------
 function openModal() {
-  modal.classList.remove('hidden');
+  modal.classList.remove("hidden");
   fetch("/user/current")
     .then((r) => r.json())
     .then((data) => {
@@ -270,18 +280,22 @@ function openModal() {
 }
 
 function closeModal() {
-  modal.classList.add('hidden');
+  modal.classList.add("hidden");
   newPassword.value = "";
   editHint.textContent = "";
   editMsg.textContent = "";
 }
 
 // Event listeners for modal
-document.getElementById("edit-profile-btn").addEventListener('click', openModal);
-document.getElementById("edit-profile-btn-mobile").addEventListener('click', openModal);
-document.getElementById("close-modal").addEventListener('click', closeModal);
+document
+  .getElementById("edit-profile-btn")
+  .addEventListener("click", openModal);
+document
+  .getElementById("edit-profile-btn-mobile")
+  .addEventListener("click", openModal);
+document.getElementById("close-modal").addEventListener("click", closeModal);
 
-window.addEventListener('click', (e) => {
+window.addEventListener("click", (e) => {
   if (e.target === modal) closeModal();
 });
 
@@ -296,42 +310,46 @@ newPassword.addEventListener("input", () => {
   if (!/[a-z]/.test(val)) msg += "Almeno una minuscola. ";
   if (!/[0-9]/.test(val)) msg += "Almeno un numero. ";
   editHint.textContent = msg;
-  editHint.className = msg ? "text-sm mt-2 text-red-500" : "text-sm mt-2 text-green-500";
+  editHint.className = msg
+    ? "text-sm mt-2 text-red-500"
+    : "text-sm mt-2 text-green-500";
 });
 
 // ------------------------------
 // Form submission
 // ------------------------------
-document.getElementById("edit-profile-form").addEventListener('submit', function (e) {
-  e.preventDefault();
-  if (editHint.textContent !== "" && !editHint.className.includes('green')) {
-    editMsg.textContent = "Correggi la password prima di salvare.";
-    editMsg.className = "text-center text-sm font-medium text-red-500";
-    return;
-  }
-
-  fetch("/user/profile", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      username: usernameHidden.value,
-      password: newPassword.value,
-    }),
-  })
-    .then((r) => r.json())
-    .then((resp) => {
-      if (resp.success) {
-        editMsg.textContent = "Profilo aggiornato con successo!";
-        editMsg.className = "text-center text-sm font-medium text-green-500";
-        newPassword.value = "";
-        editHint.textContent = "";
-      } else {
-        editMsg.textContent = resp.message || "Errore sconosciuto";
-        editMsg.className = "text-center text-sm font-medium text-red-500";
-      }
-    })
-    .catch(() => {
-      editMsg.textContent = "Errore di rete.";
+document
+  .getElementById("edit-profile-form")
+  .addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (editHint.textContent !== "" && !editHint.className.includes("green")) {
+      editMsg.textContent = "Correggi la password prima di salvare.";
       editMsg.className = "text-center text-sm font-medium text-red-500";
-    });
-});
+      return;
+    }
+
+    fetch("/user/profile", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: usernameHidden.value,
+        password: newPassword.value,
+      }),
+    })
+      .then((r) => r.json())
+      .then((resp) => {
+        if (resp.success) {
+          editMsg.textContent = "Profilo aggiornato con successo!";
+          editMsg.className = "text-center text-sm font-medium text-green-500";
+          newPassword.value = "";
+          editHint.textContent = "";
+        } else {
+          editMsg.textContent = resp.message || "Errore sconosciuto";
+          editMsg.className = "text-center text-sm font-medium text-red-500";
+        }
+      })
+      .catch(() => {
+        editMsg.textContent = "Errore di rete.";
+        editMsg.className = "text-center text-sm font-medium text-red-500";
+      });
+  });

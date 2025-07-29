@@ -855,10 +855,7 @@ const server = http.createServer((req, res) => {
   // Aggiungi questa route nel server.js, nella sezione API utenti, dopo la route POST /api/users/:id/edit
 
   // PUT /api/users/:id (modifica credenziali da admin - metodo PUT)
-  if (
-    req.method === "PUT" &&
-    parsedUrl.pathname.match(/^\/api\/users\/\d+$/)
-  ) {
+  if (req.method === "PUT" && parsedUrl.pathname.match(/^\/api\/users\/\d+$/)) {
     const id = parsedUrl.pathname.split("/")[3];
     parseBody(({ username, password }) => {
       if (

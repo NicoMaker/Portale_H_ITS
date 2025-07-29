@@ -115,7 +115,9 @@ button {
   border-radius: var(--radius);
   font-size: 1rem;
   font-family: inherit;
-  transition: border var(--transition), box-shadow var(--transition);
+  transition:
+    border var(--transition),
+    box-shadow var(--transition);
 }
 
 input:focus,
@@ -482,7 +484,9 @@ a:hover {
   color: #333; /* Colore del testo */
   border: 1px solid #ccc; /* Colore del bordo */
   cursor: pointer; /* Cambia il cursore quando il mouse passa sopra il badge */
-  transition: background-color 0.3s ease, transform 0.2s ease; /* Aggiungi transizioni morbide per l'effetto hover */
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s ease; /* Aggiungi transizioni morbide per l'effetto hover */
   text-transform: capitalize; /* Rende la prima lettera di ogni parola maiuscola */
   margin-bottom: 10px; /* Distanza tra i badge se sono disposti su più righe */
 }
@@ -523,7 +527,9 @@ a:hover {
   font-weight: 500;
   padding: 0.5rem 1rem;
   border-radius: var(--radius);
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s ease;
 }
 
 .navbar a:hover {
@@ -597,7 +603,9 @@ a:hover {
   border: none;
   border-radius: var(--radius);
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s ease;
   box-shadow: var(--shadow);
   display: inline-block; /* Per farlo comportare come un elemento inline */
 }

@@ -205,7 +205,10 @@ document.getElementById("add-user-form").onsubmit = function (e) {
       username: document.getElementById("new-username").value,
       password: newPassword.value,
       role: document.getElementById("new-role").value,
-      courses: document.getElementById("new-role").value === "user" ? [document.getElementById("new-course").value] : [],
+      courses:
+        document.getElementById("new-role").value === "user"
+          ? [document.getElementById("new-course").value]
+          : [],
     }),
   }).then(() => {
     document.getElementById("add-user-form").reset();
@@ -222,8 +225,12 @@ document.getElementById("filter-role").addEventListener("change", () => {
   toggleFilterCourseVisibility();
   renderUsersList();
 });
-document.getElementById("filter-course").addEventListener("change", renderUsersList);
-document.getElementById("filter-user-date").addEventListener("change", renderUsersList);
+document
+  .getElementById("filter-course")
+  .addEventListener("change", renderUsersList);
+document
+  .getElementById("filter-user-date")
+  .addEventListener("change", renderUsersList);
 
 // Initialize data fetching
 fetchCourses();
