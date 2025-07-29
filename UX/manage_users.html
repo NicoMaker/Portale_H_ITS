@@ -1,0 +1,807 @@
+<!doctype html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Gestione Utenti</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/manage_users.js" defer></script>
+    <style>
+        /* Animation for modal */
+        .modal {
+            transition: all 0.3s ease;
+        }
+
+        /* Hover effects for user cards */
+        .user-card-hover:hover {
+            @apply transform scale-[1.002] transition-all duration-200;
+        }
+
+        /* Custom scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            @apply bg-gray-100 rounded-full;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            @apply bg-gray-400 rounded-full hover:bg-gray-500;
+        }
+
+        /* Gradient animations */
+        @keyframes gradient-shift {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .gradient-animate {
+            background-size: 200% 200%;
+            animation: gradient-shift 3s ease infinite;
+        }
+
+        /* Floating animation */
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Pulse animation for user cards */
+        @keyframes pulse-subtle {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+            }
+        }
+
+        .pulse-on-hover:hover {
+            animation: pulse-subtle 1.5s infinite;
+        }
+
+        /* Shimmer effect */
+        @keyframes shimmer {
+            0% {
+                background-position: -200px 0;
+            }
+
+            100% {
+                background-position: calc(200px + 100%) 0;
+            }
+        }
+
+        .shimmer {
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            background-size: 200px 100%;
+            animation: shimmer 2s infinite;
+        }
+
+        /* Role badge styles */
+        .role-admin {
+            @apply bg-gradient-to-r from-red-500 to-pink-500 text-white;
+        }
+
+        .role-user {
+            @apply bg-gradient-to-r from-blue-500 to-cyan-500 text-white;
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-to-br from-green-50 via-blue-50 to-purple-100 min-h-screen">
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-lg border-b border-gray-200 backdrop-blur-sm bg-white/95">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex space-x-8">
+                    <a href="/admin_dashboard.html"
+                        class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-700 hover:text-green-600 hover:border-green-300 border-b-2 border-transparent transition-all duration-200">
+                        🏠 Dashboard Admin
+                    </a>
+                    <a href="/manage_users.html"
+                        class="inline-flex items-center px-1 pt-1 text-sm font-medium text-green-600 border-b-2 border-green-500 transition-all duration-200">
+                        👥 Gestione Utenti
+                    </a>
+                    <a href="/manage_courses.html"
+                        class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-700 hover:text-green-600 hover:border-green-300 border-b-2 border-transparent transition-all duration-200">
+                        📚 Gestione Corsi
+                    </a>
+                    <a href="/manage_schedules.html"
+                        class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-700 hover:text-green-600 hover:border-green-300 border-b-2 border-transparent transition-all duration-200">
+                        📅 Gestione Orari
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header Section -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1
+                        class="text-4xl font-bold bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 bg-clip-text text-transparent gradient-animate">
+                        👥 Gestione Utenti
+                    </h1>
+                    <p class="text-gray-600 mt-2 text-lg">Crea e gestisci gli utenti della tua piattaforma</p>
+                </div>
+                <div class="float-animation">
+                    <button id="add-user-btn"
+                        class="bg-gradient-to-r from-green-500 via-blue-500 to-purple-600 hover:from-green-600 hover:via-blue-600 hover:to-purple-700 text-white font-semibold px-8 py-4 rounded-2xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300 flex items-center space-x-3 text-lg">
+                        <span class="text-2xl">+</span>
+                        <span>Aggiungi Utente</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 mb-8 border border-gray-100">
+            <div class="flex items-center space-x-4 mb-8">
+                <div class="p-3 bg-gradient-to-r from-green-100 via-blue-100 to-purple-100 rounded-2xl shadow-lg">
+                    <span class="text-3xl">🔍</span>
+                </div>
+                <div>
+                    <h2
+                        class="text-3xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+                        Filtra gli utenti</h2>
+                    <p class="text-gray-600 text-lg">Utilizza i seguenti filtri per cercare utenti specifici</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Search by Username -->
+                <div class="space-y-3">
+                    <label for="search-user" class="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                        <span class="text-lg">👤</span>
+                        <span>Nome utente</span>
+                    </label>
+                    <input type="text" id="search-user" placeholder="Cerca utente per nome..."
+                        class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 bg-white/90 backdrop-blur-sm text-sm transition-all duration-200 shadow-lg">
+                </div>
+
+                <!-- Role Filter -->
+                <div class="space-y-3">
+                    <label for="filter-role" class="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                        <span class="text-lg">🛡️</span>
+                        <span>Ruolo</span>
+                    </label>
+                    <select id="filter-role"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 bg-white/90 backdrop-blur-sm text-sm transition-all duration-200 shadow-lg">
+                        <option value="">Tutti gli utenti</option>
+                        <option value="admin">Solo amministratori</option>
+                        <option value="user">Solo utenti</option>
+                    </select>
+                </div>
+
+                <!-- Course Filter -->
+                <div class="space-y-3 filter-group">
+                    <label for="filter-course" class="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                        <span class="text-lg">📚</span>
+                        <span>Corso</span>
+                    </label>
+                    <select id="filter-course"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 bg-white/90 backdrop-blur-sm text-sm transition-all duration-200 shadow-lg">
+                        <option value="">Tutti i corsi</option>
+                    </select>
+                </div>
+
+                <!-- Date Filter -->
+                <div class="space-y-3" style="display: none;">
+                    <label for="filter-user-date" class="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                        <span class="text-lg">📅</span>
+                        <span>Data registrazione</span>
+                    </label>
+                    <input type="date" id="filter-user-date"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 bg-white/90 backdrop-blur-sm text-sm transition-all duration-200 shadow-lg">
+                </div>
+            </div>
+        </div>
+
+        <!-- Users List -->
+        <div class="mb-8">
+            <div class="flex items-center space-x-4 mb-8">
+                <div class="p-3 bg-gradient-to-r from-green-100 via-blue-100 to-purple-100 rounded-2xl shadow-lg">
+                    <span class="text-3xl">👨‍💼</span>
+                </div>
+                <div>
+                    <h2
+                        class="text-3xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+                        I Tuoi Utenti</h2>
+                    <p class="text-gray-600 text-lg">Gestisci tutti gli utenti della tua piattaforma</p>
+                </div>
+            </div>
+
+            <div id="users-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- User cards will be inserted here -->
+            </div>
+            <div id="assign-msg" class="mt-4 p-4 rounded-2xl text-sm font-medium hidden"></div>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div id="add-user-modal"
+        class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+        style="display: none">
+        <div
+            class="bg-white/95 backdrop-blur-sm rounded-3xl shadow-3xl max-w-lg w-full overflow-hidden border border-gray-100">
+            <div
+                class="flex items-center justify-between p-8 border-b border-gray-200 bg-gradient-to-r from-green-50 to-blue-50">
+                <h3 class="text-2xl font-bold text-gray-900">➕ Aggiungi Nuovo Utente</h3>
+                <button id="close-add-user-modal"
+                    class="text-gray-400 hover:text-gray-600 text-3xl font-bold transition-colors">×</button>
+            </div>
+
+            <div class="p-8">
+                <form id="add-user-form" class="space-y-6">
+                    <div>
+                        <label for="new-username" class="block text-sm font-medium text-gray-700 mb-3">
+                            👤 Nome utente
+                        </label>
+                        <input type="text" id="new-username" placeholder="Es. mario.rossi" required
+                            class="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 bg-white/90 backdrop-blur-sm text-lg transition-all duration-200 shadow-lg">
+                    </div>
+
+                    <div>
+                        <label for="new-password" class="block text-sm font-medium text-gray-700 mb-3">
+                            🔒 Password
+                        </label>
+                        <input type="password" id="new-password" placeholder="Password sicura" required
+                            class="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 bg-white/90 backdrop-blur-sm text-lg transition-all duration-200 shadow-lg">
+                        <div id="add-password-hint" class="mt-2 text-sm text-gray-600"></div>
+                    </div>
+
+                    <div>
+                        <label for="new-role" class="block text-sm font-medium text-gray-700 mb-3">
+                            🛡️ Ruolo
+                        </label>
+                        <select id="new-role" required
+                            class="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 bg-white/90 backdrop-blur-sm text-lg transition-all duration-200 shadow-lg">
+                            <option value="user">Utente</option>
+                            <option value="admin">Amministratore</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="new-course" class="block text-sm font-medium text-gray-700 mb-3">
+                            📚 Corso (opzionale)
+                        </label>
+                        <select id="new-course" style="display: none"
+                            class="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 bg-white/90 backdrop-blur-sm text-lg transition-all duration-200 shadow-lg">
+                        </select>
+                    </div>
+
+                    <div class="flex justify-end space-x-4 pt-6">
+                        <button type="button" id="cancel-add-user"
+                            class="px-8 py-3 bg-gray-500 text-white rounded-2xl hover:bg-gray-600 transition-all duration-200 font-semibold shadow-lg">
+                            Annulla
+                        </button>
+                        <button type="submit"
+                            class="px-8 py-3 bg-gradient-to-r from-green-500 to-blue-600 text-white rounded-2xl hover:from-green-600 hover:to-blue-700 transition-all duration-200 font-semibold shadow-lg transform hover:-translate-y-0.5">
+                            Crea Utente
+                        </button>
+                    </div>
+
+                    <div id="add-user-msg" class="mt-4 p-4 rounded-2xl text-sm font-medium hidden"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div id="edit-user-modal"
+        class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+        style="display: none">
+        <div
+            class="bg-white/95 backdrop-blur-sm rounded-3xl shadow-3xl max-w-lg w-full overflow-hidden border border-gray-100">
+            <div
+                class="flex items-center justify-between p-8 border-b border-gray-200 bg-gradient-to-r from-orange-50 to-yellow-50">
+                <h3 class="text-2xl font-bold text-gray-900">✏️ Modifica Utente</h3>
+                <button id="close-edit-modal"
+                    class="text-gray-400 hover:text-gray-600 text-3xl font-bold transition-colors">×</button>
+            </div>
+
+            <div class="p-8">
+                <form id="edit-user-form" class="space-y-6">
+                    <div>
+                        <label for="edit_username" class="block text-sm font-medium text-gray-700 mb-3">
+                            👤 Nome utente
+                        </label>
+                        <input type="text" id="edit_username" placeholder="Nuovo username" required
+                            class="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 bg-white/90 backdrop-blur-sm text-lg transition-all duration-200 shadow-lg">
+                    </div>
+
+                    <div>
+                        <label for="edit_password" class="block text-sm font-medium text-gray-700 mb-3">
+                            🔒 Nuova password
+                        </label>
+                        <input type="password" id="edit_password" placeholder="Nuova password" required
+                            class="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 bg-white/90 backdrop-blur-sm text-lg transition-all duration-200 shadow-lg">
+                        <div id="edit-user-password-hint" class="mt-2 text-sm text-gray-600"></div>
+                    </div>
+
+                    <div class="flex justify-end space-x-4 pt-6">
+                        <button type="button" id="cancel-edit-user"
+                            class="px-8 py-3 bg-gray-500 text-white rounded-2xl hover:bg-gray-600 transition-all duration-200 font-semibold shadow-lg">
+                            Annulla
+                        </button>
+                        <button type="submit"
+                            class="px-8 py-3 bg-gradient-to-r from-orange-500 to-yellow-600 text-white rounded-2xl hover:from-orange-600 hover:to-yellow-700 transition-all duration-200 font-semibold shadow-lg transform hover:-translate-y-0.5">
+                            Salva Modifiche
+                        </button>
+                    </div>
+
+                    <div id="edit-user-msg" class="mt-4 p-4 rounded-2xl text-sm font-medium hidden"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Schedules Modal -->
+    <div id="user-schedules-modal"
+        class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+        style="display: none">
+        <div
+            class="bg-white/95 backdrop-blur-sm rounded-3xl shadow-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden border border-gray-100">
+            <div
+                class="flex items-center justify-between p-8 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-pink-50">
+                <h3 class="text-2xl font-bold text-gray-900">📅 Orari assegnati all'utente</h3>
+                <button id="close-schedules-modal"
+                    class="text-gray-400 hover:text-gray-600 text-3xl font-bold transition-colors">×</button>
+            </div>
+
+            <div class="p-8 max-h-96 overflow-y-auto custom-scrollbar">
+                <div id="user-schedules-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let courses = [];
+        let users = [];
+        let editingUserId = null;
+        let searchUserInput, filterCourseSelect;
+
+        const fetchCourses = () =>
+            fetch("/api/courses")
+                .then((r) => r.json())
+                .then((data) => {
+                    courses = data;
+                    updateNewCourseSelect();
+                    updateFilterCourseSelect();
+                });
+
+        function updateNewCourseSelect() {
+            const select = document.getElementById("new-course");
+            const role = document.getElementById("new-role").value;
+            if (role === "user") {
+                select.style.display = "";
+                select.innerHTML =
+                    '<option value="">Nessun corso</option>' +
+                    courses.map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
+            } else {
+                select.style.display = "none";
+                select.innerHTML = "";
+            }
+        }
+
+        document
+            .getElementById("new-role")
+            .addEventListener("change", updateNewCourseSelect);
+
+        function updateFilterCourseSelect() {
+            filterCourseSelect.innerHTML =
+                '<option value="">Tutti i corsi</option>' +
+                courses.map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
+        }
+
+        function toggleFilterCourseVisibility() {
+            const filterRole = document.getElementById("filter-role").value;
+            const filterCourseGroup = document
+                .getElementById("filter-course")
+                .closest(".filter-group");
+
+            if (filterRole === "admin") {
+                filterCourseGroup.style.display = "none";
+                document.getElementById("filter-course").value = "";
+            } else {
+                filterCourseGroup.style.display = "";
+            }
+        }
+
+        function fetchUsers() {
+            fetch("/api/users")
+                .then((r) => r.json())
+                .then((data) => {
+                    users = data;
+                    renderUsersList();
+                });
+        }
+
+        function renderUsersList() {
+            const search = searchUserInput.value.toLowerCase();
+            const courseId = filterCourseSelect.value;
+            const filterRole = document.getElementById("filter-role").value;
+            const dateFilter = document.getElementById("filter-user-date").value;
+            const adminCount = users.filter((u) => u.role === "admin").length;
+
+            let html = "";
+
+            const filteredUsers = users
+                .slice()
+                .sort((a, b) => a.username.localeCompare(b.username))
+                .filter((u) => {
+                    const matchName = u.username.toLowerCase().includes(search);
+                    const matchCourse =
+                        u.role === "admin"
+                            ? !courseId || courseId === ""
+                            : !courseId ||
+                            (u.courses && u.courses[0] && u.courses[0].id == courseId);
+                    const matchRole = !filterRole || u.role === filterRole;
+                    const matchDate =
+                        !dateFilter || (u.created_at && u.created_at.startsWith(dateFilter));
+                    return matchName && matchCourse && matchRole && matchDate;
+                });
+
+            if (!filteredUsers.length) {
+                html = `
+          <div class="col-span-full flex flex-col items-center justify-center py-20 text-gray-500">
+            <div class="relative mb-8">
+              <div class="text-8xl mb-4 float-animation">👥</div>
+              <div class="absolute -top-2 -right-2 text-3xl animate-bounce">✨</div>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-700 mb-3">Nessun utente trovato</h3>
+            <p class="text-lg text-gray-500 mb-6 text-center max-w-md">
+              Modifica i filtri per visualizzare altri utenti o crea il primo utente
+            </p>
+            <button onclick="document.getElementById('add-user-btn').click()" 
+              class="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-semibold px-8 py-4 rounded-2xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300 flex items-center space-x-3">
+              <span class="text-xl">+</span>
+              <span>Crea il primo utente</span>
+            </button>
+          </div>
+        `;
+            } else {
+                filteredUsers.forEach((u) => {
+                    const gradients = [
+                        'from-green-500 to-emerald-500',
+                        'from-blue-500 to-cyan-500',
+                        'from-purple-500 to-pink-500',
+                        'from-orange-500 to-red-500',
+                        'from-indigo-500 to-purple-500',
+                        'from-teal-500 to-green-500'
+                    ];
+                    const gradient = gradients[u.id % gradients.length];
+
+                    html += `
+            <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-2 transition-all duration-300 overflow-hidden border border-gray-100 pulse-on-hover user-card-hover">
+              <!-- User Header with Gradient -->
+              <div class="bg-gradient-to-r ${gradient} p-6 relative overflow-hidden">
+                <div class="shimmer absolute inset-0"></div>
+                <div class="relative z-10">
+                  <div class="flex items-center justify-between mb-4">
+                    <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-3">
+                      <span class="text-3xl">${u.role === 'admin' ? '👑' : '👤'}</span>
+                    </div>
+                    <div class="flex space-x-2">
+                      <button class="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-3 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105" 
+                              title="Modifica utente" onclick="openEditUser(${u.id})">
+                        <span class="text-lg">✏️</span>
+                      </button>
+                      ${adminCount > 1 || u.role !== "admin" ? `
+                      <button class="bg-white/20 hover:bg-red-500/30 backdrop-blur-sm text-white p-3 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105" 
+                              title="Elimina utente" onclick="deleteUser(${u.id})">
+                        <span class="text-lg">🗑️</span>
+                      </button>
+                      ` : ''}
+                    </div>
+                  </div>
+                  <h3 class="text-2xl font-bold text-white mb-2 truncate">${u.username}</h3>
+                  <div class="bg-white/20 backdrop-blur-sm rounded-full px-4 py-1 inline-block">
+                    <span class="text-white/90 text-sm font-medium">
+                      ${u.role === 'admin' ? '👑 Amministratore' : '👤 Utente'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- User Content -->
+              <div class="p-8">
+                <div class="mb-6">
+                  <h4 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3 flex items-center">
+                    <span class="mr-2">📚</span>
+                    Corso Assegnato
+                  </h4>
+                  ${u.role === 'user' ? `
+                    <select onchange='assignCourse(${u.id}, this.value)' 
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm transition-all duration-200 shadow-sm">
+                      <option value="">Nessun corso</option>
+                      ${courses.map((c) => {
+                        const selected = u.courses && u.courses[0] && u.courses[0].id == c.id ? "selected" : "";
+                        return `<option value="${c.id}" ${selected}>${c.name}</option>`;
+                    }).join("")}
+                    </select>
+                  ` : `
+                    <p class="text-gray-500 italic">Gli amministratori non hanno corsi assegnati</p>
+                  `}
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="flex flex-wrap gap-3">
+                  <button onclick="openEditUser(${u.id})" 
+                    class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-4 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
+                    <span>✏️</span>
+                    <span>Modifica</span>
+                  </button>
+                  
+                  ${u.role !== "admin" ? `
+                  <button onclick="promote(${u.id})" 
+                    class="flex-1 bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-semibold py-3 px-4 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
+                    <span>👑</span>
+                    <span>Rendi Admin</span>
+                  </button>
+                  ` : ''}
+                  
+                  ${u.role === "admin" && adminCount > 1 ? `
+                  <button onclick="demote(${u.id})" 
+                    class="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-semibold py-3 px-4 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
+                    <span>👤</span>
+                    <span>Rendi Utente</span>
+                  </button>
+                  ` : ''}
+                  
+                  ${adminCount > 1 || u.role !== "admin" ? `
+                  <button onclick="deleteUser(${u.id})" 
+                    class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold py-3 px-4 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center">
+                    <span>🗑️</span>
+                  </button>
+                  ` : ''}
+                </div>
+              </div>
+            </div>
+          `;
+                });
+            }
+
+            document.getElementById("users-list").innerHTML = html;
+        }
+
+        function promote(id) {
+            fetch(`/api/users/${id}/promote`, { method: "POST" }).then(fetchUsers);
+        }
+
+        function demote(id) {
+            fetch(`/api/users/${id}/demote`, { method: "POST" }).then(fetchUsers);
+        }
+
+        function deleteUser(id) {
+            if (confirm("Sei sicuro di voler eliminare questo utente?"))
+                fetch(`/api/users/${id}`, { method: "DELETE" }).then(fetchUsers);
+        }
+
+        function assignCourse(id, courseId) {
+            fetch(`/api/users/${id}/assign_course`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ course_id: courseId }),
+            })
+                .then((r) => r.text())
+                .then((msg) => {
+                    fetchUsers();
+                    const el = document.getElementById("assign-msg");
+                    el.textContent = msg === "OK" ? "Corso assegnato con successo!" : msg;
+                    el.className = `mt-4 p-4 rounded-2xl text-sm font-medium ${msg === "OK" ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
+                    el.classList.remove('hidden');
+                    setTimeout(() => {
+                        el.classList.add('hidden');
+                    }, 3000);
+                });
+        }
+
+        function openEditUser(id) {
+            editingUserId = id;
+            const user = users.find((u) => u.id === id);
+            document.getElementById("edit_username").value = user.username;
+            document.getElementById("edit_password").value = "";
+            document.getElementById("edit-user-password-hint").textContent = "";
+            document.getElementById("edit-user-msg").classList.add('hidden');
+            document.getElementById("edit-user-modal").style.display = "flex";
+        }
+
+        function showMessage(elementId, message, type) {
+            const el = document.getElementById(elementId);
+            if (el) {
+                el.textContent = message;
+                el.className = `mt-4 p-4 rounded-2xl text-sm font-medium ${type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
+                el.classList.remove('hidden');
+
+                setTimeout(() => {
+                    el.classList.add('hidden');
+                }, 3000);
+            }
+        }
+
+        // Modal functions
+        document.getElementById("add-user-btn").onclick = () => {
+            document.getElementById("add-user-modal").style.display = "flex";
+            document.getElementById("add-user-msg").classList.add('hidden');
+            updateNewCourseSelect();
+        };
+
+        document.getElementById("close-add-user-modal").onclick = () => {
+            document.getElementById("add-user-modal").style.display = "none";
+        };
+
+        document.getElementById("cancel-add-user").onclick = function () {
+            document.getElementById("add-user-modal").style.display = "none";
+        };
+
+        document.getElementById("close-edit-modal").onclick = () => {
+            document.getElementById("edit-user-modal").style.display = "none";
+        };
+
+        document.getElementById("cancel-edit-user").onclick = function () {
+            document.getElementById("edit-user-modal").style.display = "none";
+        };
+
+        document.getElementById("close-schedules-modal").onclick = () => {
+            document.getElementById("user-schedules-modal").style.display = "none";
+        };
+
+        window.onclick = (e) => {
+            if (e.target === document.getElementById("edit-user-modal"))
+                document.getElementById("edit-user-modal").style.display = "none";
+            if (e.target === document.getElementById("user-schedules-modal"))
+                document.getElementById("user-schedules-modal").style.display = "none";
+            if (e.target === document.getElementById("add-user-modal"))
+                document.getElementById("add-user-modal").style.display = "none";
+        };
+
+        // Validazione password live
+        const newPassword = document.getElementById("new-password");
+        const addHint = document.getElementById("add-password-hint");
+
+        newPassword.addEventListener("input", () => {
+            const val = newPassword.value;
+            let msg = "";
+            if (val.length < 8) msg += "Min 8 caratteri. ";
+            if (!/[A-Z]/.test(val)) msg += "Almeno una maiuscola. ";
+            if (!/[a-z]/.test(val)) msg += "Almeno una minuscola. ";
+            if (!/[0-9]/.test(val)) msg += "Almeno un numero. ";
+            addHint.textContent = msg;
+            addHint.style.color = msg ? "#ef4444" : "#22c55e";
+        });
+
+        // Validazione password edit
+        const editPassword = document.getElementById("edit_password");
+        const editHint = document.getElementById("edit-user-password-hint");
+
+        editPassword.addEventListener("input", () => {
+            const val = editPassword.value;
+            let msg = "";
+            if (val.length < 8) msg += "Min 8 caratteri. ";
+            if (!/[A-Z]/.test(val)) msg += "Almeno una maiuscola. ";
+            if (!/[a-z]/.test(val)) msg += "Almeno una minuscola. ";
+            if (!/[0-9]/.test(val)) msg += "Almeno un numero. ";
+            editHint.textContent = msg;
+            editHint.style.color = msg ? "#ef4444" : "#22c55e";
+        });
+
+        document.getElementById("add-user-form").onsubmit = function (e) {
+            e.preventDefault();
+
+            if (addHint.textContent) {
+                addHint.style.color = "#ef4444";
+                showMessage("add-user-msg", "Correggi gli errori nella password", "error");
+                return false;
+            }
+
+            fetch("/api/users", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    username: document.getElementById("new-username").value,
+                    password: newPassword.value,
+                    role: document.getElementById("new-role").value,
+                    course_id: document.getElementById("new-course").value,
+                }),
+            })
+                .then((r) => r.text())
+                .then((msg) => {
+                    if (msg === "OK") {
+                        showMessage("add-user-msg", "Utente creato con successo!", "success");
+                        this.reset();
+                        updateNewCourseSelect();
+                        fetchUsers();
+                        setTimeout(() => {
+                            document.getElementById("add-user-modal").style.display = "none";
+                        }, 1500);
+                    } else {
+                        showMessage("add-user-msg", msg, "error");
+                    }
+                });
+        };
+
+        document.getElementById("edit-user-form").onsubmit = function (e) {
+            e.preventDefault();
+
+            if (editHint.textContent) {
+                editHint.style.color = "#ef4444";
+                showMessage("edit-user-msg", "Correggi gli errori nella password", "error");
+                return false;
+            }
+
+            fetch(`/api/users/${editingUserId}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    username: document.getElementById("edit_username").value,
+                    password: document.getElementById("edit_password").value,
+                }),
+            })
+                .then((r) => r.text())
+                .then((msg) => {
+                    if (msg === "OK") {
+                        showMessage("edit-user-msg", "Utente aggiornato con successo!", "success");
+                        fetchUsers();
+                        setTimeout(() => {
+                            document.getElementById("edit-user-modal").style.display = "none";
+                        }, 1500);
+                    } else {
+                        showMessage("edit-user-msg", msg, "error");
+                    }
+                });
+        };
+
+        document.addEventListener("DOMContentLoaded", () => {
+            searchUserInput = document.getElementById("search-user");
+            filterCourseSelect = document.getElementById("filter-course");
+            const filterRoleSelect = document.getElementById("filter-role");
+            const filterUserDate = document.getElementById("filter-user-date");
+
+            if (searchUserInput && filterCourseSelect) {
+                searchUserInput.addEventListener("input", renderUsersList);
+                filterCourseSelect.addEventListener("change", renderUsersList);
+                if (filterRoleSelect)
+                    filterRoleSelect.addEventListener("change", () => {
+                        toggleFilterCourseVisibility();
+                        renderUsersList();
+                    });
+                if (filterUserDate)
+                    filterUserDate.addEventListener("input", renderUsersList);
+            }
+
+            toggleFilterCourseVisibility();
+            fetchCourses().then(fetchUsers);
+        });
+
+        // Initialize
+        fetchCourses().then(fetchUsers);
+    </script>
+</body>
+
+</html>
