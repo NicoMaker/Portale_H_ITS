@@ -55,9 +55,6 @@ function renderCoursesList() {
                     </div>
                   </div>
                   <h3 class="text-2xl font-bold text-white mb-2 truncate">${course.name}</h3>
-                  <div class="bg-white/20 backdrop-blur-sm rounded-full px-4 py-1 inline-block">
-                    <span class="text-white/90 text-sm font-medium">📖 Corso Attivo</span>
-                  </div>
                 </div>
               </div>
               
