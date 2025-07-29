@@ -43,11 +43,9 @@ function toggleFilterCourseVisibility() {
     .closest(".filter-group");
 
   if (filterRole === "admin") {
-    // Nascondi solo se si seleziona "Solo admin"
     filterCourseGroup.style.display = "none";
     document.getElementById("filter-course").value = "";
   } else {
-    // Mostra se ruolo è "Tutti gli utenti" o "Solo utenti"
     filterCourseGroup.style.display = "";
   }
 }
@@ -178,7 +176,7 @@ window.onclick = (e) => {
     document.getElementById("user-schedules-modal").style.display = "none";
 };
 
-// Validazione password live
+// Validazione password per nuovo utente
 const newPassword = document.getElementById("new-password");
 const addHint = document.getElementById("add-password-hint");
 
@@ -207,45 +205,26 @@ document.getElementById("add-user-form").onsubmit = function (e) {
       username: document.getElementById("new-username").value,
       password: newPassword.value,
       role: document.getElementById("new-role").value,
-      course_id: document.getElementById("new-course").value,
+      courses: document.getElementById("new-role").value === "user" ? [document.getElementById("new-course").value] : [],
     }),
-  })
-    .then((r) => r.text())
-    .then((msg) => {
-      document.getElementById("add-user-msg").textContent = msg;
-      if (msg === "OK") {
-        this.reset();
-        updateNewCourseSelect();
-        fetchUsers();
-      }
-    });
+  }).then(() => {
+    document.getElementById("add-user-form").reset();
+    updateNewCourseSelect();
+    fetchUsers();
+  });
 };
 
-document.addEventListener("DOMContentLoaded", () => {
-  searchUserInput = document.getElementById("search-user");
-  filterCourseSelect = document.getElementById("filter-course");
-  const filterRoleSelect = document.getElementById("filter-role");
-  const filterUserDate = document.getElementById("filter-user-date");
+searchUserInput = document.getElementById("search-user");
+filterCourseSelect = document.getElementById("filter-course");
 
-  if (searchUserInput && filterCourseSelect) {
-    searchUserInput.addEventListener("input", renderUsersList);
-    filterCourseSelect.addEventListener("change", renderUsersList);
-    if (filterRoleSelect)
-      filterRoleSelect.addEventListener("change", () => {
-        toggleFilterCourseVisibility();
-        renderUsersList();
-      });
-    if (filterUserDate)
-      filterUserDate.addEventListener("input", renderUsersList);
-  }
-
+searchUserInput.addEventListener("input", renderUsersList);
+document.getElementById("filter-role").addEventListener("change", () => {
   toggleFilterCourseVisibility();
-  fetchCourses().then(fetchUsers);
+  renderUsersList();
 });
+document.getElementById("filter-course").addEventListener("change", renderUsersList);
+document.getElementById("filter-user-date").addEventListener("change", renderUsersList);
 
-// Importa la funzione formatDate se non esiste
-if (typeof window.formatDate !== "function") {
-  const script = document.createElement("script");
-  script.src = "js/utils.js";
-  document.head.appendChild(script);
-}
+// Initialize data fetching
+fetchCourses();
+fetchUsers();

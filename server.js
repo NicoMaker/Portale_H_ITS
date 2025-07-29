@@ -852,6 +852,51 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // Aggiungi questa route nel server.js, nella sezione API utenti, dopo la route POST /api/users/:id/edit
+
+  // PUT /api/users/:id (modifica credenziali da admin - metodo PUT)
+  if (
+    req.method === "PUT" &&
+    parsedUrl.pathname.match(/^\/api\/users\/\d+$/)
+  ) {
+    const id = parsedUrl.pathname.split("/")[3];
+    parseBody(({ username, password }) => {
+      if (
+        !password ||
+        password.length < 8 ||
+        !/[A-Z]/.test(password) ||
+        !/[a-z]/.test(password) ||
+        !/[0-9]/.test(password)
+      ) {
+        res.end("Password non sicura");
+        return;
+      }
+      db.get(
+        "SELECT * FROM users WHERE username=? AND id!=?",
+        [username, id],
+        (err, user) => {
+          if (user) {
+            res.end("Username già esistente");
+            return;
+          }
+          const hash = bcrypt.hashSync(password, 10);
+          db.run(
+            "UPDATE users SET username=?, password=? WHERE id=?",
+            [username, hash, id],
+            function (err) {
+              if (err) {
+                res.end("Errore DB");
+                return;
+              }
+              res.end("OK");
+            },
+          );
+        },
+      );
+    });
+    return;
+  }
+
   // Default: 404
   res.writeHead(404, { "Content-Type": "text/plain" });
   res.end("Not found");
