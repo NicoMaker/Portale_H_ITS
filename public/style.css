@@ -1,0 +1,616 @@
+/* ======== RESET BASE ======== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  font-family: "Inter", "Segoe UI", sans-serif;
+  font-size: 16px;
+  background: #f9fafb;
+  color: #1f2937;
+  min-height: 100vh;
+  line-height: 1.6;
+  scroll-behavior: smooth;
+}
+
+:root {
+  --primary: #2563eb;
+  --primary-dark: #1e40af;
+  --accent: #10b981;
+  --error: #ef4444;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --bg: #ffffff;
+  --bg-alt: #f3f4f6;
+  --border: #e5e7eb;
+  --radius: 12px;
+  --shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  --transition: 0.2s ease;
+}
+
+/* ======== TYPOGRAPHY ======== */
+h1,
+h2,
+h3,
+h4 {
+  color: var(--primary);
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+h1 {
+  font-size: 2rem;
+}
+h2 {
+  font-size: 1.6rem;
+}
+h3 {
+  font-size: 1.3rem;
+}
+h4 {
+  font-size: 1.1rem;
+}
+
+/* ======== NAVBAR ======== */
+.navbar {
+  background: var(--primary);
+  color: white;
+  padding: 1rem 2rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar a {
+  color: white;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.navbar a:hover {
+  color: var(--accent);
+}
+
+/* ======== CONTAINERS ======== */
+.container {
+  max-width: 1100px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: var(--bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.form-container {
+  background: var(--bg);
+  padding: 2rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  max-width: 500px;
+  margin: 2rem auto;
+}
+
+/* ======== FORMS ======== */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+input,
+select,
+textarea,
+button {
+  padding: 0.75rem 1rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border var(--transition), box-shadow var(--transition);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+button:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+button:disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* ======== TABLES ======== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-alt);
+  margin-top: 1.5rem;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+th,
+td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+
+th {
+  background: #e0e7ef;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+tr:nth-child(even) {
+  background: #f9fafb;
+}
+
+tr:hover {
+  background: #eff6ff;
+}
+
+/* ======== MODALS ======== */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: var(--bg);
+  padding: 2rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  top: 1rem;
+  right: 1.2rem;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--error);
+}
+
+/* ======== BADGES & ALERTS ======== */
+.badge {
+  display: inline-block;
+  padding: 0.25em 0.75em;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: var(--bg-alt);
+  color: var(--primary);
+}
+
+.badge.admin {
+  background: var(--primary);
+  color: white;
+}
+
+.badge.user {
+  background: #e0e7ef;
+  color: #1f2937;
+}
+
+.hint {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  margin-top: 1rem;
+}
+
+.success {
+  color: var(--success);
+  font-weight: 600;
+}
+
+/* ======== UTILITIES ======== */
+a {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+a:hover {
+  color: var(--accent);
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  color: var(--primary);
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  transition: background var(--transition);
+}
+
+.icon-btn:hover {
+  background: var(--bg-alt);
+  color: var(--error);
+}
+
+/* ======== RESPONSIVE ======== */
+@media (max-width: 768px) {
+  .container,
+  .form-container {
+    padding: 1rem;
+  }
+  .filters-bar,
+  .cards {
+    flex-direction: column;
+  }
+  table,
+  thead,
+  tbody,
+  th,
+  td,
+  tr {
+    display: block;
+  }
+  thead {
+    display: none;
+  }
+  tr {
+    margin-bottom: 1rem;
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1rem;
+  }
+  td {
+    padding: 0.5rem;
+    border-bottom: none;
+  }
+  td:before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--primary);
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+}
+
+#new_username {
+  background-color: #f0f0f0;
+}
+
+.filters-bar {
+  background: #f9f9f9;
+  padding: 1rem;
+  margin-bottom: 2rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.filter-group {
+  margin-bottom: 1rem;
+}
+
+.primary-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.filters-bar {
+  background: #f9f9f9;
+  padding: 1rem;
+  margin-bottom: 2rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.filters-bar h2 {
+  margin-top: 0;
+}
+
+.filter-group {
+  margin-bottom: 1rem;
+}
+
+.filter-group label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-weight: bold;
+}
+
+.filter-group input,
+.filter-group select {
+  width: 100%;
+  padding: 0.4rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+#search-course {
+  display: none;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 2rem;
+}
+
+.section-header span {
+  font-size: 1.5em;
+  margin-right: 0.5rem;
+}
+
+.form-container h3,
+.course-list h3 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: var(--primary-dark);
+}
+
+.courses-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.course-list {
+  flex: 2 1 400px;
+  min-width: 320px;
+}
+
+#courses-list {
+  margin-top: 1rem;
+}
+
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.admin-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  padding: 0;
+  margin: 1.5rem 0;
+}
+
+.admin-links li a {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 0.8rem 1.2rem;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: var(--primary);
+  transition: background 0.2s ease;
+}
+
+.admin-links li a:hover {
+  background: #e5f0ff;
+  color: var(--primary-dark);
+}
+
+.section-title {
+  font-size: 1.7rem;
+  margin-bottom: 1.5rem;
+}
+
+.highlight-box {
+  background-color: #f0f8ff;
+  padding: 1rem;
+  border-left: 4px solid var(--primary);
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  border-radius: 8px;
+}
+
+/* Contenitore per i badge dei corsi */
+.user-courses-badges-wrap {
+  display: flex;
+  flex-wrap: wrap; /* Rende i badge flessibili e a capo se necessario */
+  justify-content: flex-start; /* Allinea i badge a sinistra (puoi cambiarlo con 'center' o 'space-between' se vuoi altri allineamenti) */
+  margin-top: 20px; /* Distanza superiore dal contenitore precedente, puoi regolarlo */
+  gap: 10px; /* Distanza tra i badge, puoi regolarla come preferisci */
+  margin-bottom: 20px; /* Distanza inferiore dal contenitore successivo, puoi regolarlo */
+}
+
+/* Styling per ogni badge del corso */
+.user-courses-badge {
+  background-color: #f0f0f0; /* Colore di sfondo (puoi cambiarlo se preferisci) */
+  padding: 5px 15px; /* Aggiungi più spazio orizzontale per rendere il badge più largo */
+  border-radius: 15px; /* Rende gli angoli arrotondati */
+  font-size: 14px; /* Imposta la dimensione del testo */
+  color: #333; /* Colore del testo */
+  border: 1px solid #ccc; /* Colore del bordo */
+  cursor: pointer; /* Cambia il cursore quando il mouse passa sopra il badge */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Aggiungi transizioni morbide per l'effetto hover */
+  text-transform: capitalize; /* Rende la prima lettera di ogni parola maiuscola */
+  margin-bottom: 10px; /* Distanza tra i badge se sono disposti su più righe */
+}
+
+/* Effetto hover per ogni badge */
+.user-courses-badge:hover {
+  background-color: #dcdcdc; /* Cambia il colore di sfondo al passaggio del mouse */
+  transform: scale(
+    1.05
+  ); /* Aumenta leggermente le dimensioni del badge per un effetto interattivo */
+}
+
+/* Effetto focus per migliorare l'accessibilità */
+.user-courses-badge:focus {
+  outline: 2px solid #4d90fe; /* Bordo blu per il focus (migliora l'accessibilità) */
+  outline-offset: 2px; /* Distanza tra il bordo e il badge */
+}
+
+/* ======== NAVBAR ======== */
+.navbar {
+  background: var(--primary); /* Colore di sfondo primario */
+  color: white;
+  padding: 1rem 2rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.navbar a:hover {
+  background-color: var(--accent); /* Verde per hover */
+  color: #fff; /* Colore del testo verde */
+  transform: scale(1.05); /* Ingrossa leggermente il link */
+}
+
+.navbar a.active {
+  background-color: var(--accent); /* Verde anche per il link attivo */
+  color: white; /* Colore del testo attivo bianco */
+  font-weight: 700; /* Testo attivo più marcato */
+}
+
+/* Per il titolo della navbar */
+.navbar .navbar-title {
+  font-weight: bold;
+  color: var(--primary-dark); /* Colore scuro per il titolo */
+}
+
+.navbar .navbar-title:hover {
+  color: var(--accent); /* Verde al passaggio del mouse sul titolo */
+}
+
+/* Modale */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  background-color: var(--bg); /* Colore di sfondo principale */
+  margin: 15% auto;
+  padding: 2rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  top: 1rem;
+  right: 1.2rem;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--error); /* Colore rosso per il bottone di chiusura */
+}
+
+/* Stile per il link */
+#edit-profile-link {
+  text-decoration: none; /* Rimuove la sottolineatura */
+  display: inline-block; /* Permette di stilizzare il bottone come un link */
+}
+
+/* Stile per il bottone */
+#edit-profile-btn {
+  background: var(--primary); /* Colore di sfondo primario */
+  color: white;
+  font-size: 1.3rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: var(--shadow);
+  display: inline-block; /* Per farlo comportare come un elemento inline */
+}
+
+/* Effetto hover per il bottone */
+#edit-profile-btn:hover {
+  background-color: var(--accent); /* Verde per hover */
+  transform: scale(1.05); /* Ingrossa leggermente il bottone */
+}
+
+/* Stato attivo del bottone */
+#edit-profile-btn:active {
+  background-color: var(--accent); /* Verde anche per il bottone attivo */
+  color: white; /* Colore del testo attivo bianco */
+  font-weight: 700; /* Testo attivo più marcato */
+}
