@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Registrazione</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gradient-to-r from-blue-100 to-blue-200 font-sans">
+
+    <!-- Banner superiore bianco con sfumatura -->
+    <div class="bg-white shadow-xl py-6">
+      <div class="max-w-7xl mx-auto px-6 text-center">
+        <span class="text-3xl font-semibold text-gray-900">Portale ITS - Registrazione</span>
+      </div>
+    </div>
+
+    <!-- Form di registrazione con ombre e bordi arrotondati -->
+    <div class="flex justify-center items-center min-h-screen px-4 sm:px-6 lg:px-8">
+      <div class="w-full max-w-lg space-y-8 bg-white p-10 rounded-xl shadow-2xl transform transition-all duration-300 hover:scale-105">
+
+        <h2 class="text-center text-3xl font-bold text-gray-800 tracking-wide">Crea un nuovo account</h2>
+        <form id="register-form" method="POST" action="/register" class="mt-6 space-y-6">
+
+          <!-- Input per Username con bordi arrotondati e ombra -->
+          <div>
+            <input 
+              type="text" 
+              name="username" 
+              id="username" 
+              placeholder="Username"
+              required 
+              autocomplete="username" 
+              class="block w-full px-6 py-4 mt-1 text-lg border border-gray-300 rounded-2xl shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ease-in-out hover:shadow-xl"
+            />
+          </div>
+
+          <!-- Input per Password con bordi arrotondati e ombra -->
+          <div>
+            <input 
+              type="password" 
+              name="password" 
+              id="password" 
+              placeholder="Password"
+              required 
+              autocomplete="new-password" 
+              class="block w-full px-6 py-4 mt-1 text-lg border border-gray-300 rounded-2xl shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ease-in-out hover:shadow-xl"
+            />
+          </div>
+
+          <!-- Suggerimenti per la password -->
+          <div id="password-hint" class="text-gray-500 text-sm mt-1"></div>
+
+          <!-- Bottone di registrazione con effetto hover e transizione -->
+          <div>
+            <button 
+              type="submit" 
+              class="w-full py-4 bg-blue-600 text-white font-semibold rounded-2xl shadow-md hover:bg-blue-700 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out"
+            >
+              Registrati
+            </button>
+          </div>
+        </form>
+
+        <!-- Link per il login con stile moderno -->
+        <p class="mt-4 text-center text-gray-600">
+          Hai già un account? 
+          <a href="/login.html" class="text-blue-600 hover:underline font-medium">Accedi</a>
+        </p>
+
+      </div>
+    </div>
+
+    <!-- Script per gestione registrazione -->
+    <script src="js/register.js"></script>
+  </body>
+</html>
