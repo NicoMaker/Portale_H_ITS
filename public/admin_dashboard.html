@@ -1,482 +1,743 @@
 <!doctype html>
 <html lang="it">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard Admin</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css" rel="stylesheet" />
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: {
-              50: "#eff6ff",
-              100: "#dbeafe",
-              500: "#3b82f6",
-              600: "#2563eb",
-              700: "#1d4ed8",
-              900: "#1e3a8a",
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                50: "#eff6ff",
+                100: "#dbeafe",
+                500: "#3b82f6",
+                600: "#2563eb",
+                700: "#1d4ed8",
+                900: "#1e3a8a",
+              },
+              dark: {
+                800: "#1f2937",
+                900: "#111827",
+              },
             },
-            dark: {
-              800: "#1f2937",
-              900: "#111827",
+            animation: {
+              "fade-in": "fadeIn 0.5s ease-out",
+              "slide-up": "slideUp 0.6s ease-out",
+              "scale-in": "scaleIn 0.3s ease-out",
+              float: "float 6s ease-in-out infinite",
             },
-          },
-          animation: {
-            "fade-in": "fadeIn 0.5s ease-out",
-            "slide-up": "slideUp 0.6s ease-out",
-            "scale-in": "scaleIn 0.3s ease-out",
-            float: "float 6s ease-in-out infinite",
-          },
-          keyframes: {
-            fadeIn: {
-              "0%": { opacity: "0" },
-              "100%": { opacity: "1" },
-            },
-            slideUp: {
-              "0%": { transform: "translateY(30px)", opacity: "0" },
-              "100%": { transform: "translateY(0)", opacity: "1" },
-            },
-            scaleIn: {
-              "0%": { transform: "scale(0.9)", opacity: "0" },
-              "100%": { transform: "scale(1)", opacity: "1" },
-            },
-            float: {
-              "0%, 100%": { transform: "translateY(0px)" },
-              "50%": { transform: "translateY(-10px)" },
+            keyframes: {
+              fadeIn: {
+                "0%": { opacity: "0" },
+                "100%": { opacity: "1" },
+              },
+              slideUp: {
+                "0%": { transform: "translateY(30px)", opacity: "0" },
+                "100%": { transform: "translateY(0)", opacity: "1" },
+              },
+              scaleIn: {
+                "0%": { transform: "scale(0.9)", opacity: "0" },
+                "100%": { transform: "scale(1)", opacity: "1" },
+              },
+              float: {
+                "0%, 100%": { transform: "translateY(0px)" },
+                "50%": { transform: "translateY(-10px)" },
+              },
             },
           },
         },
-      },
-    };
-  </script>
-  <style>
-    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+      };
+    </script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
-    * {
-      font-family:
-        "Inter",
-        system-ui,
-        -apple-system,
-        sans-serif;
-    }
-
-    .glass-effect {
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .gradient-bg {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-
-    .card-hover {
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .card-hover:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    }
-
-    .nav-link {
-      position: relative;
-      transition: all 0.3s ease;
-    }
-
-    .nav-link::after {
-      content: "";
-      position: absolute;
-      bottom: -2px;
-      left: 0;
-      width: 0;
-      height: 2px;
-      background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-      transition: width 0.3s ease;
-    }
-
-    .nav-link:hover::after,
-    .nav-link.active::after {
-      width: 100%;
-    }
-
-    .modal-backdrop {
-      backdrop-filter: blur(8px);
-      animation: fadeIn 0.3s ease-out;
-    }
-
-    .modal-content {
-      animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-      transition: all 0.3s ease;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
-    }
-
-    .floating-shapes {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .floating-shapes::before,
-    .floating-shapes::after {
-      content: "";
-      position: absolute;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.1);
-      animation: float 8s ease-in-out infinite;
-    }
-
-    .floating-shapes::before {
-      width: 200px;
-      height: 200px;
-      top: 20%;
-      left: 10%;
-      animation-delay: -2s;
-    }
-
-    .floating-shapes::after {
-      width: 150px;
-      height: 150px;
-      top: 60%;
-      right: 10%;
-      animation-delay: -4s;
-    }
-
-    .stats-card {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .stats-card:hover {
-      transform: translateY(-5px) scale(1.03);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-    }
-
-    .icon-bg {
-      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-    }
-
-    /* Custom scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: #f1f5f9;
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: linear-gradient(135deg, #2563eb, #7c3aed);
-    }
-
-    /* Enhanced mobile responsive */
-    @media (max-width: 768px) {
-      .mobile-nav {
-        transform: translateY(-100%);
-        transition: transform 0.3s ease;
+      * {
+        font-family:
+          "Inter",
+          system-ui,
+          -apple-system,
+          sans-serif;
       }
 
-      .mobile-nav.active {
-        transform: translateY(0);
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
       }
-    }
-  </style>
-</head>
 
-<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen">
-  <!-- Header con effetto glassmorphism -->
-  <nav class="glass-effect sticky top-0 z-50 border-b border-white/20 shadow-xl">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center h-16">
-        <!-- Logo e Brand -->
-        <div class="flex items-center space-x-4">
-          <div class="icon-bg p-2 rounded-xl shadow-md">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h1a1 1 0 011 1v5m-4 0h4">
-              </path>
-            </svg>
+      .gradient-bg {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+
+      .card-hover {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .card-hover:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      }
+
+      .nav-link {
+        position: relative;
+        transition: all 0.3s ease;
+      }
+
+      .nav-link::after {
+        content: "";
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        transition: width 0.3s ease;
+      }
+
+      .nav-link:hover::after,
+      .nav-link.active::after {
+        width: 100%;
+      }
+
+      .modal-backdrop {
+        backdrop-filter: blur(8px);
+        animation: fadeIn 0.3s ease-out;
+      }
+
+      .modal-content {
+        animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+      }
+
+      .floating-shapes {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .floating-shapes::before,
+      .floating-shapes::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        animation: float 8s ease-in-out infinite;
+      }
+
+      .floating-shapes::before {
+        width: 200px;
+        height: 200px;
+        top: 20%;
+        left: 10%;
+        animation-delay: -2s;
+      }
+
+      .floating-shapes::after {
+        width: 150px;
+        height: 150px;
+        top: 60%;
+        right: 10%;
+        animation-delay: -4s;
+      }
+
+      .stats-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .stats-card:hover {
+        transform: translateY(-5px) scale(1.03);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      .icon-bg {
+        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+      }
+
+      /* Enhanced mobile responsive */
+      @media (max-width: 768px) {
+        .mobile-nav {
+          transform: translateY(-100%);
+          transition: transform 0.3s ease;
+        }
+
+        .mobile-nav.active {
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+
+  <body
+    class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen"
+  >
+    <!-- Header con effetto glassmorphism -->
+    <nav
+      class="glass-effect sticky top-0 z-50 border-b border-white/20 shadow-xl"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+          <!-- Logo e Brand -->
+          <div class="flex items-center space-x-4">
+            <div class="icon-bg p-2 rounded-xl shadow-md">
+              <svg
+                class="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h1a1 1 0 011 1v5m-4 0h4"
+                ></path>
+              </svg>
+            </div>
+            <span
+              class="font-bold text-xl bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent"
+              >Admin Panel</span
+            >
           </div>
+
+          <!-- Desktop Navigation -->
+          <div class="hidden md:flex items-center space-x-8">
+            <a
+              href="/admin_dashboard.html"
+              class="nav-link active flex items-center space-x-2 px-3 py-2 text-sm font-medium text-primary-700"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2"
+                ></path>
+              </svg>
+              <span>Dashboard</span>
+            </a>
+            <a
+              href="/manage_users.html"
+              class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-primary-600"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
+                ></path>
+              </svg>
+              <span>Utenti</span>
+            </a>
+            <a
+              href="/manage_courses.html"
+              class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-primary-600"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                ></path>
+              </svg>
+              <span>Corsi</span>
+            </a>
+            <a
+              href="/manage_schedules.html"
+              class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-primary-600"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v16a2 2 0 002 2z"
+                ></path>
+              </svg>
+              <span>Orari</span>
+            </a>
+          </div>
+
+          <!-- User Actions -->
+          <div class="flex items-center space-x-4">
+            <button
+              id="edit-profile-btn"
+              class="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-600 transition-all duration-200 hover:bg-white/50 rounded-lg"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                ></path>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                ></path>
+              </svg>
+              <span class="hidden sm:inline">Profilo</span>
+            </button>
+            <a
+              href="/logout"
+              class="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 transition-all duration-200 hover:bg-red-50 rounded-lg"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                ></path>
+              </svg>
+              <span class="hidden sm:inline">Logout</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section con animazioni -->
+    <section
+      class="relative gradient-bg text-white py-16 md:py-24 overflow-hidden"
+    >
+      <div class="floating-shapes"></div>
+      <div class="relative z-10 max-w-6xl mx-auto text-center px-4">
+        <h1 class="text-4xl md:text-6xl font-bold mb-6 animate-slide-up">
+          Dashboard
           <span
-            class="font-bold text-xl bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">Admin
-            Panel</span>
-        </div>
-
-        <!-- Desktop Navigation -->
-        <div class="hidden md:flex items-center space-x-8">
-          <a href="/admin_dashboard.html"
-            class="nav-link active flex items-center space-x-2 px-3 py-2 text-sm font-medium text-primary-700">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2"></path>
-            </svg>
-            <span>Dashboard</span>
-          </a>
-          <a href="/manage_users.html"
-            class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-primary-600">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z">
-              </path>
-            </svg>
-            <span>Utenti</span>
-          </a>
-          <a href="/manage_courses.html"
-            class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-primary-600">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
-              </path>
-            </svg>
-            <span>Corsi</span>
-          </a>
-          <a href="/manage_schedules.html"
-            class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-primary-600">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v16a2 2 0 002 2z"></path>
-            </svg>
-            <span>Orari</span>
-          </a>
-        </div>
-
-        <!-- User Actions -->
-        <div class="flex items-center space-x-4">
-          <button id="edit-profile-btn"
-            class="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-600 transition-all duration-200 hover:bg-white/50 rounded-lg">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
-              </path>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-            </svg>
-            <span class="hidden sm:inline">Profilo</span>
-          </button>
-          <a href="/logout"
-            class="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 transition-all duration-200 hover:bg-red-50 rounded-lg">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-            </svg>
-            <span class="hidden sm:inline">Logout</span>
-          </a>
-        </div>
-      </div>
-    </div>
-  </nav>
-
-  <!-- Hero Section con animazioni -->
-  <section class="relative gradient-bg text-white py-16 md:py-24 overflow-hidden">
-    <div class="floating-shapes"></div>
-    <div class="relative z-10 max-w-6xl mx-auto text-center px-4">
-      <h1 class="text-4xl md:text-6xl font-bold mb-6 animate-slide-up">
-        Dashboard
-        <span class="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">Admin</span>
-      </h1>
-      <p class="text-xl md:text-2xl text-blue-100 mb-8 animate-fade-in animation-delay-300 max-w-3xl mx-auto">
-        Un portale per gestire utenti, corsi e calendario in modo semplice
-      </p>
-      <div class="flex flex-wrap justify-center gap-4 animate-fade-in animation-delay-500"></div>
-    </div>
-  </section>
-
-  <!-- Main Content -->
-  <main class="max-w-7xl mx-auto px-4 py-12">
-    <!-- Quick Actions Grid - Fixed to ensure equal height and alignment -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
-      <!-- Gestione Utenti Card -->
-      <div class="glass-effect rounded-3xl p-8 card-hover animate-slide-up flex flex-col">
-        <div class="flex items-center justify-between mb-6">
-          <div class="icon-bg p-4 rounded-2xl shadow-lg">
-            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z">
-              </path>
-            </svg>
-          </div>
-        </div>
-        <h3 class="text-xl font-bold text-gray-800 mb-3">Gestione Utenti</h3>
-        <p class="text-gray-600 mb-6 flex-grow">
-          Amministra account utente, permessi e profili..
+            class="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent"
+            >Admin</span
+          >
+        </h1>
+        <p
+          class="text-xl md:text-2xl text-blue-100 mb-8 animate-fade-in animation-delay-300 max-w-3xl mx-auto"
+        >
+          Un portale per gestire utenti, corsi e calendario in modo semplice
         </p>
-        <a href="/manage_users.html"
-          class="inline-flex items-center justify-center w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-6 py-3 rounded-xl font-medium transition-all transform hover:scale-105 hover:shadow-lg mt-auto">
-          <span>Gestisci Utenti</span>
-          <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-          </svg>
-        </a>
+        <div
+          class="flex flex-wrap justify-center gap-4 animate-fade-in animation-delay-500"
+        ></div>
       </div>
+    </section>
 
-      <!-- Gestione Corsi Card -->
-      <div class="glass-effect rounded-3xl p-8 card-hover animate-slide-up animation-delay-200 flex flex-col">
-        <div class="flex items-center justify-between mb-6">
-          <div class="bg-gradient-to-r from-green-500 to-emerald-600 p-4 rounded-2xl shadow-lg">
-            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
-              </path>
-            </svg>
-          </div>
-        </div>
-        <h3 class="text-xl font-bold text-gray-800 mb-3">Gestione Corsi</h3>
-        <p class="text-gray-600 mb-6 flex-grow">
-          Crea, modifica e organizza corsi. Gestisci Corsi.
-        </p>
-        <a href="/manage_courses.html"
-          class="inline-flex items-center justify-center w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-6 py-3 rounded-xl font-medium transition-all transform hover:scale-105 hover:shadow-lg mt-auto">
-          <span>Gestisci Corsi</span>
-          <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-          </svg>
-        </a>
-      </div>
-
-      <!-- Gestione Orari Card -->
-      <div class="glass-effect rounded-3xl p-8 card-hover animate-slide-up animation-delay-400 flex flex-col">
-        <div class="flex items-center justify-between mb-6">
-          <div class="bg-gradient-to-r from-purple-500 to-indigo-600 p-4 rounded-2xl shadow-lg">
-            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v16a2 2 0 002 2z"></path>
-            </svg>
-          </div>
-        </div>
-        <h3 class="text-xl font-bold text-gray-800 mb-3">Gestione Orari</h3>
-        <p class="text-gray-600 mb-6 flex-grow">
-          Programma lezioni, gestisci calendari e ottimizza la pianificazione
-          didattica.
-        </p>
-        <a href="/manage_schedules.html"
-          class="inline-flex items-center justify-center w-full bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-medium transition-all transform hover:scale-105 hover:shadow-lg mt-auto">
-          <span>Gestisci Orari</span>
-          <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-          </svg>
-        </a>
-      </div>
-    </div>
-  </main>
-
-  <!-- Modal Modifica Profilo -->
-  <div id="edit-profile-modal"
-    class="hidden fixed inset-0 bg-black/50 modal-backdrop flex items-center justify-center z-50 p-4">
-    <div class="modal-content glass-effect rounded-3xl shadow-2xl w-full max-w-md relative border border-white/20">
-      <button id="close-modal"
-        class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-white/20 rounded-full">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
-      </button>
-
-      <div class="p-8">
-        <div class="text-center mb-8">
-          <div class="icon-bg p-4 rounded-2xl w-16 h-16 mx-auto mb-4">
-            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-            </svg>
-          </div>
-          <h3 class="text-2xl font-bold text-gray-800 mb-2">
-            Modifica Profilo
-          </h3>
-          <p class="text-gray-600">Aggiorna le tue informazioni personali</p>
-        </div>
-
-        <form id="edit-profile-form" class="space-y-6">
-          <div>
-            <label for="new_username" class="block text-sm font-semibold text-gray-700 mb-2">
-              Nome utente
-            </label>
-            <div class="relative">
-              <input type="text" id="new_username" name="new_username" readonly
-                class="w-full p-4 pl-12 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-gray-50 text-gray-600 transition-all" />
-              <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none"
-                stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-12">
+      <!-- Quick Actions Grid - Fixed to ensure equal height and alignment -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+        <!-- Gestione Utenti Card -->
+        <div
+          class="glass-effect rounded-3xl p-8 card-hover animate-slide-up flex flex-col"
+        >
+          <div class="flex items-center justify-between mb-6">
+            <div class="icon-bg p-4 rounded-2xl shadow-lg">
+              <svg
+                class="w-8 h-8 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
+                ></path>
               </svg>
             </div>
           </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-3">Gestione Utenti</h3>
+          <p class="text-gray-600 mb-6 flex-grow">
+            Amministra account utente, permessi e profili..
+          </p>
+          <a
+            href="/manage_users.html"
+            class="inline-flex items-center justify-center w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-6 py-3 rounded-xl font-medium transition-all transform hover:scale-105 hover:shadow-lg mt-auto"
+          >
+            <span>Gestisci Utenti</span>
+            <svg
+              class="w-4 h-4 ml-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              ></path>
+            </svg>
+          </a>
+        </div>
 
-          <div>
-            <label for="new_password" class="block text-sm font-semibold text-gray-700 mb-2">
-              Nuova password
-            </label>
-            <div class="relative">
-              <input type="password" name="new_password" id="new_password" placeholder="Inserisci la nuova password"
-                required
-                class="w-full p-4 pl-12 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all" />
-              <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none"
-                stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
-                </path>
+        <!-- Gestione Corsi Card -->
+        <div
+          class="glass-effect rounded-3xl p-8 card-hover animate-slide-up animation-delay-200 flex flex-col"
+        >
+          <div class="flex items-center justify-between mb-6">
+            <div
+              class="bg-gradient-to-r from-green-500 to-emerald-600 p-4 rounded-2xl shadow-lg"
+            >
+              <svg
+                class="w-8 h-8 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                ></path>
               </svg>
-              <button type="button" id="toggle-password"
-                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                  </path>
+            </div>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-3">Gestione Corsi</h3>
+          <p class="text-gray-600 mb-6 flex-grow">
+            Crea, modifica e organizza corsi. Gestisci Corsi.
+          </p>
+          <a
+            href="/manage_courses.html"
+            class="inline-flex items-center justify-center w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-6 py-3 rounded-xl font-medium transition-all transform hover:scale-105 hover:shadow-lg mt-auto"
+          >
+            <span>Gestisci Corsi</span>
+            <svg
+              class="w-4 h-4 ml-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              ></path>
+            </svg>
+          </a>
+        </div>
+
+        <!-- Gestione Orari Card -->
+        <div
+          class="glass-effect rounded-3xl p-8 card-hover animate-slide-up animation-delay-400 flex flex-col"
+        >
+          <div class="flex items-center justify-between mb-6">
+            <div
+              class="bg-gradient-to-r from-purple-500 to-indigo-600 p-4 rounded-2xl shadow-lg"
+            >
+              <svg
+                class="w-8 h-8 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v16a2 2 0 002 2z"
+                ></path>
+              </svg>
+            </div>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-3">Gestione Orari</h3>
+          <p class="text-gray-600 mb-6 flex-grow">
+            Programma lezioni, gestisci calendari e ottimizza la pianificazione
+            didattica.
+          </p>
+          <a
+            href="/manage_schedules.html"
+            class="inline-flex items-center justify-center w-full bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-medium transition-all transform hover:scale-105 hover:shadow-lg mt-auto"
+          >
+            <span>Gestisci Orari</span>
+            <svg
+              class="w-4 h-4 ml-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              ></path>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </main>
+
+    <!-- Modal Modifica Profilo -->
+    <div
+      id="edit-profile-modal"
+      class="hidden fixed inset-0 bg-black/50 modal-backdrop flex items-center justify-center z-50 p-4"
+    >
+      <div
+        class="modal-content glass-effect rounded-3xl shadow-2xl w-full max-w-md relative border border-white/20"
+      >
+        <button
+          id="close-modal"
+          class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-white/20 rounded-full"
+        >
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </button>
+
+        <div class="p-8">
+          <div class="text-center mb-8">
+            <div class="icon-bg p-4 rounded-2xl w-16 h-16 mx-auto mb-4">
+              <svg
+                class="w-8 h-8 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                ></path>
+              </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-2">
+              Modifica Profilo
+            </h3>
+            <p class="text-gray-600">Aggiorna le tue informazioni personali</p>
+          </div>
+
+          <form id="edit-profile-form" class="space-y-6">
+            <div>
+              <label
+                for="new_username"
+                class="block text-sm font-semibold text-gray-700 mb-2"
+              >
+                Nome utente
+              </label>
+              <div class="relative">
+                <input
+                  type="text"
+                  id="new_username"
+                  name="new_username"
+                  readonly
+                  class="w-full p-4 pl-12 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-gray-50 text-gray-600 transition-all"
+                />
+                <svg
+                  class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  ></path>
                 </svg>
-              </button>
+              </div>
             </div>
-            <div id="edit-password-hint" class="mt-2 text-sm text-gray-500 flex items-center space-x-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              <span>La password deve contenere almeno 8 caratteri, una maiuscola,
-                una minuscola e un numero.</span>
+
+            <div>
+              <label
+                for="new_password"
+                class="block text-sm font-semibold text-gray-700 mb-2"
+              >
+                Nuova password
+              </label>
+              <div class="relative">
+                <input
+                  type="password"
+                  name="new_password"
+                  id="new_password"
+                  placeholder="Inserisci la nuova password"
+                  required
+                  class="w-full p-4 pl-12 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                />
+                <svg
+                  class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                  ></path>
+                </svg>
+                <button
+                  type="button"
+                  id="toggle-password"
+                  class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    ></path>
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                    ></path>
+                  </svg>
+                </button>
+              </div>
+              <div
+                id="edit-password-hint"
+                class="mt-2 text-sm text-gray-500 flex items-center space-x-2"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  ></path>
+                </svg>
+                <span
+                  >La password deve contenere almeno 8 caratteri, una maiuscola,
+                  una minuscola e un numero.</span
+                >
+              </div>
             </div>
-          </div>
 
-          <button type="submit"
-            class="btn-primary w-full p-4 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
-            <span class="flex items-center justify-center space-x-2">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>Salva Modifiche</span>
-            </span>
-          </button>
+            <button
+              type="submit"
+              class="btn-primary w-full p-4 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+            >
+              <span class="flex items-center justify-center space-x-2">
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  ></path>
+                </svg>
+                <span>Salva Modifiche</span>
+              </span>
+            </button>
 
-          <div id="edit-profile-msg" class="text-center text-sm font-medium"></div>
-        </form>
+            <div
+              id="edit-profile-msg"
+              class="text-center text-sm font-medium"
+            ></div>
+          </form>
+        </div>
       </div>
     </div>
-  </div>
 
-  <script src="js/admin_dashboard.js"></script>
-</body>
-
+    <script src="js/admin_dashboard.js"></script>
+  </body>
 </html>
