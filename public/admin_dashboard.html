@@ -400,10 +400,10 @@
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 py-12">
-      <!-- Quick Actions Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+      <!-- Quick Actions Grid - Fixed to ensure equal height and alignment -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
         <!-- Gestione Utenti Card -->
-        <div class="glass-effect rounded-3xl p-8 card-hover animate-slide-up">
+        <div class="glass-effect rounded-3xl p-8 card-hover animate-slide-up flex flex-col">
           <div class="flex items-center justify-between mb-6">
             <div class="icon-bg p-4 rounded-2xl shadow-lg">
               <svg
@@ -422,13 +422,12 @@
             </div>
           </div>
           <h3 class="text-xl font-bold text-gray-800 mb-3">Gestione Utenti</h3>
-          <p class="text-gray-600 mb-6">
-            Amministra account utente, permessi e profili. Controlla l'accesso e
-            monitora l'attività.
+          <p class="text-gray-600 mb-6 flex-grow">
+            Amministra account utente, permessi e profili..
           </p>
           <a
             href="/manage_users.html"
-            class="inline-flex items-center justify-center w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-6 py-3 rounded-xl font-medium transition-all transform hover:scale-105 hover:shadow-lg"
+            class="inline-flex items-center justify-center w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-6 py-3 rounded-xl font-medium transition-all transform hover:scale-105 hover:shadow-lg mt-auto"
           >
             <span>Gestisci Utenti</span>
             <svg
@@ -449,7 +448,7 @@
 
         <!-- Gestione Corsi Card -->
         <div
-          class="glass-effect rounded-3xl p-8 card-hover animate-slide-up animation-delay-200"
+          class="glass-effect rounded-3xl p-8 card-hover animate-slide-up animation-delay-200 flex flex-col"
         >
           <div class="flex items-center justify-between mb-6">
             <div
@@ -471,13 +470,12 @@
             </div>
           </div>
           <h3 class="text-xl font-bold text-gray-800 mb-3">Gestione Corsi</h3>
-          <p class="text-gray-600 mb-6">
-            Crea, modifica e organizza corsi. Gestisci contenuti, moduli e
-            materiali didattici.
+          <p class="text-gray-600 mb-6 flex-grow">
+            Crea, modifica e organizza corsi. Gestisci Corsi. 
           </p>
           <a
             href="/manage_courses.html"
-            class="inline-flex items-center justify-center w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-6 py-3 rounded-xl font-medium transition-all transform hover:scale-105 hover:shadow-lg"
+            class="inline-flex items-center justify-center w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-6 py-3 rounded-xl font-medium transition-all transform hover:scale-105 hover:shadow-lg mt-auto"
           >
             <span>Gestisci Corsi</span>
             <svg
@@ -498,7 +496,7 @@
 
         <!-- Gestione Orari Card -->
         <div
-          class="glass-effect rounded-3xl p-8 card-hover animate-slide-up animation-delay-400 md:col-span-2 lg:col-span-1"
+          class="glass-effect rounded-3xl p-8 card-hover animate-slide-up animation-delay-400 flex flex-col"
         >
           <div class="flex items-center justify-between mb-6">
             <div
@@ -520,13 +518,13 @@
             </div>
           </div>
           <h3 class="text-xl font-bold text-gray-800 mb-3">Gestione Orari</h3>
-          <p class="text-gray-600 mb-6">
+          <p class="text-gray-600 mb-6 flex-grow">
             Programma lezioni, gestisci calendari e ottimizza la pianificazione
             didattica.
           </p>
           <a
             href="/manage_schedules.html"
-            class="inline-flex items-center justify-center w-full bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-medium transition-all transform hover:scale-105 hover:shadow-lg"
+            class="inline-flex items-center justify-center w-full bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-medium transition-all transform hover:scale-105 hover:shadow-lg mt-auto"
           >
             <span>Gestisci Orari</span>
             <svg
@@ -738,6 +736,7 @@
         </div>
       </div>
     </div>
+
     <script src="js/admin_dashboard.js"></script>
   </body>
 </html>
