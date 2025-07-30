@@ -72,7 +72,7 @@ function initDb() {
         }
         if (row.count === 0) {
           // Se non esiste nessun admin, crea l'utente 'admin' predefinito
-          const utenteadmin = "admin";
+          const utenteadmin = "Admin";
           const passwordadmin = "Admin123";
           db.run(
             "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
