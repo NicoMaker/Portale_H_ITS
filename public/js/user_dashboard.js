@@ -44,9 +44,9 @@ document.getElementById("mobile-menu-btn").addEventListener("click", () => {
 function normalize(str) {
   return str
     ? str
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
     : "";
 }
 
@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
     searchEnabled: false,
     shouldSort: false,
     placeholder: true,
-    position: "top"   // *** Qui facciamo aprire il filtro Giorno verso l’alto ***
+    position: "top", // *** Qui facciamo aprire il filtro Giorno verso l’alto ***
   });
 
   // Carica dati dalle API

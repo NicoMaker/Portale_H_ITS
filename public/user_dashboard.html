@@ -1,463 +1,546 @@
 <!doctype html>
 <html lang="it">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard Utente</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: {
-              50: "#f0f9ff",
-              500: "#3b82f6",
-              600: "#2563eb",
-              700: "#1d4ed8",
-              900: "#1e3a8a",
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Utente</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                50: "#f0f9ff",
+                500: "#3b82f6",
+                600: "#2563eb",
+                700: "#1d4ed8",
+                900: "#1e3a8a",
+              },
+            },
+            animation: {
+              "fade-in": "fadeIn 0.5s ease-in-out",
+              "slide-up": "slideUp 0.3s ease-out",
+              "pulse-soft": "pulse 2s infinite",
             },
           },
-          animation: {
-            "fade-in": "fadeIn 0.5s ease-in-out",
-            "slide-up": "slideUp 0.3s ease-out",
-            "pulse-soft": "pulse 2s infinite",
-          },
         },
-      },
-    };
-  </script>
-  <style>
-    .choices[data-dropdown-position='top'] .choices__list--dropdown {
-      top: auto !important;
-      bottom: 100% !important;
-      margin-bottom: 0.25rem;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
+      };
+    </script>
+    <style>
+      .choices[data-dropdown-position="top"] .choices__list--dropdown {
+        top: auto !important;
+        bottom: 100% !important;
+        margin-bottom: 0.25rem;
       }
 
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
 
-    @keyframes slideUp {
-      from {
-        transform: translateY(20px);
-        opacity: 0;
-      }
-
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-
-    /* Gradient animations */
-    @keyframes gradient-shift {
-
-      0%,
-      100% {
-        background-position: 0% 50%;
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
-      50% {
-        background-position: 100% 50%;
-      }
-    }
+      @keyframes slideUp {
+        from {
+          transform: translateY(20px);
+          opacity: 0;
+        }
 
-    .gradient-animate {
-      background-size: 200% 200%;
-      animation: gradient-shift 3s ease infinite;
-    }
-
-    /* Floating animation */
-    @keyframes float {
-
-      0%,
-      100% {
-        transform: translateY(0px);
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
       }
 
-      50% {
-        transform: translateY(-10px);
-      }
-    }
+      /* Gradient animations */
+      @keyframes gradient-shift {
+        0%,
+        100% {
+          background-position: 0% 50%;
+        }
 
-    .float-animation {
-      animation: float 6s ease-in-out infinite;
-    }
-
-    .glass-effect {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .gradient-bg {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-
-    .hover-lift {
-      transition: all 0.3s ease;
-    }
-
-    .hover-lift:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    }
-
-    .choices {
-      margin-bottom: 0;
-    }
-
-    .choices__inner {
-      background: white;
-      border: 2px solid #e5e7eb;
-      border-radius: 0.75rem;
-      padding: 0.75rem;
-      transition: all 0.2s ease;
-    }
-
-    .choices__inner:focus-within {
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-
-    .modern-table {
-      overflow: hidden;
-      border-radius: 1rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    }
-
-    .modern-table thead {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-
-    .modern-table tbody tr:nth-child(even) {
-      background-color: #f8fafc;
-    }
-
-    .modern-table tbody tr:hover {
-      background-color: #e0f2fe;
-      transform: scale(1.005);
-      transition: all 0.2s ease;
-    }
-
-    /* Mobile responsive table */
-    @media (max-width: 768px) {
-      .mobile-table-container {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
+        50% {
+          background-position: 100% 50%;
+        }
       }
 
-      .mobile-table {
-        min-width: 800px;
+      .gradient-animate {
+        background-size: 200% 200%;
+        animation: gradient-shift 3s ease infinite;
       }
 
-      .mobile-table th,
-      .mobile-table td {
-        padding: 12px 8px;
-        font-size: 14px;
-        white-space: nowrap;
+      /* Floating animation */
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+
+        50% {
+          transform: translateY(-10px);
+        }
       }
 
-      .mobile-table th {
-        font-size: 12px;
-        font-weight: 600;
+      .float-animation {
+        animation: float 6s ease-in-out infinite;
       }
 
-      /* Compact mobile view */
-      .mobile-compact th:first-child,
-      .mobile-compact td:first-child {
-        position: sticky;
-        left: 0;
-        background: inherit;
-        z-index: 10;
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
       }
-    }
 
-    /* Mobile navigation */
-    .mobile-nav {
-      transform: translateX(-100%);
-      transition: transform 0.3s ease-in-out;
-    }
+      .gradient-bg {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
 
-    .mobile-nav.open {
-      transform: translateX(0);
-    }
+      .hover-lift {
+        transition: all 0.3s ease;
+      }
 
-    /* Custom scrollbar for mobile table */
-    .mobile-table-container::-webkit-scrollbar {
-      height: 6px;
-    }
+      .hover-lift:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
 
-    .mobile-table-container::-webkit-scrollbar-track {
-      background: #f1f5f9;
-      border-radius: 3px;
-    }
+      .choices {
+        margin-bottom: 0;
+      }
 
-    .mobile-table-container::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 3px;
-    }
+      .choices__inner {
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 0.75rem;
+        padding: 0.75rem;
+        transition: all 0.2s ease;
+      }
 
-    .mobile-table-container::-webkit-scrollbar-thumb:hover {
-      background: #94a3b8;
-    }
-  </style>
-</head>
+      .choices__inner:focus-within {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
 
-<body class="bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 min-h-screen">
-  <!-- Navigation Bar -->
-  <nav class="bg-white shadow-lg border-b border-gray-200 backdrop-blur-sm bg-white/95 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between h-16">
-        <!-- Desktop Navigation -->
-        <div class="hidden md:flex space-x-8 items-center">
-          <a href="/user_dashboard.html"
-            class="inline-flex items-center px-1 pt-1 text-sm font-medium text-blue-600 border-b-2 border-blue-500 transition-all duration-200">
-            🏠 Dashboard User
-          </a>
+      .modern-table {
+        overflow: hidden;
+        border-radius: 1rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      }
+
+      .modern-table thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+
+      .modern-table tbody tr:nth-child(even) {
+        background-color: #f8fafc;
+      }
+
+      .modern-table tbody tr:hover {
+        background-color: #e0f2fe;
+        transform: scale(1.005);
+        transition: all 0.2s ease;
+      }
+
+      /* Mobile responsive table */
+      @media (max-width: 768px) {
+        .mobile-table-container {
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        .mobile-table {
+          min-width: 800px;
+        }
+
+        .mobile-table th,
+        .mobile-table td {
+          padding: 12px 8px;
+          font-size: 14px;
+          white-space: nowrap;
+        }
+
+        .mobile-table th {
+          font-size: 12px;
+          font-weight: 600;
+        }
+
+        /* Compact mobile view */
+        .mobile-compact th:first-child,
+        .mobile-compact td:first-child {
+          position: sticky;
+          left: 0;
+          background: inherit;
+          z-index: 10;
+        }
+      }
+
+      /* Mobile navigation */
+      .mobile-nav {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+      }
+
+      .mobile-nav.open {
+        transform: translateX(0);
+      }
+
+      /* Custom scrollbar for mobile table */
+      .mobile-table-container::-webkit-scrollbar {
+        height: 6px;
+      }
+
+      .mobile-table-container::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 3px;
+      }
+
+      .mobile-table-container::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+      }
+
+      .mobile-table-container::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+    </style>
+  </head>
+
+  <body
+    class="bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 min-h-screen"
+  >
+    <!-- Navigation Bar -->
+    <nav
+      class="bg-white shadow-lg border-b border-gray-200 backdrop-blur-sm bg-white/95 sticky top-0 z-50"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+          <!-- Desktop Navigation -->
+          <div class="hidden md:flex space-x-8 items-center">
+            <a
+              href="/user_dashboard.html"
+              class="inline-flex items-center px-1 pt-1 text-sm font-medium text-blue-600 border-b-2 border-blue-500 transition-all duration-200"
+            >
+              🏠 Dashboard User
+            </a>
+          </div>
+
+          <!-- Desktop Actions -->
+          <div class="hidden md:flex items-center space-x-4">
+            <a
+              href="/logout"
+              class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg transition-all duration-200"
+            >
+              🚪 Logout
+            </a>
+          </div>
+
+          <!-- Mobile menu button -->
+          <div class="md:hidden flex items-center">
+            <button
+              id="mobile-menu-btn"
+              class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+            >
+              <svg
+                class="block h-6 w-6"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
 
-        <!-- Desktop Actions -->
-        <div class="hidden md:flex items-center space-x-4">
-          <a href="/logout"
-            class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg transition-all duration-200">
-            🚪 Logout
-          </a>
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-menu" class="md:hidden hidden">
+          <div
+            class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200"
+          >
+            <a
+              href="/user_dashboard.html"
+              class="block px-3 py-2 text-base font-medium text-blue-600 bg-blue-50 rounded-md"
+            >
+              🏠 Dashboard User
+            </a>
+            <a
+              href="/logout"
+              class="block px-3 py-2 text-base font-medium text-white bg-red-500 hover:bg-red-600 rounded-md"
+            >
+              🚪 Logout
+            </a>
+          </div>
         </div>
+      </div>
+    </nav>
 
-        <!-- Mobile menu button -->
-        <div class="md:hidden flex items-center">
-          <button id="mobile-menu-btn"
-            class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
-            <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Header Section -->
+      <div class="mb-8">
+        <div
+          class="flex flex-col md:flex-row md:items-center md:justify-between"
+        >
+          <div class="mb-4 md:mb-0">
+            <h1
+              class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent gradient-animate"
+            >
+              🏠 Dashboard Utente
+            </h1>
+            <p class="text-gray-600 mt-2 text-base md:text-lg">
+              Visualizza gli orari delle tue lezioni.
+            </p>
+          </div>
         </div>
       </div>
 
-      <!-- Mobile Navigation Menu -->
-      <div id="mobile-menu" class="md:hidden hidden">
-        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200">
-          <a href="/user_dashboard.html"
-            class="block px-3 py-2 text-base font-medium text-blue-600 bg-blue-50 rounded-md">
-            🏠 Dashboard User
-          </a>
-          <a href="/logout"
-            class="block px-3 py-2 text-base font-medium text-white bg-red-500 hover:bg-red-600 rounded-md">
-            🚪 Logout
-          </a>
+      <!-- Courses Badges Section -->
+      <div id="courses-section" class="mb-8 animate-slide-up">
+        <div
+          class="bg-white/95 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-lg hover-lift overflow-hidden border border-gray-100"
+        >
+          <div class="p-4 md:p-6">
+            <div class="flex items-center space-x-3 md:space-x-4 mb-4 md:mb-6">
+              <div
+                class="p-2 md:p-3 bg-gradient-to-r from-purple-100 via-blue-100 to-indigo-100 rounded-xl md:rounded-2xl shadow-lg"
+              >
+                <span class="text-2xl md:text-3xl">📚</span>
+              </div>
+              <div>
+                <h2
+                  class="text-xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent"
+                >
+                  I Tuoi Corsi
+                </h2>
+                <p class="text-gray-600 text-sm md:text-lg">
+                  Corsi assegnati al tuo account
+                </p>
+              </div>
+            </div>
+            <div id="user-courses" class="flex flex-wrap gap-2 md:gap-3">
+              <!-- Course badges will be inserted here -->
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </nav>
 
-  <!-- Main Content -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Header Section -->
-    <div class="mb-8">
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between">
-        <div class="mb-4 md:mb-0">
-          <h1
-            class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent gradient-animate">
-            🏠 Dashboard Utente
-          </h1>
-          <p class="text-gray-600 mt-2 text-base md:text-lg">
-            Visualizza gli orari delle tue lezioni.
-          </p>
-        </div>
-      </div>
-    </div>
+      <!-- Filters Section -->
+      <div class="mb-8 animate-slide-up">
+        <div
+          class="bg-white/95 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-lg hover-lift overflow-hidden border border-gray-100"
+        >
+          <div class="p-4 md:p-6">
+            <div class="flex items-center space-x-3 md:space-x-4 mb-4 md:mb-6">
+              <div
+                class="p-2 md:p-3 bg-gradient-to-r from-purple-100 via-blue-100 to-indigo-100 rounded-xl md:rounded-2xl shadow-lg"
+              >
+                <span class="text-2xl md:text-3xl">🔎</span>
+              </div>
+              <div>
+                <h2
+                  class="text-xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent"
+                >
+                  Filtra Risultati
+                </h2>
+                <p class="text-gray-600 text-sm md:text-lg">
+                  Cerca lezioni per docente, aula, materia, giorno o data
+                </p>
+              </div>
+            </div>
 
-    <!-- Courses Badges Section -->
-    <div id="courses-section" class="mb-8 animate-slide-up">
-      <div
-        class="bg-white/95 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-lg hover-lift overflow-hidden border border-gray-100">
-        <div class="p-4 md:p-6">
-          <div class="flex items-center space-x-3 md:space-x-4 mb-4 md:mb-6">
             <div
-              class="p-2 md:p-3 bg-gradient-to-r from-purple-100 via-blue-100 to-indigo-100 rounded-xl md:rounded-2xl shadow-lg">
-              <span class="text-2xl md:text-3xl">📚</span>
-            </div>
-            <div>
-              <h2
-                class="text-xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                I Tuoi Corsi
-              </h2>
-              <p class="text-gray-600 text-sm md:text-lg">
-                Corsi assegnati al tuo account
-              </p>
-            </div>
-          </div>
-          <div id="user-courses" class="flex flex-wrap gap-2 md:gap-3">
-            <!-- Course badges will be inserted here -->
-          </div>
-        </div>
-      </div>
-    </div>
+              class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"
+            >
+              <div class="space-y-2">
+                <label
+                  for="filter-teacher-u"
+                  class="block text-xs md:text-sm font-semibold text-gray-700 flex items-center"
+                >
+                  <span class="mr-2">👨‍🏫</span>
+                  Docente
+                </label>
+                <select id="filter-teacher-u" multiple class="w-full"></select>
+              </div>
 
-    <!-- Filters Section -->
-    <div class="mb-8 animate-slide-up">
-      <div
-        class="bg-white/95 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-lg hover-lift overflow-hidden border border-gray-100">
-        <div class="p-4 md:p-6">
-          <div class="flex items-center space-x-3 md:space-x-4 mb-4 md:mb-6">
-            <div
-              class="p-2 md:p-3 bg-gradient-to-r from-purple-100 via-blue-100 to-indigo-100 rounded-xl md:rounded-2xl shadow-lg">
-              <span class="text-2xl md:text-3xl">🔎</span>
-            </div>
-            <div>
-              <h2
-                class="text-xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                Filtra Risultati
-              </h2>
-              <p class="text-gray-600 text-sm md:text-lg">
-                Cerca lezioni per docente, aula, materia, giorno o data
-              </p>
-            </div>
-          </div>
+              <div class="space-y-2">
+                <label
+                  for="filter-room-u"
+                  class="block text-xs md:text-sm font-semibold text-gray-700 flex items-center"
+                >
+                  <span class="mr-2">🏫</span>
+                  Aula
+                </label>
+                <select id="filter-room-u" multiple class="w-full"></select>
+              </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            <div class="space-y-2">
-              <label for="filter-teacher-u"
-                class="block text-xs md:text-sm font-semibold text-gray-700 flex items-center">
-                <span class="mr-2">👨‍🏫</span>
-                Docente
-              </label>
-              <select id="filter-teacher-u" multiple class="w-full"></select>
-            </div>
+              <div class="space-y-2">
+                <label
+                  for="filter-subject-u"
+                  class="block text-xs md:text-sm font-semibold text-gray-700 flex items-center"
+                >
+                  <span class="mr-2">📖</span>
+                  Materia
+                </label>
+                <select id="filter-subject-u" multiple class="w-full"></select>
+              </div>
 
-            <div class="space-y-2">
-              <label for="filter-room-u" class="block text-xs md:text-sm font-semibold text-gray-700 flex items-center">
-                <span class="mr-2">🏫</span>
-                Aula
-              </label>
-              <select id="filter-room-u" multiple class="w-full"></select>
-            </div>
+              <div class="space-y-2">
+                <label
+                  for="filter-date-u"
+                  class="block text-xs md:text-sm font-semibold text-gray-700 flex items-center"
+                >
+                  <span class="mr-2">📅</span>
+                  Giorno
+                </label>
+                <select id="filter-date-u" multiple class="w-full"></select>
+              </div>
 
-            <div class="space-y-2">
-              <label for="filter-subject-u"
-                class="block text-xs md:text-sm font-semibold text-gray-700 flex items-center">
-                <span class="mr-2">📖</span>
-                Materia
-              </label>
-              <select id="filter-subject-u" multiple class="w-full"></select>
-            </div>
-
-            <div class="space-y-2">
-              <label for="filter-date-u" class="block text-xs md:text-sm font-semibold text-gray-700 flex items-center">
-                <span class="mr-2">📅</span>
-                Giorno
-              </label>
-              <select id="filter-date-u" multiple class="w-full"></select>
-            </div>
-
-            <div class="space-y-2">
-              <label for="filter-date-exact-u"
-                class="block text-xs md:text-sm font-semibold text-gray-700 flex items-center">
-                <span class="mr-2">📆</span>
-                Data
-              </label>
-              <input type="date" id="filter-date-exact-u"
-                class="w-full px-3 md:px-4 py-2 md:py-3 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-sm md:text-base" />
+              <div class="space-y-2">
+                <label
+                  for="filter-date-exact-u"
+                  class="block text-xs md:text-sm font-semibold text-gray-700 flex items-center"
+                >
+                  <span class="mr-2">📆</span>
+                  Data
+                </label>
+                <input
+                  type="date"
+                  id="filter-date-exact-u"
+                  class="w-full px-3 md:px-4 py-2 md:py-3 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-sm md:text-base"
+                />
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Schedules Table Section -->
-    <div class="animate-slide-up">
-      <div
-        class="bg-white/95 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-lg hover-lift overflow-hidden border border-gray-100">
-        <div class="p-4 md:p-6">
-          <div class="flex items-center space-x-3 md:space-x-4 mb-4 md:mb-6">
-            <div
-              class="p-2 md:p-3 bg-gradient-to-r from-purple-100 via-blue-100 to-indigo-100 rounded-xl md:rounded-2xl shadow-lg">
-              <span class="text-2xl md:text-3xl">📋</span>
+      <!-- Schedules Table Section -->
+      <div class="animate-slide-up">
+        <div
+          class="bg-white/95 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-lg hover-lift overflow-hidden border border-gray-100"
+        >
+          <div class="p-4 md:p-6">
+            <div class="flex items-center space-x-3 md:space-x-4 mb-4 md:mb-6">
+              <div
+                class="p-2 md:p-3 bg-gradient-to-r from-purple-100 via-blue-100 to-indigo-100 rounded-xl md:rounded-2xl shadow-lg"
+              >
+                <span class="text-2xl md:text-3xl">📋</span>
+              </div>
+              <div>
+                <h2
+                  class="text-xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent"
+                >
+                  Orari delle Lezioni
+                </h2>
+                <p class="text-gray-600 text-sm md:text-lg">
+                  Visualizza tutti gli orari delle tue lezioni
+                </p>
+              </div>
             </div>
-            <div>
-              <h2
-                class="text-xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                Orari delle Lezioni
-              </h2>
-              <p class="text-gray-600 text-sm md:text-lg">
-                Visualizza tutti gli orari delle tue lezioni
-              </p>
-            </div>
-          </div>
 
-          <!-- Mobile table container with horizontal scroll -->
-          <div id="user-schedules-table" class="mobile-table-container">
-            <!-- Table will be inserted here -->
+            <!-- Mobile table container with horizontal scroll -->
+            <div id="user-schedules-table" class="mobile-table-container">
+              <!-- Table will be inserted here -->
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </main>
+    </main>
 
-  <!-- Edit Profile Modal -->
-  <div id="edit-profile-modal"
-    class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <!-- Edit Profile Modal -->
     <div
-      class="bg-white/95 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-3xl max-w-md w-full overflow-hidden border border-gray-100 animate-slide-up">
+      id="edit-profile-modal"
+      class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+    >
       <div
-        class="flex items-center justify-between p-6 md:p-8 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-blue-50">
-        <h3 class="text-xl md:text-2xl font-bold text-gray-900 flex items-center">
-          <span class="text-2xl md:text-3xl mr-3">⚙️</span>
-          Modifica Profilo
-        </h3>
-        <button id="close-modal"
-          class="text-gray-400 hover:text-gray-600 text-2xl md:text-3xl font-bold transition-colors">
-          ×
-        </button>
-      </div>
-
-      <div class="p-6 md:p-8">
-        <form id="edit-profile-form" class="space-y-4 md:space-y-6">
-          <div>
-            <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-2 md:mb-3">
-              Username
-            </label>
-            <input type="text" id="new_username" disabled
-              class="w-full px-4 md:px-6 py-3 md:py-4 border-2 border-gray-200 rounded-xl md:rounded-2xl bg-gray-50 text-gray-500 text-sm md:text-base" />
-          </div>
-
-          <div>
-            <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-2 md:mb-3">
-              Nuova Password
-            </label>
-            <input type="password" id="new_password" placeholder="Inserisci la nuova password" required
-              class="w-full px-4 md:px-6 py-3 md:py-4 border-2 border-gray-300 rounded-xl md:rounded-2xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-sm md:text-base" />
-            <div id="edit-password-hint" class="text-xs md:text-sm mt-2 text-red-500"></div>
-          </div>
-
-          <button type="submit"
-            class="w-full bg-gradient-to-r from-purple-500 to-blue-600 text-white py-3 md:py-4 px-6 rounded-xl md:rounded-2xl font-semibold hover:from-purple-600 hover:to-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg text-sm md:text-base">
-            Salva Modifiche
+        class="bg-white/95 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-3xl max-w-md w-full overflow-hidden border border-gray-100 animate-slide-up"
+      >
+        <div
+          class="flex items-center justify-between p-6 md:p-8 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-blue-50"
+        >
+          <h3
+            class="text-xl md:text-2xl font-bold text-gray-900 flex items-center"
+          >
+            <span class="text-2xl md:text-3xl mr-3">⚙️</span>
+            Modifica Profilo
+          </h3>
+          <button
+            id="close-modal"
+            class="text-gray-400 hover:text-gray-600 text-2xl md:text-3xl font-bold transition-colors"
+          >
+            ×
           </button>
+        </div>
 
-          <div id="edit-profile-msg" class="text-center text-xs md:text-sm font-medium"></div>
-        </form>
+        <div class="p-6 md:p-8">
+          <form id="edit-profile-form" class="space-y-4 md:space-y-6">
+            <div>
+              <label
+                class="block text-xs md:text-sm font-semibold text-gray-700 mb-2 md:mb-3"
+              >
+                Username
+              </label>
+              <input
+                type="text"
+                id="new_username"
+                disabled
+                class="w-full px-4 md:px-6 py-3 md:py-4 border-2 border-gray-200 rounded-xl md:rounded-2xl bg-gray-50 text-gray-500 text-sm md:text-base"
+              />
+            </div>
+
+            <div>
+              <label
+                class="block text-xs md:text-sm font-semibold text-gray-700 mb-2 md:mb-3"
+              >
+                Nuova Password
+              </label>
+              <input
+                type="password"
+                id="new_password"
+                placeholder="Inserisci la nuova password"
+                required
+                class="w-full px-4 md:px-6 py-3 md:py-4 border-2 border-gray-300 rounded-xl md:rounded-2xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-sm md:text-base"
+              />
+              <div
+                id="edit-password-hint"
+                class="text-xs md:text-sm mt-2 text-red-500"
+              ></div>
+            </div>
+
+            <button
+              type="submit"
+              class="w-full bg-gradient-to-r from-purple-500 to-blue-600 text-white py-3 md:py-4 px-6 rounded-xl md:rounded-2xl font-semibold hover:from-purple-600 hover:to-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg text-sm md:text-base"
+            >
+              Salva Modifiche
+            </button>
+
+            <div
+              id="edit-profile-msg"
+              class="text-center text-xs md:text-sm font-medium"
+            ></div>
+          </form>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-  <script src="js/user_dashboard.js"></script>
-</body>
-
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script src="js/user_dashboard.js"></script>
+  </body>
 </html>
