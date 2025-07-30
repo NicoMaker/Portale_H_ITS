@@ -18,7 +18,7 @@ function updateNewCourseSelect() {
   const role = document.getElementById("new-role").value;
   if (role === "user") {
     select.style.display = "";
-    label.style.display = ""; 
+    label.style.display = "";
     select.innerHTML =
       '<option value="">Nessun corso</option>' +
       courses.map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
@@ -28,7 +28,6 @@ function updateNewCourseSelect() {
     select.innerHTML = "";
   }
 }
-
 
 document
   .getElementById("new-role")

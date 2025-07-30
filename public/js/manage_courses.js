@@ -230,7 +230,7 @@ function renderCoursesList() {
                 <span class="mr-2">📝</span>
                 Descrizione
               </h4>
-              <p class="text-gray-600 leading-relaxed break-words whitespace-normal ${!course.description ? 'italic text-gray-400' : ''}">
+              <p class="text-gray-600 leading-relaxed break-words whitespace-normal ${!course.description ? "italic text-gray-400" : ""}">
                 ${course.description || "Nessuna descrizione disponibile per questo corso"}
               </p>
             </div>

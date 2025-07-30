@@ -14,10 +14,13 @@ const db = new sqlite3.Database(path.join(dbDir, "database.db"));
 // Inizializzazione DB e admin
 function initDb() {
   db.serialize(() => {
-    // ABILITA LE CHIAVI ESTERE QUI ALL'INIZIO DELLA SESSIONE DB
+    // ABILITA LE CHIAVI ESTERNE QUI ALL'INIZIO DELLA SESSIONE DB
     db.run("PRAGMA foreign_keys = ON;", (err) => {
       if (err) {
-        console.error("Errore nell'abilitazione delle chiavi esterne:", err.message);
+        console.error(
+          "Errore nell'abilitazione delle chiavi esterne:",
+          err.message,
+        );
       } else {
         console.log("Chiavi esterne abilitate con successo.");
       }
@@ -53,10 +56,52 @@ function initDb() {
       date TEXT NOT NULL,
       FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
     )`);
-    db.run(
-      "INSERT OR IGNORE INTO users (username, password, role) VALUES (?, ?, ?)",
-      ["admin", "admin123", "admin"],
+
+    // --- LOGICA MODIFICATA PER LA CREAZIONE DELL'ADMIN ---
+    // Controlla se esiste almeno un utente con il ruolo 'admin'
+    db.get(
+      'SELECT COUNT(*) AS count FROM users WHERE role = "admin"',
+      [],
+      (err, row) => {
+        if (err) {
+          console.error(
+            "Errore nel controllo degli admin esistenti:",
+            err.message,
+          );
+          return;
+        }
+        if (row.count === 0) {
+          // Se non esiste nessun admin, crea l'utente 'admin' predefinito
+          db.run(
+            "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
+            ["admin", "admin123", "admin"],
+            function (err) {
+              if (err) {
+                // Potrebbe esserci un errore se 'admin' username esiste già,
+                // anche se abbiamo già controllato la presenza di un admin per ruolo.
+                // Questo può succedere solo se un utente 'user' si chiama 'admin'.
+                console.error(
+                  "Errore durante la creazione dell'admin iniziale:",
+                  err.message,
+                );
+              } else {
+                console.log("Utente 'admin' predefinito creato con successo.");
+              }
+            },
+          );
+        } else {
+          // Gestione del messaggio per singolare/plurale
+          const adminText =
+            row.count === 1
+              ? "un utente 'admin'"
+              : `${row.count} utenti 'admin'`;
+          console.log(
+            `Esiste già ${adminText}. Nessun nuovo admin predefinito creato.`,
+          );
+        }
+      },
     );
+    // ---------------------------------------------------
   });
 }
 
@@ -235,7 +280,8 @@ const server = http.createServer((req, res) => {
         }
         // Per ogni utente, prendi i corsi
         let done = 0;
-        if (users.length === 0) { // Handle case with no users
+        if (users.length === 0) {
+          // Handle case with no users
           res.end(JSON.stringify([]));
           return;
         }
