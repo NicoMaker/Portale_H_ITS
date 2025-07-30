@@ -74,7 +74,7 @@ function initDb() {
           // Se non esiste nessun admin, crea l'utente 'admin' predefinito
           db.run(
             "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
-            ["admin", "admin123", "admin"],
+            ["admin", "Admin123", "admin"],
             function (err) {
               if (err) {
                 // Potrebbe esserci un errore se 'admin' username esiste già,
