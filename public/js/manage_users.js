@@ -14,17 +14,21 @@ const fetchCourses = () =>
 
 function updateNewCourseSelect() {
   const select = document.getElementById("new-course");
+  const label = document.getElementById("new-course-label");
   const role = document.getElementById("new-role").value;
   if (role === "user") {
     select.style.display = "";
+    label.style.display = ""; 
     select.innerHTML =
       '<option value="">Nessun corso</option>' +
       courses.map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
   } else {
     select.style.display = "none";
+    label.style.display = "none"; // o 'none' se vuoi nascondere anche la label
     select.innerHTML = "";
   }
 }
+
 
 document
   .getElementById("new-role")
