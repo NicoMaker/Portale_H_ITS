@@ -14,6 +14,15 @@ const db = new sqlite3.Database(path.join(dbDir, "database.db"));
 // Inizializzazione DB e admin
 function initDb() {
   db.serialize(() => {
+    // ABILITA LE CHIAVI ESTERE QUI ALL'INIZIO DELLA SESSIONE DB
+    db.run("PRAGMA foreign_keys = ON;", (err) => {
+      if (err) {
+        console.error("Errore nell'abilitazione delle chiavi esterne:", err.message);
+      } else {
+        console.log("Chiavi esterne abilitate con successo.");
+      }
+    });
+
     db.run(`CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       username TEXT UNIQUE NOT NULL,
@@ -44,7 +53,6 @@ function initDb() {
       date TEXT NOT NULL,
       FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
     )`);
-    // Removed bcrypt hashing for admin password
     db.run(
       "INSERT OR IGNORE INTO users (username, password, role) VALUES (?, ?, ?)",
       ["admin", "admin123", "admin"],
@@ -54,6 +62,7 @@ function initDb() {
 
 initDb();
 
+// ... il resto del tuo codice rimane invariato ...
 // Session management (cookie-based, in-memory)
 const sessions = {};
 function createSession(user) {
@@ -144,7 +153,6 @@ const server = http.createServer((req, res) => {
         "SELECT * FROM users WHERE username = ?",
         [username],
         (err, user) => {
-          // Removed bcrypt.compareSync
           if (!user || password !== user.password) {
             res.writeHead(200, { "Content-Type": "text/html" });
             return res.end(
@@ -173,7 +181,6 @@ const server = http.createServer((req, res) => {
   // Auth: register
   if (req.method === "POST" && parsedUrl.pathname === "/register") {
     parseBody(({ username, password, role }) => {
-      // Removed password strength validation
       let userRole = "user";
       const session = getSession(req);
       if (
@@ -184,7 +191,6 @@ const server = http.createServer((req, res) => {
       ) {
         userRole = "admin";
       }
-      // Removed bcrypt hashing
       db.run(
         "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
         [username, password, userRole],
@@ -229,6 +235,10 @@ const server = http.createServer((req, res) => {
         }
         // Per ogni utente, prendi i corsi
         let done = 0;
+        if (users.length === 0) { // Handle case with no users
+          res.end(JSON.stringify([]));
+          return;
+        }
         users.forEach((u) => {
           db.all(
             "SELECT c.* FROM courses c JOIN user_courses uc ON c.id=uc.course_id WHERE uc.user_id=?",
@@ -239,14 +249,12 @@ const server = http.createServer((req, res) => {
             },
           );
         });
-        if (users.length === 0) res.end(JSON.stringify([]));
       });
       return;
     }
     // POST /api/users (creazione utente da admin)
     if (req.method === "POST" && parsedUrl.pathname === "/api/users") {
       parseBody(({ username, password, role, course_id }) => {
-        // Removed password validation
         let userRole = "user";
         if (
           role === "admin" &&
@@ -256,7 +264,6 @@ const server = http.createServer((req, res) => {
         ) {
           userRole = "admin";
         }
-        // Removed bcrypt hashing
         db.run(
           "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
           [username, password, userRole],
@@ -385,7 +392,6 @@ const server = http.createServer((req, res) => {
     ) {
       const id = parsedUrl.pathname.split("/")[3];
       parseBody(({ username, password }) => {
-        // Removed password validation
         db.get(
           "SELECT * FROM users WHERE username=? AND id!=?",
           [username, id],
@@ -394,7 +400,6 @@ const server = http.createServer((req, res) => {
               res.end("Username già esistente");
               return;
             }
-            // Removed bcrypt hashing
             db.run(
               "UPDATE users SET username=?, password=? WHERE id=?",
               [username, password, id],
@@ -731,7 +736,6 @@ const server = http.createServer((req, res) => {
       return;
     }
     parseBody(({ username, password }) => {
-      // Removed password validation
       db.get(
         "SELECT * FROM users WHERE username=? AND id!=?",
         [username, session.user.id],
@@ -740,7 +744,6 @@ const server = http.createServer((req, res) => {
             res.end("Username già esistente");
             return;
           }
-          // Removed bcrypt hashing
           db.run(
             "UPDATE users SET username=?, password=? WHERE id=?",
             [username, password, session.user.id],
@@ -816,7 +819,6 @@ const server = http.createServer((req, res) => {
   if (req.method === "PUT" && parsedUrl.pathname.match(/^\/api\/users\/\d+$/)) {
     const id = parsedUrl.pathname.split("/")[3];
     parseBody(({ username, password }) => {
-      // Removed password validation
       db.get(
         "SELECT * FROM users WHERE username=? AND id!=?",
         [username, id],
@@ -825,7 +827,6 @@ const server = http.createServer((req, res) => {
             res.end("Username già esistente");
             return;
           }
-          // Removed bcrypt hashing
           db.run(
             "UPDATE users SET username=?, password=? WHERE id=?",
             [username, password, id],
