@@ -3,7 +3,6 @@ const fs = require("fs");
 const path = require("path");
 const url = require("url");
 const sqlite3 = require("sqlite3").verbose();
-const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 
 const dbDir = path.join(__dirname, "db");
@@ -45,10 +44,10 @@ function initDb() {
       date TEXT NOT NULL,
       FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
     )`);
-    const hash = bcrypt.hashSync("admin123", 10);
+    // Removed bcrypt hashing for admin password
     db.run(
       "INSERT OR IGNORE INTO users (username, password, role) VALUES (?, ?, ?)",
-      ["admin", hash, "admin"],
+      ["admin", "admin123", "admin"],
     );
   });
 }
@@ -145,7 +144,8 @@ const server = http.createServer((req, res) => {
         "SELECT * FROM users WHERE username = ?",
         [username],
         (err, user) => {
-          if (!user || !bcrypt.compareSync(password, user.password)) {
+          // Removed bcrypt.compareSync
+          if (!user || password !== user.password) {
             res.writeHead(200, { "Content-Type": "text/html" });
             return res.end(
               '<div class="hint" style="color:red;text-align:center">Credenziali non valide</div>',
@@ -173,19 +173,7 @@ const server = http.createServer((req, res) => {
   // Auth: register
   if (req.method === "POST" && parsedUrl.pathname === "/register") {
     parseBody(({ username, password, role }) => {
-      // Password sicura
-      if (
-        !password ||
-        password.length < 8 ||
-        !/[A-Z]/.test(password) ||
-        !/[a-z]/.test(password) ||
-        !/[0-9]/.test(password)
-      ) {
-        res.writeHead(400, { "Content-Type": "text/html" });
-        return res.end(
-          "<script>alert(\"Password non sicura. Min 8 caratteri, almeno una maiuscola, una minuscola, un numero.\");window.location='/register.html';</script>",
-        );
-      }
+      // Removed password strength validation
       let userRole = "user";
       const session = getSession(req);
       if (
@@ -196,10 +184,10 @@ const server = http.createServer((req, res) => {
       ) {
         userRole = "admin";
       }
-      const hash = bcrypt.hashSync(password, 10);
+      // Removed bcrypt hashing
       db.run(
         "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
-        [username, hash, userRole],
+        [username, password, userRole],
         function (err) {
           if (err) {
             res.writeHead(400, { "Content-Type": "text/html" });
@@ -258,17 +246,7 @@ const server = http.createServer((req, res) => {
     // POST /api/users (creazione utente da admin)
     if (req.method === "POST" && parsedUrl.pathname === "/api/users") {
       parseBody(({ username, password, role, course_id }) => {
-        // Validazione password
-        if (
-          !password ||
-          password.length < 8 ||
-          !/[A-Z]/.test(password) ||
-          !/[a-z]/.test(password) ||
-          !/[0-9]/.test(password)
-        ) {
-          res.end("Password non sicura");
-          return;
-        }
+        // Removed password validation
         let userRole = "user";
         if (
           role === "admin" &&
@@ -278,10 +256,10 @@ const server = http.createServer((req, res) => {
         ) {
           userRole = "admin";
         }
-        const hash = bcrypt.hashSync(password, 10);
+        // Removed bcrypt hashing
         db.run(
           "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
-          [username, hash, userRole],
+          [username, password, userRole],
           function (err) {
             if (err) {
               res.end("Username già esistente");
@@ -407,16 +385,7 @@ const server = http.createServer((req, res) => {
     ) {
       const id = parsedUrl.pathname.split("/")[3];
       parseBody(({ username, password }) => {
-        if (
-          !password ||
-          password.length < 8 ||
-          !/[A-Z]/.test(password) ||
-          !/[a-z]/.test(password) ||
-          !/[0-9]/.test(password)
-        ) {
-          res.end("Password non sicura");
-          return;
-        }
+        // Removed password validation
         db.get(
           "SELECT * FROM users WHERE username=? AND id!=?",
           [username, id],
@@ -425,10 +394,10 @@ const server = http.createServer((req, res) => {
               res.end("Username già esistente");
               return;
             }
-            const hash = bcrypt.hashSync(password, 10);
+            // Removed bcrypt hashing
             db.run(
               "UPDATE users SET username=?, password=? WHERE id=?",
-              [username, hash, id],
+              [username, password, id],
               function (err) {
                 if (err) {
                   res.end("Errore DB");
@@ -762,16 +731,7 @@ const server = http.createServer((req, res) => {
       return;
     }
     parseBody(({ username, password }) => {
-      if (
-        !password ||
-        password.length < 8 ||
-        !/[A-Z]/.test(password) ||
-        !/[a-z]/.test(password) ||
-        !/[0-9]/.test(password)
-      ) {
-        res.end("Password non sicura");
-        return;
-      }
+      // Removed password validation
       db.get(
         "SELECT * FROM users WHERE username=? AND id!=?",
         [username, session.user.id],
@@ -780,10 +740,10 @@ const server = http.createServer((req, res) => {
             res.end("Username già esistente");
             return;
           }
-          const hash = bcrypt.hashSync(password, 10);
+          // Removed bcrypt hashing
           db.run(
             "UPDATE users SET username=?, password=? WHERE id=?",
-            [username, hash, session.user.id],
+            [username, password, session.user.id],
             function (err) {
               if (err) {
                 res.end("Errore DB");
@@ -852,22 +812,11 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // Aggiungi questa route nel server.js, nella sezione API utenti, dopo la route POST /api/users/:id/edit
-
   // PUT /api/users/:id (modifica credenziali da admin - metodo PUT)
   if (req.method === "PUT" && parsedUrl.pathname.match(/^\/api\/users\/\d+$/)) {
     const id = parsedUrl.pathname.split("/")[3];
     parseBody(({ username, password }) => {
-      if (
-        !password ||
-        password.length < 8 ||
-        !/[A-Z]/.test(password) ||
-        !/[a-z]/.test(password) ||
-        !/[0-9]/.test(password)
-      ) {
-        res.end("Password non sicura");
-        return;
-      }
+      // Removed password validation
       db.get(
         "SELECT * FROM users WHERE username=? AND id!=?",
         [username, id],
@@ -876,10 +825,10 @@ const server = http.createServer((req, res) => {
             res.end("Username già esistente");
             return;
           }
-          const hash = bcrypt.hashSync(password, 10);
+          // Removed bcrypt hashing
           db.run(
             "UPDATE users SET username=?, password=? WHERE id=?",
-            [username, hash, id],
+            [username, password, id],
             function (err) {
               if (err) {
                 res.end("Errore DB");
