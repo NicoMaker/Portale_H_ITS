@@ -890,6 +890,48 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // PUT /api/courses/:id
+  if (
+    req.method === "PUT" &&
+    parsedUrl.pathname.match(/^\/api\/courses\/\d+$/)
+  ) {
+    const id = parsedUrl.pathname.split("/")[3];
+    parseBody(({ name, description }) => {
+      // Check if a course with the new name already exists, excluding the current course being updated
+      db.get(
+        "SELECT * FROM courses WHERE name = ? AND id != ?",
+        [name, id],
+        (err, existingCourse) => {
+          if (err) {
+            res.writeHead(500);
+            res.end("DB error");
+            return;
+          }
+          if (existingCourse) {
+            res.writeHead(400);
+            res.end("Nome corso già esistente"); // Course name already exists
+            return;
+          }
+
+          // If no existing course with the same name (excluding itself), proceed with the update
+          db.run(
+            "UPDATE courses SET name=?, description=? WHERE id=?",
+            [name, description, id],
+            function (err) {
+              if (err) {
+                res.writeHead(400);
+                res.end("Errore update corso"); // Error updating course
+                return;
+              }
+              res.end("OK");
+            },
+          );
+        },
+      );
+    });
+    return;
+  }
+
   // Default: 404
   res.writeHead(404, { "Content-Type": "text/plain" });
   res.end("Not found");
