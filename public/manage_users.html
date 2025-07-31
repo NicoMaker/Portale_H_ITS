@@ -67,7 +67,6 @@
   <body
     class="bg-gradient-to-br from-green-50 via-blue-50 to-purple-100 min-h-screen"
   >
-    <!-- Navigation Bar -->
     <nav
       class="bg-white shadow-lg border-b border-gray-200 backdrop-blur-sm bg-white/95 sticky top-0 z-50"
     >
@@ -104,7 +103,6 @@
     </nav>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <!-- Header Section -->
       <div class="mb-8">
         <div class="flex items-center justify-between">
           <div>
@@ -129,7 +127,6 @@
         </div>
       </div>
 
-      <!-- Filters Section -->
       <div
         class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 mb-8 border border-gray-100"
       >
@@ -152,7 +149,6 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <!-- Search by Username -->
           <div class="space-y-3">
             <label
               for="search-user"
@@ -169,7 +165,6 @@
             />
           </div>
 
-          <!-- Role Filter -->
           <div class="space-y-3">
             <label
               for="filter-role"
@@ -188,7 +183,6 @@
             </select>
           </div>
 
-          <!-- Course Filter -->
           <div class="space-y-3 filter-group">
             <label
               for="filter-course"
@@ -205,7 +199,6 @@
             </select>
           </div>
 
-          <!-- Date Filter -->
           <div class="space-y-3" style="display: none">
             <label
               for="filter-user-date"
@@ -223,7 +216,6 @@
         </div>
       </div>
 
-      <!-- Users List -->
       <div class="mb-8">
         <div class="flex items-center space-x-4 mb-8">
           <div
@@ -246,9 +238,7 @@
         <div
           id="users-list"
           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-        >
-          <!-- User cards will be inserted here -->
-        </div>
+        ></div>
         <div
           id="assign-msg"
           class="mt-4 p-4 rounded-2xl text-sm font-medium hidden"
@@ -256,7 +246,6 @@
       </div>
     </div>
 
-    <!-- Add User Modal -->
     <div
       id="add-user-modal"
       class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
@@ -374,7 +363,6 @@
       </div>
     </div>
 
-    <!-- Edit User Modal -->
     <div
       id="edit-user-modal"
       class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
@@ -458,7 +446,6 @@
       </div>
     </div>
 
-    <!-- User Schedules Modal -->
     <div
       id="user-schedules-modal"
       class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
@@ -483,6 +470,65 @@
 
         <div class="p-8 max-h-96 overflow-y-auto custom-scrollbar">
           <div id="user-schedules-content"></div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="delete-user-confirm-modal"
+      class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      style="display: none"
+    >
+      <div
+        class="bg-white/95 backdrop-blur-sm rounded-3xl shadow-3xl max-w-sm w-full overflow-hidden border border-gray-100 text-center"
+      >
+        <div
+          class="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-red-50 to-orange-50"
+        >
+          <h3
+            class="text-2xl font-bold text-gray-900 flex items-center mx-auto"
+          >
+            <span class="text-4xl mr-2">🗑️</span> Conferma Eliminazione Utente
+          </h3>
+          <button
+            id="close-delete-user-confirm-modal"
+            class="text-gray-400 hover:text-gray-600 text-3xl font-bold transition-colors absolute top-4 right-4"
+          >
+            ×
+          </button>
+        </div>
+
+        <div class="p-8">
+          <p class="text-gray-700 text-lg mb-6">
+            Sei sicuro di voler eliminare l'utente "<strong
+              id="delete-user-name-display"
+            ></strong
+            >"? Questa azione non può essere annullata.
+            <span
+              id="delete-admin-warning"
+              class="block mt-2 text-red-600 font-semibold"
+              style="display: none"
+            >
+              Attenzione: stai eliminando un amministratore! Assicurati che ce
+              ne sia almeno un altro.
+            </span>
+          </p>
+          <div class="flex justify-center space-x-4">
+            <button
+              type="button"
+              id="cancel-delete-user-modal"
+              class="px-8 py-3 bg-gray-500 text-white rounded-2xl hover:bg-gray-600 transition-all duration-200 font-semibold shadow-lg"
+            >
+              Annulla
+            </button>
+            <button
+              type="button"
+              id="confirm-delete-user"
+              class="px-8 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-2xl hover:from-red-700 hover:to-red-800 transition-all duration-200 font-semibold shadow-lg transform hover:-translate-y-0.5"
+            >
+              Sì, Elimina
+            </button>
+          </div>
         </div>
       </div>
     </div>

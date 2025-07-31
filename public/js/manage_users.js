@@ -2,6 +2,7 @@ let courses = [];
 let users = [];
 let editingUserId = null;
 let searchUserInput, filterCourseSelect;
+let userToDeleteId = null; // NEW: Variabile per tenere traccia dell'ID dell'utente da eliminare
 
 const fetchCourses = () =>
   fetch("/api/courses")
@@ -114,7 +115,6 @@ function renderUsersList() {
 
       html += `
             <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-2 transition-all duration-300 overflow-hidden border border-gray-100 pulse-on-hover user-card-hover">
-              <!-- User Header with Gradient -->
               <div class="bg-gradient-to-r ${gradient} p-6 relative overflow-hidden">
                 <div class="shimmer absolute inset-0"></div>
                 <div class="relative z-10">
@@ -148,7 +148,6 @@ function renderUsersList() {
                 </div>
               </div>
               
-              <!-- User Content -->
               <div class="p-8">
                 <div class="mb-6">
                   <h4 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3 flex items-center">
@@ -178,7 +177,6 @@ function renderUsersList() {
                   }
                 </div>
                 
-                <!-- Action Buttons -->
                 <div class="flex flex-wrap gap-3">
                   <button onclick="openEditUser(${u.id})" 
                     class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-4 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
@@ -238,9 +236,59 @@ function demote(id) {
   fetch(`/api/users/${id}/demote`, { method: "POST" }).then(fetchUsers);
 }
 
+// NEW: Functions for Delete User Confirmation Modal
+function openDeleteUserConfirmModal(id) {
+  userToDeleteId = id;
+  const user = users.find((u) => u.id == id);
+  if (user) {
+    document.getElementById("delete-user-name-display").textContent =
+      user.username;
+    const adminCount = users.filter((u) => u.role === "admin").length;
+    if (user.role === "admin" && adminCount <= 1) {
+      document.getElementById("delete-admin-warning").style.display = "block";
+      document.getElementById("confirm-delete-user").disabled = true; // NEW: Disable confirm button if last admin
+      document
+        .getElementById("confirm-delete-user")
+        .classList.add("opacity-50", "cursor-not-allowed"); // NEW: Add styling for disabled button
+    } else {
+      document.getElementById("delete-admin-warning").style.display = "none";
+      document.getElementById("confirm-delete-user").disabled = false; // NEW: Enable confirm button
+      document
+        .getElementById("confirm-delete-user")
+        .classList.remove("opacity-50", "cursor-not-allowed"); // NEW: Remove styling for disabled button
+    }
+  }
+  document.getElementById("delete-user-confirm-modal").style.display = "flex";
+}
+
+document.getElementById("close-delete-user-confirm-modal").onclick = () => {
+  document.getElementById("delete-user-confirm-modal").style.display = "none";
+};
+
+document.getElementById("cancel-delete-user-modal").onclick = () => {
+  document.getElementById("delete-user-confirm-modal").style.display = "none";
+};
+
+document.getElementById("confirm-delete-user").onclick = () => {
+  if (userToDeleteId) {
+    fetch(`/api/users/${userToDeleteId}`, { method: "DELETE" })
+      .then(() => {
+        fetchUsers();
+        document.getElementById("delete-user-confirm-modal").style.display =
+          "none";
+      })
+      .catch((err) => {
+        console.error("Errore durante l'eliminazione:", err);
+        // Potresti aggiungere qui un messaggio di errore all'utente
+        document.getElementById("delete-user-confirm-modal").style.display =
+          "none";
+      });
+  }
+};
+
+// Modified deleteUser to open the custom modal
 function deleteUser(id) {
-  if (confirm("Sei sicuro di voler eliminare questo utente?"))
-    fetch(`/api/users/${id}`, { method: "DELETE" }).then(fetchUsers);
+  openDeleteUserConfirmModal(id);
 }
 
 function assignCourse(id, courseId) {
@@ -319,6 +367,9 @@ window.onclick = (e) => {
     document.getElementById("user-schedules-modal").style.display = "none";
   if (e.target === document.getElementById("add-user-modal"))
     document.getElementById("add-user-modal").style.display = "none";
+  if (e.target === document.getElementById("delete-user-confirm-modal"))
+    // NEW: Close delete user modal on outside click
+    document.getElementById("delete-user-confirm-modal").style.display = "none";
 };
 
 // Validazione password live

@@ -1,4 +1,5 @@
 let allCourses = [];
+let courseToDeleteId = null; // Variabile per tenere traccia dell'ID del corso da eliminare
 
 function fetchCourses() {
   fetch("/api/courses")
@@ -19,7 +20,7 @@ function fetchCourses() {
               <div class="text-8xl mb-6">⚠️</div>
               <h3 class="text-2xl font-bold mb-3">Errore nel caricamento</h3>
               <p class="text-lg mb-6">Errore nel caricamento corsi: ${err.message}</p>
-              <button onclick="fetchCourses()" 
+              <button onclick="fetchCourses()"
                 class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold px-8 py-4 rounded-2xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300">
                 🔄 Riprova
               </button>
@@ -41,7 +42,7 @@ function showMessage(elementId, message, type) {
   }
 }
 
-// Modal functions
+// Modal functions for Add Course
 document.getElementById("add-course-btn").onclick = () => {
   document.getElementById("add-course-modal").style.display = "flex";
   document.getElementById("course-msg").classList.add("hidden");
@@ -113,6 +114,9 @@ window.onclick = (e) => {
     document.getElementById("edit-course-modal").style.display = "none";
   if (e.target === document.getElementById("add-course-modal"))
     document.getElementById("add-course-modal").style.display = "none";
+  if (e.target === document.getElementById("delete-confirm-modal"))
+    // NEW: Close delete modal on outside click
+    document.getElementById("delete-confirm-modal").style.display = "none";
 };
 
 document.getElementById("edit-course-form").onsubmit = function (e) {
@@ -140,16 +144,43 @@ document.getElementById("edit-course-form").onsubmit = function (e) {
     });
 };
 
-function deleteCourse(id) {
-  if (
-    confirm(
-      "Sei sicuro di voler eliminare questo corso? Questa azione non può essere annullata.",
-    )
-  ) {
-    fetch(`/api/courses/${id}`, { method: "DELETE" }).then(() =>
-      fetchCourses(),
-    );
+// NEW: Functions for Delete Confirmation Modal
+function openDeleteConfirmModal(id) {
+  courseToDeleteId = id;
+  const course = allCourses.find((c) => c.id == id);
+  if (course) {
+    document.getElementById("delete-course-name-display").textContent =
+      course.name;
   }
+  document.getElementById("delete-confirm-modal").style.display = "flex";
+}
+
+document.getElementById("close-delete-confirm-modal").onclick = () => {
+  document.getElementById("delete-confirm-modal").style.display = "none";
+};
+
+document.getElementById("cancel-delete-course").onclick = () => {
+  document.getElementById("delete-confirm-modal").style.display = "none";
+};
+
+document.getElementById("confirm-delete-course").onclick = () => {
+  if (courseToDeleteId) {
+    fetch(`/api/courses/${courseToDeleteId}`, { method: "DELETE" })
+      .then(() => {
+        fetchCourses();
+        document.getElementById("delete-confirm-modal").style.display = "none";
+      })
+      .catch((err) => {
+        console.error("Errore durante l'eliminazione:", err);
+        // Potresti aggiungere qui un messaggio di errore all'utente
+        document.getElementById("delete-confirm-modal").style.display = "none";
+      });
+  }
+};
+
+// Modified deleteCourse to open the custom modal
+function deleteCourse(id) {
+  openDeleteConfirmModal(id);
 }
 
 // Initialize
@@ -200,7 +231,6 @@ function renderCoursesList() {
 
       html += `
         <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-2 transition-all duration-300 overflow-hidden border border-gray-100 pulse-on-hover course-card-hover">
-          <!-- Course Header with Gradient -->
           <div class="bg-gradient-to-r ${gradient} p-6 relative overflow-hidden">
             <div class="shimmer absolute inset-0"></div>
             <div class="relative z-10">
@@ -209,11 +239,11 @@ function renderCoursesList() {
                   <span class="text-3xl">📚</span>
                 </div>
                 <div class="flex space-x-2">
-                  <button class="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-3 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105" 
+                  <button class="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-3 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
                           title="Modifica corso" onclick="openEditCourse(${course.id})">
                     <span class="text-lg">✏️</span>
                   </button>
-                  <button class="bg-white/20 hover:bg-red-500/30 backdrop-blur-sm text-white p-3 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105" 
+                  <button class="bg-white/20 hover:bg-red-500/30 backdrop-blur-sm text-white p-3 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
                           title="Elimina corso" onclick="deleteCourse(${course.id})">
                     <span class="text-lg">🗑️</span>
                   </button>
@@ -222,8 +252,7 @@ function renderCoursesList() {
               <h3 class="text-2xl font-bold text-white mb-2 truncate">${course.name}</h3>
             </div>
           </div>
-          
-          <!-- Course Content -->
+
           <div class="p-8">
             <div class="mb-6">
               <h4 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3 flex items-center">
@@ -235,14 +264,13 @@ function renderCoursesList() {
               </p>
             </div>
 
-            <!-- Action Buttons -->
             <div class="flex space-x-3">
-              <button onclick="openEditCourse(${course.id})" 
+              <button onclick="openEditCourse(${course.id})"
                 class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-4 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
                 <span>✏️</span>
                 <span>Modifica</span>
               </button>
-              <button onclick="deleteCourse(${course.id})" 
+              <button onclick="deleteCourse(${course.id})"
                 class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold py-3 px-4 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center">
                 <span>🗑️</span>
               </button>
