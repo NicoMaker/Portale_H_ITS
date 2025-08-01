@@ -275,22 +275,31 @@ document.getElementById("cancel-delete-user-modal").onclick = () => {
 
 document.getElementById("confirm-delete-user").onclick = () => {
   if (userToDeleteId) {
+    const userBeingDeleted = users.find(u => u.id === userToDeleteId);
     fetch(`/api/users/${userToDeleteId}`, { method: "DELETE" })
       .then(() => {
-        // Se l'utente eliminato è quello attualmente loggato, imposta un flag e reindirizza
         if (userToDeleteId === currentlyLoggedInUserId) {
-          localStorage.setItem('logoutReason', 'account_deleted');
-          window.location.href = '/login.html'; // Reindirizza alla pagina di login
+          showCustomAlert(
+            "Account Eliminato",
+            "Il tuo account è stato eliminato. Verrai reindirizzato alla pagina di login.",
+            "👋",
+            () => {
+              localStorage.setItem('logoutReason', 'account_deleted');
+              window.location.href = '/login.html';
+            }
+          );
         } else {
             fetchUsers();
             document.getElementById("delete-user-confirm-modal").style.display =
             "none";
+            showMessage("assign-msg", `Utente "${userBeingDeleted ? userBeingDeleted.username : ''}" eliminato con successo!`, "success");
         }
       })
       .catch((err) => {
         console.error("Errore durante l'eliminazione:", err);
         document.getElementById("delete-user-confirm-modal").style.display =
           "none";
+        showMessage("assign-msg", "Errore durante l'eliminazione dell'utente.", "error");
       });
   }
 };
@@ -323,7 +332,8 @@ function openEditUser(id) {
   const user = users.find((u) => u.id === id);
   document.getElementById("edit_username").value = user.username;
   document.getElementById("edit_password").value = ""; // Clear password field on open
-  document.getElementById("edit-user-password-hint").textContent = ""; // Clear hint
+  document.getElementById("edit-user-password-hint").textContent = "Lascia vuoto per non cambiare la password."; // Initial hint
+  document.getElementById("edit-user-password-hint").style.color = "#6b7280";
   document.getElementById("edit-user-msg").classList.add("hidden");
   document.getElementById("edit-user-modal").style.display = "flex";
 }
@@ -345,6 +355,11 @@ function showMessage(elementId, message, type) {
 document.getElementById("add-user-btn").onclick = () => {
   document.getElementById("add-user-modal").style.display = "flex";
   document.getElementById("add-user-msg").classList.add("hidden");
+  document.getElementById("new-username").value = "";
+  document.getElementById("new-password").value = "";
+  document.getElementById("new-role").value = "user";
+  document.getElementById("add-password-hint").textContent = ""; // Clear hint on new user modal open
+  document.getElementById("add-password-hint").style.color = "#6b7280";
   updateNewCourseSelect();
 };
 
@@ -377,6 +392,8 @@ window.onclick = (e) => {
     document.getElementById("add-user-modal").style.display = "none";
   if (e.target === document.getElementById("delete-user-confirm-modal"))
     document.getElementById("delete-user-confirm-modal").style.display = "none";
+  if (e.target === document.getElementById("custom-alert-modal"))
+    document.getElementById("custom-alert-modal").style.display = "none";
 };
 
 // Validazione password live (per aggiunta nuovo utente)
@@ -412,6 +429,7 @@ editPassword.addEventListener("input", () => {
   // Colore del testo basato sulla presenza di messaggi (errori)
   if (val.length === 0) {
     editHint.style.color = "#6b7280"; // Grigio, nessuna validazione richiesta
+    editHint.textContent = "Lascia vuoto per non cambiare la password.";
   } else {
     editHint.style.color = msg ? "#ef4444" : "#22c55e"; // Rosso per errori, verde per OK
   }
@@ -421,7 +439,7 @@ editPassword.addEventListener("input", () => {
 document.getElementById("add-user-form").onsubmit = function (e) {
   e.preventDefault();
 
-  if (addHint.textContent) {
+  if (addHint.textContent && newPassword.value.length > 0) { // Check hint only if password is provided
     addHint.style.color = "#ef4444";
     showMessage("add-user-msg", "Correggi gli errori nella password", "error");
     return false;
@@ -457,12 +475,11 @@ document.getElementById("edit-user-form").onsubmit = function (e) {
   e.preventDefault();
 
   const newUsername = document.getElementById("edit_username").value;
-  const newPassword = document.getElementById("edit_password").value;
+  const newPasswordVal = document.getElementById("edit_password").value; // Renamed to avoid conflict
 
   // Valida la password solo se il campo non è vuoto e ci sono hint
-  if (newPassword && editHint.textContent) {
-    editHint.style.color = "#ef4444";
-    showMessage("edit-user-msg", "Correggi gli errori nella password", "error");
+  if (newPasswordVal.length > 0 && editHint.textContent && editHint.style.color === "rgb(239, 68, 68)") { // Check if there's an error hint
+    showMessage("edit-user-msg", "Correggi gli errori nella nuova password", "error");
     return false;
   }
 
@@ -471,8 +488,8 @@ document.getElementById("edit-user-form").onsubmit = function (e) {
   };
 
   // Aggiungi la password al payload solo se è stata inserita
-  if (newPassword) {
-    userData.password = newPassword;
+  if (newPasswordVal) {
+    userData.password = newPasswordVal;
   }
 
   fetch(`/api/users/${editingUserId}`, {
@@ -483,24 +500,43 @@ document.getElementById("edit-user-form").onsubmit = function (e) {
     .then((r) => r.text())
     .then((msg) => {
       if (msg === "OK") {
-        showMessage(
-          "edit-user-msg",
-          "Utente aggiornato con successo!",
-          "success",
-        );
-        fetchUsers();
-        // Se l'utente modificato è quello attualmente loggato e la password è stata cambiata
-        if (editingUserId === currentlyLoggedInUserId && newPassword) {
-            localStorage.setItem('passwordChanged', 'true'); // Imposta un flag in localStorage
-            localStorage.setItem('passwordChangedMessage', 'La tua password è stata modificata. Per favore, effettua nuovamente l\'accesso.');
-            window.location.href = '/login.html'; // Reindirizza alla pagina di login
-        } else if (editingUserId === currentlyLoggedInUserId && !newPassword) {
-            // Se l'username è stato cambiato ma non la password
+        const userEdited = users.find(u => u.id === editingUserId);
+        if (editingUserId === currentlyLoggedInUserId) {
+          if (newPasswordVal) { // Password was changed
+            showCustomAlert(
+              "Credenziali Aggiornate",
+              "La tua password è stata modificata. Per favore, effettua nuovamente l'accesso.",
+              "🔒",
+              () => {
+                localStorage.setItem('passwordChanged', 'true');
+                localStorage.setItem('passwordChangedMessage', 'La tua password è stata modificata. Per favore, effettua nuovamente l\'accesso.');
+                window.location.href = '/login.html';
+              }
+            );
+          } else if (userEdited && userEdited.username !== newUsername) { // Only username was changed
+            showCustomAlert(
+              "Nome Utente Aggiornato",
+              "Il tuo nome utente è stato modificato con successo.",
+              "👤",
+              () => {
+                fetchUsers();
+                document.getElementById("edit-user-modal").style.display = "none";
+              }
+            );
+          } else { // No changes or minor changes not requiring re-login
+             showMessage("edit-user-msg", "Utente aggiornato con successo!", "success");
+             fetchUsers();
              setTimeout(() => {
                 document.getElementById("edit-user-modal").style.display = "none";
             }, 1500);
-        }
-        else {
+          }
+        } else { // Another user was edited
+            showMessage(
+                "edit-user-msg",
+                "Utente aggiornato con successo!",
+                "success",
+            );
+            fetchUsers();
             setTimeout(() => {
                 document.getElementById("edit-user-modal").style.display = "none";
             }, 1500);
@@ -508,6 +544,10 @@ document.getElementById("edit-user-form").onsubmit = function (e) {
       } else {
         showMessage("edit-user-msg", msg, "error");
       }
+    })
+    .catch((err) => {
+        console.error("Errore durante l'aggiornamento:", err);
+        showMessage("edit-user-msg", "Errore durante l'aggiornamento dell'utente.", "error");
     });
 };
 
