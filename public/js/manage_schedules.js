@@ -767,3 +767,248 @@ function updateDatalists() {
   setOptions("room-list", rooms);
   setOptions("subject-list", subjects);
 }
+
+// ... (codice esistente) ...
+
+function setupAddFieldWithButton(inputId, buttonId, listId) {
+  const input = document.getElementById(inputId);
+  const button = document.getElementById(buttonId);
+  const list = document.getElementById(listId);
+
+  if (!input || !button || !list) return;
+
+  // Aggiungi un attributo per tenere traccia se un nuovo valore è stato "aggiunto"
+  input.dataset.isAdded = 'false';
+
+  input.addEventListener("input", () => {
+    const val = input.value.trim();
+    const exists = Array.from(list.options).some(
+      (opt) => opt.value.toLowerCase() === val.toLowerCase(),
+    );
+    button.style.display = val && !exists ? "inline-block" : "none";
+    // Resetta lo stato quando l'input cambia
+    input.dataset.isAdded = 'false';
+  });
+
+  button.addEventListener("click", () => {
+    const val = input.value.trim();
+    if (!val) return;
+    const opt = document.createElement("option");
+    opt.value = val;
+    list.appendChild(opt);
+    button.style.display = "none";
+    // Imposta lo stato a true quando un valore viene aggiunto
+    input.dataset.isAdded = 'true';
+  });
+}
+
+// Funzione di validazione generica per i campi con datalist
+function validateDatalistField(inputId, listId, msgElementId, fieldName) {
+  const input = document.getElementById(inputId);
+  const list = document.getElementById(listId);
+  const msgEl = document.getElementById(msgElementId);
+  const val = input.value.trim();
+
+  // Se il campo è vuoto, è valido (consideriamo opzionale se non richiesto diversamente)
+  if (!val) {
+    return true;
+  }
+
+  const isPresentInDatalist = Array.from(list.options).some(
+    (opt) => opt.value.toLowerCase() === val.toLowerCase(),
+  );
+
+  // Se il valore è presente nella datalist, è valido
+  if (isPresentInDatalist) {
+    return true;
+  }
+
+  // Se il valore non è nella datalist, controlla se è stato aggiunto esplicitamente
+  if (input.dataset.isAdded === 'true' && input.value.toLowerCase() === val.toLowerCase()) {
+      return true;
+  }
+
+
+  // Se non è presente e non è stato aggiunto, mostra un messaggio di errore
+  msgEl.textContent = `${fieldName} "${val}" non è nella lista. Clicca "+ Aggiungi" o seleziona uno esistente.`;
+  msgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
+  return false;
+}
+
+
+document.getElementById("add-schedule-form").onsubmit = async function (e) {
+  e.preventDefault();
+
+  // Validazione ora di inizio/fine
+  const addStart = document.getElementById("add-start").value;
+  const addEnd = document.getElementById("add-end").value;
+  const addMsgEl = document.getElementById("add-schedule-msg");
+
+  if (addStart >= addEnd) {
+    addMsgEl.textContent = "L'ora di inizio deve essere precedente a quella di fine.";
+    addMsgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
+    return;
+  }
+
+  // Validazione campi Docente, Aula, Materia
+  if (!validateDatalistField("add-teacher", "teacher-list", "add-schedule-msg", "Docente")) return;
+  if (!validateDatalistField("add-room", "room-list", "add-schedule-msg", "Aula")) return;
+  if (!validateDatalistField("add-subject", "subject-list", "add-schedule-msg", "Materia")) return;
+
+
+  await fetch("/api/schedules")
+    .then((r) => r.json())
+    .then((data) => {
+      schedules = data;
+    });
+
+  const course_id = document.getElementById("add-course-select").value;
+  const teacher = document.getElementById("add-teacher").value;
+  const room = document.getElementById("add-room").value;
+  const subject = document.getElementById("add-subject").value;
+  const day = document.getElementById("add-day").textContent;
+  const date = document.getElementById("add-date").value;
+  const start_time = document.getElementById("add-start").value;
+  const end_time = document.getElementById("add-end").value;
+
+
+  const overlap = schedules.some(
+    (s) =>
+      String(s.course_id) === String(course_id) &&
+      s.date === date &&
+      s.start_time === start_time,
+  );
+
+  if (overlap) {
+    addMsgEl.textContent =
+      "Esiste già un orario per questo corso, data e ora di inizio.";
+    addMsgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
+    return;
+  }
+  
+  // Se tutte le validazioni passano, resetta il messaggio e invia
+  addMsgEl.textContent = "";
+  addMsgEl.className = "hidden"; // Nascondi il messaggio di errore
+
+  fetch("/api/schedules", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      course_id,
+      teacher,
+      room,
+      subject,
+      day,
+      date,
+      start_time,
+      end_time,
+    }),
+  })
+    .then((r) => r.text())
+    .then((msg) => {
+      fetchCoursesAndSchedules();
+      if (msg === "OK") {
+        addMsgEl.textContent = "Orario aggiunto!";
+        addMsgEl.className =
+          "mt-4 p-3 rounded-lg text-sm bg-green-100 text-green-800";
+        document.getElementById("filter-course").value = course_id;
+        renderSchedules();
+        setTimeout(() => {
+          document.getElementById("add-schedule-modal").style.display = "none";
+        }, 1000);
+      } else {
+        addMsgEl.textContent = msg;
+        addMsgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
+      }
+    });
+};
+
+
+document.getElementById("edit-schedule-form").onsubmit = async function (e) {
+  e.preventDefault();
+  
+  // Validazione ora di inizio/fine
+  const editStart = document.getElementById("edit-start").value;
+  const editEnd = document.getElementById("edit-end").value;
+  const editMsgEl = document.getElementById("edit-schedule-msg");
+
+  if (editStart >= editEnd) {
+    editMsgEl.textContent = "L'ora di inizio deve essere precedente a quella di fine.";
+    editMsgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
+    return;
+  }
+
+  // Validazione campi Docente, Aula, Materia
+  if (!validateDatalistField("edit-teacher", "teacher-list", "edit-schedule-msg", "Docente")) return;
+  if (!validateDatalistField("edit-room", "room-list", "edit-schedule-msg", "Aula")) return;
+  if (!validateDatalistField("edit-subject", "subject-list", "edit-schedule-msg", "Materia")) return;
+
+
+  await fetch("/api/schedules")
+    .then((r) => r.json())
+    .then((data) => {
+      schedules = data;
+    });
+
+  const course_id = document.getElementById("edit-course-select").value;
+  const teacher = document.getElementById("edit-teacher").value;
+  const room = document.getElementById("edit-room").value;
+  const subject = document.getElementById("edit-subject").value;
+  // Non modifichiamo day in edit modal, è solo visualizzato
+  const day = document.getElementById("edit-day").textContent;
+  const date = document.getElementById("edit-date").value;
+  const start_time = document.getElementById("edit-start").value;
+  const end_time = document.getElementById("edit-end").value;
+
+
+  const overlap = schedules.some(
+    (s) =>
+      String(s.course_id) === String(course_id) &&
+      s.date === date &&
+      s.start_time === start_time &&
+      s.id != editingScheduleId,
+  );
+
+  if (overlap) {
+    editMsgEl.textContent =
+      "Esiste già un orario per questo corso, data e ora di inizio.";
+    editMsgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
+    return;
+  }
+
+  // Se tutte le validazioni passano, resetta il messaggio e invia
+  editMsgEl.textContent = "";
+  editMsgEl.className = "hidden"; // Nascondi il messaggio di errore
+
+  fetch(`/api/schedules/${editingScheduleId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      course_id,
+      teacher,
+      room,
+      subject,
+      day,
+      date,
+      start_time,
+      end_time,
+    }),
+  })
+    .then((r) => r.text())
+    .then((msg) => {
+      fetchCoursesAndSchedules();
+      if (msg === "OK") {
+        editMsgEl.textContent = "Orario aggiornato!";
+        editMsgEl.className =
+          "mt-4 p-3 rounded-lg text-sm bg-green-100 text-green-800";
+        document.getElementById("filter-course").value = course_id;
+        renderSchedules();
+        setTimeout(() => {
+          document.getElementById("edit-schedule-modal").style.display = "none";
+        }, 1000);
+      } else {
+        editMsgEl.textContent = msg;
+        editMsgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
+      }
+    });
+};
