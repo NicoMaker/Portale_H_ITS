@@ -1,375 +1,618 @@
 <!doctype html>
 <html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Gestione Orari</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"
+    />
+    <script src="js/tailwind.js"></script>
+    <link rel="stylesheet" href="CSS/style.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <title>Gestione Orari</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
-  <link rel="stylesheet" href="CSS/style.css">
-</head>
-
-<body class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
-  <nav class="bg-white shadow-lg border-b border-gray-200 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between h-16">
-        <div class="flex space-x-8">
-          <a href="/admin_dashboard.html"
-            class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-700 hover:text-blue-600 hover:border-blue-300 border-b-2 border-transparent transition-all duration-200">
-            🏠 Dashboard Admin
-          </a>
-          <a href="/manage_users.html"
-            class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-700 hover:text-blue-600 hover:border-blue-300 border-b-2 border-transparent transition-all duration-200">
-            👥 Gestione Utenti
-          </a>
-          <a href="/manage_courses.html"
-            class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-700 hover:text-blue-600 hover:border-blue-300 border-b-2 border-transparent transition-all duration-200">
-            📚 Gestione Corsi
-          </a>
-          <a href="/manage_schedules.html"
-            class="inline-flex items-center px-1 pt-1 text-sm font-medium text-blue-600 border-b-2 border-blue-500 transition-all duration-200">
-            📅 Gestione Orari
-          </a>
+  <body class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+    <nav class="bg-white shadow-lg border-b border-gray-200 sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+          <div class="flex space-x-8">
+            <a
+              href="/admin_dashboard.html"
+              class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-700 hover:text-blue-600 hover:border-blue-300 border-b-2 border-transparent transition-all duration-200"
+            >
+              🏠 Dashboard Admin
+            </a>
+            <a
+              href="/manage_users.html"
+              class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-700 hover:text-blue-600 hover:border-blue-300 border-b-2 border-transparent transition-all duration-200"
+            >
+              👥 Gestione Utenti
+            </a>
+            <a
+              href="/manage_courses.html"
+              class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-700 hover:text-blue-600 hover:border-blue-300 border-b-2 border-transparent transition-all duration-200"
+            >
+              📚 Gestione Corsi
+            </a>
+            <a
+              href="/manage_schedules.html"
+              class="inline-flex items-center px-1 pt-1 text-sm font-medium text-blue-600 border-b-2 border-blue-500 transition-all duration-200"
+            >
+              📅 Gestione Orari
+            </a>
+          </div>
         </div>
       </div>
-    </div>
-  </nav>
+    </nav>
 
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="mb-8">
-      <div class="flex items-center justify-between">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-900">📅 Gestione Orari</h1>
-          <p class="text-gray-600 mt-2">
-            Organizza e gestisci gli orari delle lezioni
-          </p>
-        </div>
-        <button id="add-schedule-btn"
-          class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-2">
-          <span class="text-lg">+</span>
-          <span>Aggiungi Orario</span>
-        </button>
-      </div>
-    </div>
-
-    <div class="bg-white rounded-2xl shadow-xl p-6 mb-8 border border-gray-100">
-      <div class="flex items-center space-x-3 mb-6">
-        <div class="p-2 bg-blue-100 rounded-xl">🔍</div>
-        <div>
-          <h2 class="text-xl font-semibold text-gray-900">
-            Filtra i risultati
-          </h2>
-          <p class="text-gray-600 text-sm">
-            Utilizza i seguenti filtri per cercare lezioni, docenti, aule e
-            altro.
-          </p>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div class="space-y-2">
-          <label for="filter-course" class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-            <span class="text-lg">📚</span>
-            <span>Corso</span>
-          </label>
-          <select id="filter-course"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm transition-all duration-200"></select>
-        </div>
-
-        <div class="space-y-2">
-          <label class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-            <span class="text-lg">👨‍🏫</span>
-            <span>Docente</span>
-          </label>
-          <select id="filter-teacher" multiple class="w-full"></select>
-        </div>
-
-        <div class="space-y-2">
-          <label class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-            <span class="text-lg">🏫</span>
-            <span>Aula</span>
-          </label>
-          <select id="filter-room" multiple class="w-full"></select>
-        </div>
-
-        <div class="space-y-2">
-          <label class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-            <span class="text-lg">📖</span>
-            <span>Materia</span>
-          </label>
-          <select id="filter-subject" multiple class="w-full"></select>
-        </div>
-
-        <div class="space-y-2">
-          <label class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-            <span class="text-lg">📅</span>
-            <span>Giorno</span>
-          </label>
-          <select id="filter-day" multiple class="w-full"></select>
-        </div>
-
-        <div class="space-y-2">
-          <label for="filter-date" class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-            <span class="text-lg">📆</span>
-            <span>Data</span>
-          </label>
-          <input type="date" id="filter-date"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-all duration-200" />
-        </div>
-      </div>
-    </div>
-
-    <div class="hidden mb-6">
-      <div class="flex gap-4">
-        <input type="text" id="search-schedule-course" placeholder="Cerca corso per nome..."
-          class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-        <select id="filter-schedule-course"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-          <option value="">Tutti i corsi</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-      <div id="schedules-list" class="custom-scrollbar"></div>
-    </div>
-
-    <div id="edit-schedule-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-      style="display: none">
-      <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
-        <div class="flex items-center justify-between p-6 border-b border-gray-200">
-          <h3 class="text-xl font-semibold text-gray-900">
-            ✏️ Modifica Orario
-          </h3>
-          <button id="close-edit-schedule-modal" class="text-gray-400 hover:text-gray-600 text-2xl font-bold">
-            ×
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="mb-8">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-3xl font-bold text-gray-900">📅 Gestione Orari</h1>
+            <p class="text-gray-600 mt-2">
+              Organizza e gestisci gli orari delle lezioni
+            </p>
+          </div>
+          <button
+            id="add-schedule-btn"
+            class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-2"
+          >
+            <span class="text-lg">+</span>
+            <span>Aggiungi Orario</span>
           </button>
         </div>
+      </div>
 
-        <div class="p-6 max-h-96 overflow-y-auto custom-scrollbar">
-          <form id="edit-schedule-form" class="space-y-4">
-            <div>
-              <label for="edit-course-select" class="block text-sm font-medium text-gray-700 mb-2">Corso</label>
-              <select id="edit-course-select" required
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></select>
-            </div>
+      <div
+        class="bg-white rounded-2xl shadow-xl p-6 mb-8 border border-gray-100"
+      >
+        <div class="flex items-center space-x-3 mb-6">
+          <div class="p-2 bg-blue-100 rounded-xl">🔍</div>
+          <div>
+            <h2 class="text-xl font-semibold text-gray-900">
+              Filtra i risultati
+            </h2>
+            <p class="text-gray-600 text-sm">
+              Utilizza i seguenti filtri per cercare lezioni, docenti, aule e
+              altro.
+            </p>
+          </div>
+        </div>
 
-            <div>
-              <label for="edit-teacher" class="block text-sm font-medium text-gray-700 mb-2">Docente</label>
-              <div class="flex gap-2">
-                <input type="text" id="edit-teacher" list="teacher-list" placeholder="Docente" required
-                  class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                <button type="button" id="edit-teacher-btn" style="display: none"
-                  class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
-                  + Aggiungi
-                </button>
-              </div>
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="space-y-2">
+            <label
+              for="filter-course"
+              class="flex items-center space-x-2 text-sm font-medium text-gray-700"
+            >
+              <span class="text-lg">📚</span>
+              <span>Corso</span>
+            </label>
+            <select
+              id="filter-course"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm transition-all duration-200"
+            ></select>
+          </div>
 
-            <div>
-              <label for="edit-subject" class="block text-sm font-medium text-gray-700 mb-2">Materia</label>
-              <div class="flex gap-2">
-                <input type="text" id="edit-subject" list="subject-list" placeholder="Materia" required
-                  class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                <button type="button" id="edit-subject-btn" style="display: none"
-                  class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
-                  + Aggiungi
-                </button>
-              </div>
-            </div>
+          <div class="space-y-2">
+            <label
+              class="flex items-center space-x-2 text-sm font-medium text-gray-700"
+            >
+              <span class="text-lg">👨‍🏫</span>
+              <span>Docente</span>
+            </label>
+            <select id="filter-teacher" multiple class="w-full"></select>
+          </div>
 
-            <div>
-              <label for="edit-room" class="block text-sm font-medium text-gray-700 mb-2">Aula</label>
-              <div class="flex gap-2">
-                <input type="text" id="edit-room" list="room-list" placeholder="Aula" required
-                  class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                <button type="button" id="edit-room-btn" style="display: none"
-                  class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
-                  + Aggiungi
-                </button>
-              </div>
-            </div>
+          <div class="space-y-2">
+            <label
+              class="flex items-center space-x-2 text-sm font-medium text-gray-700"
+            >
+              <span class="text-lg">🏫</span>
+              <span>Aula</span>
+            </label>
+            <select id="filter-room" multiple class="w-full"></select>
+          </div>
 
-            <datalist id="teacher-list"></datalist>
-            <datalist id="subject-list"></datalist>
-            <datalist id="room-list"></datalist>
+          <div class="space-y-2">
+            <label
+              class="flex items-center space-x-2 text-sm font-medium text-gray-700"
+            >
+              <span class="text-lg">📖</span>
+              <span>Materia</span>
+            </label>
+            <select id="filter-subject" multiple class="w-full"></select>
+          </div>
 
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Giorno</label>
-              <div id="edit-day"
-                class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-700 flex items-center min-h-[2.5rem]">
-              </div>
-            </div>
+          <div class="space-y-2">
+            <label
+              class="flex items-center space-x-2 text-sm font-medium text-gray-700"
+            >
+              <span class="text-lg">📅</span>
+              <span>Giorno</span>
+            </label>
+            <select id="filter-day" multiple class="w-full"></select>
+          </div>
 
-            <div>
-              <label for="edit-date" class="block text-sm font-medium text-gray-700 mb-2">Data</label>
-              <input type="date" id="edit-date" required
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-            </div>
+          <div class="space-y-2">
+            <label
+              for="filter-date"
+              class="flex items-center space-x-2 text-sm font-medium text-gray-700"
+            >
+              <span class="text-lg">📆</span>
+              <span>Data</span>
+            </label>
+            <input
+              type="date"
+              id="filter-date"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-all duration-200"
+            />
+          </div>
+        </div>
+      </div>
 
-            <div class="grid grid-cols-2 gap-4">
+      <div class="hidden mb-6">
+        <div class="flex gap-4">
+          <input
+            type="text"
+            id="search-schedule-course"
+            placeholder="Cerca corso per nome..."
+            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+          <select
+            id="filter-schedule-course"
+            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">Tutti i corsi</option>
+          </select>
+        </div>
+      </div>
+
+      <div
+        class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100"
+      >
+        <div id="schedules-list" class="custom-scrollbar"></div>
+      </div>
+
+      <div
+        id="edit-schedule-modal"
+        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+        style="display: none"
+      >
+        <div
+          class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden"
+        >
+          <div
+            class="flex items-center justify-between p-6 border-b border-gray-200"
+          >
+            <h3 class="text-xl font-semibold text-gray-900">
+              ✏️ Modifica Orario
+            </h3>
+            <button
+              id="close-edit-schedule-modal"
+              class="text-gray-400 hover:text-gray-600 text-2xl font-bold"
+            >
+              ×
+            </button>
+          </div>
+
+          <div class="p-6 max-h-96 overflow-y-auto custom-scrollbar">
+            <form id="edit-schedule-form" class="space-y-4">
               <div>
-                <label for="edit-start" class="block text-sm font-medium text-gray-700 mb-2">Ora Inizio</label>
-                <input type="time" id="edit-start" required
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                <label
+                  for="edit-course-select"
+                  class="block text-sm font-medium text-gray-700 mb-2"
+                  >Corso</label
+                >
+                <select
+                  id="edit-course-select"
+                  required
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                ></select>
               </div>
-              <div>
-                <label for="edit-end" class="block text-sm font-medium text-gray-700 mb-2">Ora Fine</label>
-                <input type="time" id="edit-end" required
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-              </div>
-            </div>
 
-            <div class="flex justify-end space-x-3 pt-4">
-              <button type="button" id="cancel-edit-schedule"
-                class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
+              <div>
+                <label
+                  for="edit-teacher"
+                  class="block text-sm font-medium text-gray-700 mb-2"
+                  >Docente</label
+                >
+                <div class="flex gap-2">
+                  <input
+                    type="text"
+                    id="edit-teacher"
+                    list="teacher-list"
+                    placeholder="Docente"
+                    required
+                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <button
+                    type="button"
+                    id="edit-teacher-btn"
+                    style="display: none"
+                    class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                  >
+                    + Aggiungi
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label
+                  for="edit-subject"
+                  class="block text-sm font-medium text-gray-700 mb-2"
+                  >Materia</label
+                >
+                <div class="flex gap-2">
+                  <input
+                    type="text"
+                    id="edit-subject"
+                    list="subject-list"
+                    placeholder="Materia"
+                    required
+                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <button
+                    type="button"
+                    id="edit-subject-btn"
+                    style="display: none"
+                    class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                  >
+                    + Aggiungi
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label
+                  for="edit-room"
+                  class="block text-sm font-medium text-gray-700 mb-2"
+                  >Aula</label
+                >
+                <div class="flex gap-2">
+                  <input
+                    type="text"
+                    id="edit-room"
+                    list="room-list"
+                    placeholder="Aula"
+                    required
+                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <button
+                    type="button"
+                    id="edit-room-btn"
+                    style="display: none"
+                    class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                  >
+                    + Aggiungi
+                  </button>
+                </div>
+              </div>
+
+              <datalist id="teacher-list"></datalist>
+              <datalist id="subject-list"></datalist>
+              <datalist id="room-list"></datalist>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2"
+                  >Giorno</label
+                >
+                <div
+                  id="edit-day"
+                  class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-700 flex items-center min-h-[2.5rem]"
+                ></div>
+              </div>
+
+              <div>
+                <label
+                  for="edit-date"
+                  class="block text-sm font-medium text-gray-700 mb-2"
+                  >Data</label
+                >
+                <input
+                  type="date"
+                  id="edit-date"
+                  required
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label
+                    for="edit-start"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                    >Ora Inizio</label
+                  >
+                  <input
+                    type="time"
+                    id="edit-start"
+                    required
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label
+                    for="edit-end"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                    >Ora Fine</label
+                  >
+                  <input
+                    type="time"
+                    id="edit-end"
+                    required
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div class="flex justify-end space-x-3 pt-4">
+                <button
+                  type="button"
+                  id="cancel-edit-schedule"
+                  class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                >
+                  Annulla
+                </button>
+                <button
+                  type="submit"
+                  class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  Salva
+                </button>
+              </div>
+
+              <div
+                id="edit-schedule-msg"
+                class="mt-4 p-3 rounded-lg text-sm"
+              ></div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="add-schedule-modal"
+        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+        style="display: none"
+      >
+        <div
+          class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden"
+        >
+          <div
+            class="flex items-center justify-between p-6 border-b border-gray-200"
+          >
+            <h3 class="text-xl font-semibold text-gray-900">
+              ➕ Aggiungi Orario
+            </h3>
+            <button
+              id="close-add-schedule-modal"
+              class="text-gray-400 hover:text-gray-600 text-2xl font-bold"
+            >
+              ×
+            </button>
+          </div>
+
+          <div class="p-6 max-h-96 overflow-y-auto custom-scrollbar">
+            <form id="add-schedule-form" class="space-y-4">
+              <div>
+                <label
+                  for="add-course-select"
+                  class="block text-sm font-medium text-gray-700 mb-2"
+                  >Corso</label
+                >
+                <select
+                  id="add-course-select"
+                  required
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                ></select>
+              </div>
+
+              <div>
+                <label
+                  for="add-teacher"
+                  class="block text-sm font-medium text-gray-700 mb-2"
+                  >Docente</label
+                >
+                <div class="flex gap-2">
+                  <input
+                    type="text"
+                    id="add-teacher"
+                    list="teacher-list"
+                    placeholder="Docente"
+                    required
+                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <button
+                    type="button"
+                    id="add-teacher-btn"
+                    style="display: none"
+                    class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                  >
+                    + Aggiungi
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label
+                  for="add-subject"
+                  class="block text-sm font-medium text-gray-700 mb-2"
+                  >Materia</label
+                >
+                <div class="flex gap-2">
+                  <input
+                    type="text"
+                    id="add-subject"
+                    list="subject-list"
+                    placeholder="Materia"
+                    required
+                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <button
+                    type="button"
+                    id="add-subject-btn"
+                    style="display: none"
+                    class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                  >
+                    + Aggiungi
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label
+                  for="add-room"
+                  class="block text-sm font-medium text-gray-700 mb-2"
+                  >Aula</label
+                >
+                <div class="flex gap-2">
+                  <input
+                    type="text"
+                    id="add-room"
+                    list="room-list"
+                    placeholder="Aula"
+                    required
+                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <button
+                    type="button"
+                    id="add-room-btn"
+                    style="display: none"
+                    class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                  >
+                    + Aggiungi
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2"
+                  >Giorno</label
+                >
+                <div
+                  id="add-day"
+                  class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-700 flex items-center min-h-[2.5rem]"
+                ></div>
+              </div>
+
+              <div>
+                <label
+                  for="add-date"
+                  class="block text-sm font-medium text-gray-700 mb-2"
+                  >Data</label
+                >
+                <input
+                  type="date"
+                  id="add-date"
+                  required
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label
+                    for="add-start"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                    >Ora Inizio</label
+                  >
+                  <input
+                    type="time"
+                    id="add-start"
+                    required
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label
+                    for="add-end"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                    >Ora Fine</label
+                  >
+                  <input
+                    type="time"
+                    id="add-end"
+                    required
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div class="flex justify-end space-x-3 pt-4">
+                <button
+                  type="button"
+                  id="cancel-add-schedule"
+                  class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                >
+                  Annulla
+                </button>
+                <button
+                  type="submit"
+                  class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  Salva
+                </button>
+              </div>
+
+              <div
+                id="add-schedule-msg"
+                class="mt-4 p-3 rounded-lg text-sm"
+              ></div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="delete-schedule-modal"
+        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+        style="display: none"
+      >
+        <div
+          class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden"
+        >
+          <div
+            class="flex items-center justify-between p-6 border-b border-gray-200"
+          >
+            <h3 class="text-xl font-semibold text-gray-900">
+              🗑️ Conferma Eliminazione
+            </h3>
+            <button
+              id="close-delete-schedule-modal"
+              class="text-gray-400 hover:text-gray-600 text-2xl font-bold"
+            >
+              ×
+            </button>
+          </div>
+          <div class="p-6">
+            <p class="text-gray-700 mb-6">
+              Sei sicuro di voler eliminare questo orario? Questa azione non può
+              essere annullata.
+            </p>
+            <div class="flex justify-end space-x-3">
+              <button
+                id="cancel-delete-schedule"
+                class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+              >
                 Annulla
               </button>
-              <button type="submit"
-                class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-                Salva
+              <button
+                id="confirm-delete-schedule"
+                class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Elimina
               </button>
             </div>
-
-            <div id="edit-schedule-msg" class="mt-4 p-3 rounded-lg text-sm"></div>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <div id="add-schedule-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-      style="display: none">
-      <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
-        <div class="flex items-center justify-between p-6 border-b border-gray-200">
-          <h3 class="text-xl font-semibold text-gray-900">
-            ➕ Aggiungi Orario
-          </h3>
-          <button id="close-add-schedule-modal" class="text-gray-400 hover:text-gray-600 text-2xl font-bold">
-            ×
-          </button>
-        </div>
-
-        <div class="p-6 max-h-96 overflow-y-auto custom-scrollbar">
-          <form id="add-schedule-form" class="space-y-4">
-            <div>
-              <label for="add-course-select" class="block text-sm font-medium text-gray-700 mb-2">Corso</label>
-              <select id="add-course-select" required
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></select>
-            </div>
-
-            <div>
-              <label for="add-teacher" class="block text-sm font-medium text-gray-700 mb-2">Docente</label>
-              <div class="flex gap-2">
-                <input type="text" id="add-teacher" list="teacher-list" placeholder="Docente" required
-                  class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                <button type="button" id="add-teacher-btn" style="display: none"
-                  class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
-                  + Aggiungi
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label for="add-subject" class="block text-sm font-medium text-gray-700 mb-2">Materia</label>
-              <div class="flex gap-2">
-                <input type="text" id="add-subject" list="subject-list" placeholder="Materia" required
-                  class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                <button type="button" id="add-subject-btn" style="display: none"
-                  class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
-                  + Aggiungi
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label for="add-room" class="block text-sm font-medium text-gray-700 mb-2">Aula</label>
-              <div class="flex gap-2">
-                <input type="text" id="add-room" list="room-list" placeholder="Aula" required
-                  class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                <button type="button" id="add-room-btn" style="display: none"
-                  class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
-                  + Aggiungi
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Giorno</label>
-              <div id="add-day"
-                class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-700 flex items-center min-h-[2.5rem]">
-              </div>
-            </div>
-
-            <div>
-              <label for="add-date" class="block text-sm font-medium text-gray-700 mb-2">Data</label>
-              <input type="date" id="add-date" required
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label for="add-start" class="block text-sm font-medium text-gray-700 mb-2">Ora Inizio</label>
-                <input type="time" id="add-start" required
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-              </div>
-              <div>
-                <label for="add-end" class="block text-sm font-medium text-gray-700 mb-2">Ora Fine</label>
-                <input type="time" id="add-end" required
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-              </div>
-            </div>
-
-            <div class="flex justify-end space-x-3 pt-4">
-              <button type="button" id="cancel-add-schedule"
-                class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
-                Annulla
-              </button>
-              <button type="submit"
-                class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-                Salva
-              </button>
-            </div>
-
-            <div id="add-schedule-msg" class="mt-4 p-3 rounded-lg text-sm"></div>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <div id="delete-schedule-modal"
-      class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none">
-      <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden">
-        <div class="flex items-center justify-between p-6 border-b border-gray-200">
-          <h3 class="text-xl font-semibold text-gray-900">
-            🗑️ Conferma Eliminazione
-          </h3>
-          <button id="close-delete-schedule-modal" class="text-gray-400 hover:text-gray-600 text-2xl font-bold">
-            ×
-          </button>
-        </div>
-        <div class="p-6">
-          <p class="text-gray-700 mb-6">
-            Sei sicuro di voler eliminare questo orario? Questa azione non può
-            essere annullata.
-          </p>
-          <div class="flex justify-end space-x-3">
-            <button id="cancel-delete-schedule"
-              class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
-              Annulla
-            </button>
-            <button id="confirm-delete-schedule"
-              class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-              Elimina
-            </button>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-  <script src="js/manage_schedules.js"></script>
-</body>
-
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script src="js/manage_schedules.js"></script>
+  </body>
 </html>

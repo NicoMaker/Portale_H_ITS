@@ -700,7 +700,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (end <= start) {
         e.preventDefault();
         const el = document.getElementById("add-schedule-msg"); // Define el here
-        el.textContent = "L'ora di inizio deve essere precedente a quella di fine.";
+        el.textContent =
+          "L'ora di inizio deve essere precedente a quella di fine.";
         el.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
         return false;
       }
@@ -714,7 +715,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (end <= start) {
         e.preventDefault();
         const el = document.getElementById("edit-schedule-msg"); // Define el here
-        el.textContent = "L'ora di inizio deve essere precedente a quella di fine.";
+        el.textContent =
+          "L'ora di inizio deve essere precedente a quella di fine.";
         el.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
         return false;
       }
