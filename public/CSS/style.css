@@ -247,49 +247,12 @@
   @apply bg-gray-50 transform scale-[1.001] transition-all duration-200;
 }
 
-/* Animations */
-@keyframes gradient-shift {
-  0%,
-  100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-}
 
 .gradient-animate {
   background-size: 200% 200%;
   animation: gradient-shift 3s ease infinite;
 }
 
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-.float-animation {
-  animation: float 6s ease-in-out infinite;
-}
-
-@keyframes pulse-subtle {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
-  }
-}
-
-.pulse-on-hover:hover {
-  animation: pulse-subtle 1.5s infinite;
-}
 
 .shimmer {
   background: linear-gradient(
@@ -394,3 +357,4 @@
 .custom-scrollbar::-webkit-scrollbar-thumb {
   @apply bg-gray-400 rounded-full hover:bg-gray-500;
 }
+
