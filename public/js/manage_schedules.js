@@ -248,26 +248,41 @@ window.onclick = (e) => {
 };
 document.getElementById("edit-schedule-form").onsubmit = async function (e) {
   e.preventDefault();
+  
+  // Validazione ora di inizio/fine
+  const editStart = document.getElementById("edit-start").value;
+  const editEnd = document.getElementById("edit-end").value;
+  const editMsgEl = document.getElementById("edit-schedule-msg");
+
+  if (editStart >= editEnd) {
+    editMsgEl.textContent = "L'ora di inizio deve essere precedente a quella di fine.";
+    editMsgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
+    return;
+  }
+
+  // Validazione campi Docente, Aula, Materia
+  if (!validateDatalistField("edit-teacher", "teacher-list", "edit-schedule-msg", "Docente")) return;
+  if (!validateDatalistField("edit-room", "room-list", "edit-schedule-msg", "Aula")) return;
+  if (!validateDatalistField("edit-subject", "subject-list", "edit-schedule-msg", "Materia")) return;
+
+
   await fetch("/api/schedules")
     .then((r) => r.json())
     .then((data) => {
       schedules = data;
     });
+
   const course_id = document.getElementById("edit-course-select").value;
   const teacher = document.getElementById("edit-teacher").value;
   const room = document.getElementById("edit-room").value;
   const subject = document.getElementById("edit-subject").value;
+  // Non modifichiamo day in edit modal, è solo visualizzato
   const day = document.getElementById("edit-day").textContent;
   const date = document.getElementById("edit-date").value;
   const start_time = document.getElementById("edit-start").value;
   const end_time = document.getElementById("edit-end").value;
 
-  if (start_time >= end_time) {
-    const el = document.getElementById("edit-schedule-msg"); // Define el here
-    el.textContent = "L'ora di inizio deve essere precedente a quella di fine.";
-    el.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
-    return;
-  }
+
   const overlap = schedules.some(
     (s) =>
       String(s.course_id) === String(course_id) &&
@@ -275,13 +290,18 @@ document.getElementById("edit-schedule-form").onsubmit = async function (e) {
       s.start_time === start_time &&
       s.id != editingScheduleId,
   );
-  const el = document.getElementById("edit-schedule-msg");
+
   if (overlap) {
-    el.textContent =
+    editMsgEl.textContent =
       "Esiste già un orario per questo corso, data e ora di inizio.";
-    el.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
+    editMsgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
     return;
   }
+
+  // Se tutte le validazioni passano, resetta il messaggio e invia
+  editMsgEl.textContent = "";
+  editMsgEl.className = "hidden"; // Nascondi il messaggio di errore
+
   fetch(`/api/schedules/${editingScheduleId}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -300,8 +320,8 @@ document.getElementById("edit-schedule-form").onsubmit = async function (e) {
     .then((msg) => {
       fetchCoursesAndSchedules();
       if (msg === "OK") {
-        el.textContent = "Orario aggiornato!";
-        el.className =
+        editMsgEl.textContent = "Orario aggiornato!";
+        editMsgEl.className =
           "mt-4 p-3 rounded-lg text-sm bg-green-100 text-green-800";
         document.getElementById("filter-course").value = course_id;
         renderSchedules();
@@ -309,11 +329,12 @@ document.getElementById("edit-schedule-form").onsubmit = async function (e) {
           document.getElementById("edit-schedule-modal").style.display = "none";
         }, 1000);
       } else {
-        el.textContent = msg;
-        el.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
+        editMsgEl.textContent = msg;
+        editMsgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
       }
     });
 };
+
 
 // Function to open the delete confirmation modal
 function openDeleteScheduleModal(id) {
@@ -919,96 +940,6 @@ document.getElementById("add-schedule-form").onsubmit = async function (e) {
       } else {
         addMsgEl.textContent = msg;
         addMsgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
-      }
-    });
-};
-
-
-document.getElementById("edit-schedule-form").onsubmit = async function (e) {
-  e.preventDefault();
-  
-  // Validazione ora di inizio/fine
-  const editStart = document.getElementById("edit-start").value;
-  const editEnd = document.getElementById("edit-end").value;
-  const editMsgEl = document.getElementById("edit-schedule-msg");
-
-  if (editStart >= editEnd) {
-    editMsgEl.textContent = "L'ora di inizio deve essere precedente a quella di fine.";
-    editMsgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
-    return;
-  }
-
-  // Validazione campi Docente, Aula, Materia
-  if (!validateDatalistField("edit-teacher", "teacher-list", "edit-schedule-msg", "Docente")) return;
-  if (!validateDatalistField("edit-room", "room-list", "edit-schedule-msg", "Aula")) return;
-  if (!validateDatalistField("edit-subject", "subject-list", "edit-schedule-msg", "Materia")) return;
-
-
-  await fetch("/api/schedules")
-    .then((r) => r.json())
-    .then((data) => {
-      schedules = data;
-    });
-
-  const course_id = document.getElementById("edit-course-select").value;
-  const teacher = document.getElementById("edit-teacher").value;
-  const room = document.getElementById("edit-room").value;
-  const subject = document.getElementById("edit-subject").value;
-  // Non modifichiamo day in edit modal, è solo visualizzato
-  const day = document.getElementById("edit-day").textContent;
-  const date = document.getElementById("edit-date").value;
-  const start_time = document.getElementById("edit-start").value;
-  const end_time = document.getElementById("edit-end").value;
-
-
-  const overlap = schedules.some(
-    (s) =>
-      String(s.course_id) === String(course_id) &&
-      s.date === date &&
-      s.start_time === start_time &&
-      s.id != editingScheduleId,
-  );
-
-  if (overlap) {
-    editMsgEl.textContent =
-      "Esiste già un orario per questo corso, data e ora di inizio.";
-    editMsgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
-    return;
-  }
-
-  // Se tutte le validazioni passano, resetta il messaggio e invia
-  editMsgEl.textContent = "";
-  editMsgEl.className = "hidden"; // Nascondi il messaggio di errore
-
-  fetch(`/api/schedules/${editingScheduleId}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      course_id,
-      teacher,
-      room,
-      subject,
-      day,
-      date,
-      start_time,
-      end_time,
-    }),
-  })
-    .then((r) => r.text())
-    .then((msg) => {
-      fetchCoursesAndSchedules();
-      if (msg === "OK") {
-        editMsgEl.textContent = "Orario aggiornato!";
-        editMsgEl.className =
-          "mt-4 p-3 rounded-lg text-sm bg-green-100 text-green-800";
-        document.getElementById("filter-course").value = course_id;
-        renderSchedules();
-        setTimeout(() => {
-          document.getElementById("edit-schedule-modal").style.display = "none";
-        }, 1000);
-      } else {
-        editMsgEl.textContent = msg;
-        editMsgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
       }
     });
 };
