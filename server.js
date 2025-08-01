@@ -57,9 +57,6 @@ function initDb() {
       date TEXT NOT NULL,
       FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
     )`);
-
-    // --- LOGICA MODIFICATA PER LA CREAZIONE DELL'ADMIN ---
-    // Controlla se esiste almeno un utente con il ruolo 'admin'
     db.get(
       'SELECT COUNT(*) AS count FROM users WHERE role = "admin"',
       [],
