@@ -277,9 +277,9 @@ document.getElementById("confirm-delete-user").onclick = () => {
   if (userToDeleteId) {
     fetch(`/api/users/${userToDeleteId}`, { method: "DELETE" })
       .then(() => {
-        // Se l'utente eliminato è quello attualmente loggato, reindirizza
+        // Se l'utente eliminato è quello attualmente loggato, imposta un flag e reindirizza
         if (userToDeleteId === currentlyLoggedInUserId) {
-          alert("Il tuo account è stato eliminato. Verrai disconnesso.");
+          localStorage.setItem('logoutReason', 'account_deleted');
           window.location.href = '/login.html'; // Reindirizza alla pagina di login
         } else {
             fetchUsers();
@@ -489,14 +489,13 @@ document.getElementById("edit-user-form").onsubmit = function (e) {
           "success",
         );
         fetchUsers();
-        // Se l'utente modificato è quello attualmente loggato, reindirizza
-        if (editingUserId === currentlyLoggedInUserId && newPassword) { // Solo se la password è stata cambiata
-            alert("La tua password è stata modificata. Per favore, effettua nuovamente l'accesso.");
+        // Se l'utente modificato è quello attualmente loggato e la password è stata cambiata
+        if (editingUserId === currentlyLoggedInUserId && newPassword) {
+            localStorage.setItem('passwordChanged', 'true'); // Imposta un flag in localStorage
+            localStorage.setItem('passwordChangedMessage', 'La tua password è stata modificata. Per favore, effettua nuovamente l\'accesso.');
             window.location.href = '/login.html'; // Reindirizza alla pagina di login
         } else if (editingUserId === currentlyLoggedInUserId && !newPassword) {
-            // Se l'username è stato cambiato ma non la password, non è strettamente necessario un re-login
-            // Ma potresti voler forzare un refresh della pagina per aggiornare eventuali display del nome utente
-            // window.location.reload();
+            // Se l'username è stato cambiato ma non la password
              setTimeout(() => {
                 document.getElementById("edit-user-modal").style.display = "none";
             }, 1500);
