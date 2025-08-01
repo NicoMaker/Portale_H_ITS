@@ -329,7 +329,7 @@ const server = http.createServer((req, res) => {
                 [this.lastID, course_id],
                 function (err2) {
                   if (err2) {
-                    res.end("Errore DB");
+                    res.end("Scrivi Password");
                     return;
                   }
                   res.end("OK");
@@ -455,7 +455,7 @@ const server = http.createServer((req, res) => {
               [username, password, id],
               function (err) {
                 if (err) {
-                  res.end("Errore DB");
+                  res.end("Scrivi Password");
                   return;
                 }
                 res.end("OK");
@@ -882,7 +882,7 @@ const server = http.createServer((req, res) => {
             [username, password, id],
             function (err) {
               if (err) {
-                res.end("Errore DB");
+                res.end("Scrivi Password");
                 return;
               }
               res.end("OK");
