@@ -2,7 +2,12 @@ let courses = [];
 let users = [];
 let editingUserId = null;
 let searchUserInput, filterCourseSelect;
-let userToDeleteId = null; // NEW: Variabile per tenere traccia dell'ID dell'utente da eliminare
+let userToDeleteId = null;
+
+// !!! IMPORTANTE: DEVI IMPOSTARE QUESTO ID QUANDO L'UTENTE EFFETTUA IL LOGIN !!!
+// Ad esempio, potresti recuperarlo da un endpoint API al caricamento della dashboard
+// o passarlo dal backend nel HTML della pagina se usi un template engine.
+let currentlyLoggedInUserId = 1; // Esempio: Sostituisci con l'ID reale dell'utente loggato
 
 const fetchCourses = () =>
   fetch("/api/courses")
@@ -25,7 +30,7 @@ function updateNewCourseSelect() {
       courses.map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
   } else {
     select.style.display = "none";
-    label.style.display = "none"; // o 'none' se vuoi nascondere anche la label
+    label.style.display = "none";
     select.innerHTML = "";
   }
 }
@@ -236,7 +241,6 @@ function demote(id) {
   fetch(`/api/users/${id}/demote`, { method: "POST" }).then(fetchUsers);
 }
 
-// NEW: Functions for Delete User Confirmation Modal
 function openDeleteUserConfirmModal(id) {
   userToDeleteId = id;
   const user = users.find((u) => u.id == id);
@@ -246,16 +250,16 @@ function openDeleteUserConfirmModal(id) {
     const adminCount = users.filter((u) => u.role === "admin").length;
     if (user.role === "admin" && adminCount <= 1) {
       document.getElementById("delete-admin-warning").style.display = "block";
-      document.getElementById("confirm-delete-user").disabled = true; // NEW: Disable confirm button if last admin
+      document.getElementById("confirm-delete-user").disabled = true;
       document
         .getElementById("confirm-delete-user")
-        .classList.add("opacity-50", "cursor-not-allowed"); // NEW: Add styling for disabled button
+        .classList.add("opacity-50", "cursor-not-allowed");
     } else {
       document.getElementById("delete-admin-warning").style.display = "none";
-      document.getElementById("confirm-delete-user").disabled = false; // NEW: Enable confirm button
+      document.getElementById("confirm-delete-user").disabled = false;
       document
         .getElementById("confirm-delete-user")
-        .classList.remove("opacity-50", "cursor-not-allowed"); // NEW: Remove styling for disabled button
+        .classList.remove("opacity-50", "cursor-not-allowed");
     }
   }
   document.getElementById("delete-user-confirm-modal").style.display = "flex";
@@ -273,20 +277,24 @@ document.getElementById("confirm-delete-user").onclick = () => {
   if (userToDeleteId) {
     fetch(`/api/users/${userToDeleteId}`, { method: "DELETE" })
       .then(() => {
-        fetchUsers();
-        document.getElementById("delete-user-confirm-modal").style.display =
-          "none";
+        // Se l'utente eliminato è quello attualmente loggato, reindirizza
+        if (userToDeleteId === currentlyLoggedInUserId) {
+          alert("Il tuo account è stato eliminato. Verrai disconnesso.");
+          window.location.href = '/login.html'; // Reindirizza alla pagina di login
+        } else {
+            fetchUsers();
+            document.getElementById("delete-user-confirm-modal").style.display =
+            "none";
+        }
       })
       .catch((err) => {
         console.error("Errore durante l'eliminazione:", err);
-        // Potresti aggiungere qui un messaggio di errore all'utente
         document.getElementById("delete-user-confirm-modal").style.display =
           "none";
       });
   }
 };
 
-// Modified deleteUser to open the custom modal
 function deleteUser(id) {
   openDeleteUserConfirmModal(id);
 }
@@ -314,8 +322,8 @@ function openEditUser(id) {
   editingUserId = id;
   const user = users.find((u) => u.id === id);
   document.getElementById("edit_username").value = user.username;
-  document.getElementById("edit_password").value = "";
-  document.getElementById("edit-user-password-hint").textContent = "";
+  document.getElementById("edit_password").value = ""; // Clear password field on open
+  document.getElementById("edit-user-password-hint").textContent = ""; // Clear hint
   document.getElementById("edit-user-msg").classList.add("hidden");
   document.getElementById("edit-user-modal").style.display = "flex";
 }
@@ -368,11 +376,10 @@ window.onclick = (e) => {
   if (e.target === document.getElementById("add-user-modal"))
     document.getElementById("add-user-modal").style.display = "none";
   if (e.target === document.getElementById("delete-user-confirm-modal"))
-    // NEW: Close delete user modal on outside click
     document.getElementById("delete-user-confirm-modal").style.display = "none";
 };
 
-// Validazione password live
+// Validazione password live (per aggiunta nuovo utente)
 const newPassword = document.getElementById("new-password");
 const addHint = document.getElementById("add-password-hint");
 
@@ -387,20 +394,29 @@ newPassword.addEventListener("input", () => {
   addHint.style.color = msg ? "#ef4444" : "#22c55e";
 });
 
-// Validazione password edit
+// Validazione password edit (per modifica utente) - opzionale
 const editPassword = document.getElementById("edit_password");
 const editHint = document.getElementById("edit-user-password-hint");
 
 editPassword.addEventListener("input", () => {
   const val = editPassword.value;
   let msg = "";
-  if (val.length < 8) msg += "Min 8 caratteri. ";
-  if (!/[A-Z]/.test(val)) msg += "Almeno una maiuscola. ";
-  if (!/[a-z]/.test(val)) msg += "Almeno una minuscola. ";
-  if (!/[0-9]/.test(val)) msg += "Almeno un numero. ";
+  // La validazione si applica solo se il campo password non è vuoto
+  if (val.length > 0) {
+    if (val.length < 8) msg += "Min 8 caratteri. ";
+    if (!/[A-Z]/.test(val)) msg += "Almeno una maiuscola. ";
+    if (!/[a-z]/.test(val)) msg += "Almeno una minuscola. ";
+    if (!/[0-9]/.test(val)) msg += "Almeno un numero. ";
+  }
   editHint.textContent = msg;
-  editHint.style.color = msg ? "#ef4444" : "#22c55e";
+  // Colore del testo basato sulla presenza di messaggi (errori)
+  if (val.length === 0) {
+    editHint.style.color = "#6b7280"; // Grigio, nessuna validazione richiesta
+  } else {
+    editHint.style.color = msg ? "#ef4444" : "#22c55e"; // Rosso per errori, verde per OK
+  }
 });
+
 
 document.getElementById("add-user-form").onsubmit = function (e) {
   e.preventDefault();
@@ -440,19 +456,29 @@ document.getElementById("add-user-form").onsubmit = function (e) {
 document.getElementById("edit-user-form").onsubmit = function (e) {
   e.preventDefault();
 
-  if (editHint.textContent) {
+  const newUsername = document.getElementById("edit_username").value;
+  const newPassword = document.getElementById("edit_password").value;
+
+  // Valida la password solo se il campo non è vuoto e ci sono hint
+  if (newPassword && editHint.textContent) {
     editHint.style.color = "#ef4444";
     showMessage("edit-user-msg", "Correggi gli errori nella password", "error");
     return false;
   }
 
+  const userData = {
+    username: newUsername,
+  };
+
+  // Aggiungi la password al payload solo se è stata inserita
+  if (newPassword) {
+    userData.password = newPassword;
+  }
+
   fetch(`/api/users/${editingUserId}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      username: document.getElementById("edit_username").value,
-      password: document.getElementById("edit_password").value,
-    }),
+    body: JSON.stringify(userData),
   })
     .then((r) => r.text())
     .then((msg) => {
@@ -463,9 +489,23 @@ document.getElementById("edit-user-form").onsubmit = function (e) {
           "success",
         );
         fetchUsers();
-        setTimeout(() => {
-          document.getElementById("edit-user-modal").style.display = "none";
-        }, 1500);
+        // Se l'utente modificato è quello attualmente loggato, reindirizza
+        if (editingUserId === currentlyLoggedInUserId && newPassword) { // Solo se la password è stata cambiata
+            alert("La tua password è stata modificata. Per favore, effettua nuovamente l'accesso.");
+            window.location.href = '/login.html'; // Reindirizza alla pagina di login
+        } else if (editingUserId === currentlyLoggedInUserId && !newPassword) {
+            // Se l'username è stato cambiato ma non la password, non è strettamente necessario un re-login
+            // Ma potresti voler forzare un refresh della pagina per aggiornare eventuali display del nome utente
+            // window.location.reload();
+             setTimeout(() => {
+                document.getElementById("edit-user-modal").style.display = "none";
+            }, 1500);
+        }
+        else {
+            setTimeout(() => {
+                document.getElementById("edit-user-modal").style.display = "none";
+            }, 1500);
+        }
       } else {
         showMessage("edit-user-msg", msg, "error");
       }
