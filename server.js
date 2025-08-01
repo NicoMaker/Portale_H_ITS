@@ -4,6 +4,7 @@ const path = require("path");
 const url = require("url");
 const sqlite3 = require("sqlite3").verbose();
 const crypto = require("crypto");
+const bcrypt = require("bcryptjs");
 
 const dbDir = path.join(__dirname, "db");
 if (!fs.existsSync(dbDir)) {
@@ -74,27 +75,33 @@ function initDb() {
           // Se non esiste nessun admin, crea l'utente 'admin' predefinito
           const utenteadmin = "Admin";
           const passwordadmin = "Admin123";
-          db.run(
-            "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
-            [utenteadmin, passwordadmin, "admin"],
-            function (err) {
-              if (err) {
-                // Potrebbe esserci un errore se 'admin' username esiste già,
-                // anche se abbiamo già controllato la presenza di un admin per ruolo.
-                // Questo può succedere solo se un utente 'user' si chiama 'admin'.
-                console.error(
-                  "Errore durante la creazione dell'admin iniziale:",
-                  err.message,
-                );
-              } else {
-                console.log(
-                  `Utente ${utenteadmin} predefinito creato con successo nome utente ${utenteadmin} e password ${passwordadmin}.`,
-                );
-              }
-            },
-          );
+          // HASH DELLA PASSWORD DELL'ADMIN
+          bcrypt.hash(passwordadmin, 10, (hashErr, hashedPassword) => {
+            if (hashErr) {
+              console.error(
+                "Errore durante l'hashing della password admin:",
+                hashErr.message,
+              );
+              return;
+            }
+            db.run(
+              "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
+              [utenteadmin, hashedPassword, "admin"], // Salva l'hash
+              function (err) {
+                if (err) {
+                  console.error(
+                    "Errore durante la creazione dell'admin iniziale:",
+                    err.message,
+                  );
+                } else {
+                  console.log(
+                    `Utente ${utenteadmin} predefinito creato con successo (password hashata).`,
+                  );
+                }
+              },
+            );
+          });
         } else {
-          // Gestione del messaggio per singolare/plurale
           const adminText =
             row.count === 1
               ? "un utente 'admin'"
@@ -111,7 +118,6 @@ function initDb() {
 
 initDb();
 
-// ... il resto del tuo codice rimane invariato ...
 // Session management (cookie-based, in-memory)
 const sessions = {};
 function createSession(user) {
@@ -202,25 +208,48 @@ const server = http.createServer((req, res) => {
         "SELECT * FROM users WHERE username = ?",
         [username],
         (err, user) => {
-          if (!user || password !== user.password) {
+          if (err) {
+            console.error("Errore DB durante il login:", err.message);
+            res.writeHead(500);
+            return res.end("Errore interno del server.");
+          }
+          if (!user) {
             res.writeHead(200, { "Content-Type": "text/html" });
             return res.end(
               '<div class="hint" style="color:red;text-align:center">Credenziali non valide</div>',
             );
           }
-          const sid = createSession({
-            id: user.id,
-            username: user.username,
-            role: user.role,
+
+          // VERIFICA LA PASSWORD CON BCRYPT
+          bcrypt.compare(password, user.password, (compareErr, result) => {
+            if (compareErr) {
+              console.error("Errore bcrypt durante il login:", compareErr.message);
+              res.writeHead(500);
+              return res.end("Errore interno del server.");
+            }
+            if (!result) {
+              // Password non corrispondente
+              res.writeHead(200, { "Content-Type": "text/html" });
+              return res.end(
+                '<div class="hint" style="color:red;text-align:center">Credenziali non valide</div>',
+              );
+            }
+
+            // Password valida, crea sessione
+            const sid = createSession({
+              id: user.id,
+              username: user.username,
+              role: user.role,
+            });
+            res.setHeader("Set-Cookie", `sid=${sid}; HttpOnly; Path=/`);
+            res.writeHead(302, {
+              Location:
+                user.role === "admin"
+                  ? "/admin_dashboard.html"
+                  : "/user_dashboard.html",
+            });
+            res.end();
           });
-          res.setHeader("Set-Cookie", `sid=${sid}; HttpOnly; Path=/`);
-          res.writeHead(302, {
-            Location:
-              user.role === "admin"
-                ? "/admin_dashboard.html"
-                : "/user_dashboard.html",
-          });
-          res.end();
         },
       );
     });
@@ -240,20 +269,30 @@ const server = http.createServer((req, res) => {
       ) {
         userRole = "admin";
       }
-      db.run(
-        "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
-        [username, password, userRole],
-        function (err) {
-          if (err) {
-            res.writeHead(400, { "Content-Type": "text/html" });
-            return res.end(
-              "<script>alert(\"Username già esistente\");window.location='/register.html';</script>",
-            );
-          }
-          res.writeHead(200, { "Content-Type": "text/plain" });
-          res.end("Registrazione avvenuta!");
-        },
-      );
+
+      // HASH DELLA PASSWORD PRIMA DI SALVARLA
+      bcrypt.hash(password, 10, (err, hashedPassword) => {
+        if (err) {
+          console.error("Errore hashing password durante la registrazione:", err.message);
+          res.writeHead(500);
+          return res.end("Errore interno del server.");
+        }
+
+        db.run(
+          "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
+          [username, hashedPassword, userRole], // Salva l'hash
+          function (err) {
+            if (err) {
+              res.writeHead(400, { "Content-Type": "text/html" });
+              return res.end(
+                "<script>alert(\"Username già esistente\");window.location='/register.html';</script>",
+              );
+            }
+            res.writeHead(200, { "Content-Type": "text/plain" });
+            res.end("Registrazione avvenuta!");
+          },
+        );
+      });
     });
     return;
   }
@@ -276,7 +315,7 @@ const server = http.createServer((req, res) => {
     }
     // GET /api/users
     if (req.method === "GET" && parsedUrl.pathname === "/api/users") {
-      db.all("SELECT * FROM users", [], (err, users) => {
+      db.all("SELECT id, username, role FROM users", [], (err, users) => { // Non esporre le password hashate!
         if (err) {
           res.writeHead(500);
           res.end("DB error");
@@ -285,7 +324,6 @@ const server = http.createServer((req, res) => {
         // Per ogni utente, prendi i corsi
         let done = 0;
         if (users.length === 0) {
-          // Handle case with no users
           res.end(JSON.stringify([]));
           return;
         }
@@ -314,32 +352,42 @@ const server = http.createServer((req, res) => {
         ) {
           userRole = "admin";
         }
-        db.run(
-          "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
-          [username, password, userRole],
-          function (err) {
-            if (err) {
-              res.end("Username già esistente");
-              return;
-            }
-            // Se è stato passato un corso e il ruolo è user, associalo
-            if (userRole === "user" && course_id) {
-              db.run(
-                "INSERT OR IGNORE INTO user_courses (user_id, course_id) VALUES (?, ?)",
-                [this.lastID, course_id],
-                function (err2) {
-                  if (err2) {
-                    res.end("Scrivi Password");
-                    return;
-                  }
-                  res.end("OK");
-                },
-              );
-            } else {
-              res.end("OK");
-            }
-          },
-        );
+
+        // HASH DELLA PASSWORD PRIMA DI SALVARLA
+        bcrypt.hash(password, 10, (err, hashedPassword) => {
+          if (err) {
+            console.error("Errore hashing password durante creazione utente (admin):", err.message);
+            res.writeHead(500);
+            return res.end("Errore interno del server.");
+          }
+
+          db.run(
+            "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
+            [username, hashedPassword, userRole], // Salva l'hash
+            function (err) {
+              if (err) {
+                res.end("Username già esistente");
+                return;
+              }
+              // Se è stato passato un corso e il ruolo è user, associalo
+              if (userRole === "user" && course_id) {
+                db.run(
+                  "INSERT OR IGNORE INTO user_courses (user_id, course_id) VALUES (?, ?)",
+                  [this.lastID, course_id],
+                  function (err2) {
+                    if (err2) {
+                      res.end("Errore nell'associazione del corso"); // Changed message
+                      return;
+                    }
+                    res.end("OK");
+                  },
+                );
+              } else {
+                res.end("OK");
+              }
+            },
+          );
+        });
       });
       return;
     }
@@ -450,17 +498,42 @@ const server = http.createServer((req, res) => {
               res.end("Username già esistente");
               return;
             }
-            db.run(
-              "UPDATE users SET username=?, password=? WHERE id=?",
-              [username, password, id],
-              function (err) {
-                if (err) {
-                  res.end("Scrivi Password");
-                  return;
-                }
-                res.end("OK");
-              },
-            );
+            // Solo se la password è stata fornita, la hash
+            if (password) {
+                bcrypt.hash(password, 10, (hashErr, hashedPassword) => {
+                    if (hashErr) {
+                        console.error("Errore hashing password durante modifica utente (admin):", hashErr.message);
+                        res.writeHead(500);
+                        return res.end("Errore interno del server.");
+                    }
+                    db.run(
+                        "UPDATE users SET username=?, password=? WHERE id=?",
+                        [username, hashedPassword, id],
+                        function (err) {
+                            if (err) {
+                                res.writeHead(500); // Changed to 500 for generic DB error
+                                res.end("Errore aggiornamento utente.");
+                                return;
+                            }
+                            res.end("OK");
+                        },
+                    );
+                });
+            } else {
+                // Se la password non è stata fornita, aggiorna solo l'username
+                db.run(
+                    "UPDATE users SET username=? WHERE id=?",
+                    [username, id],
+                    function (err) {
+                        if (err) {
+                            res.writeHead(500);
+                            res.end("Errore aggiornamento utente.");
+                            return;
+                        }
+                        res.end("OK");
+                    },
+                );
+            }
           },
         );
       });
@@ -551,16 +624,35 @@ const server = http.createServer((req, res) => {
     ) {
       const id = parsedUrl.pathname.split("/")[3];
       parseBody(({ name, description }) => {
-        db.run(
-          "UPDATE courses SET name=?, description=? WHERE id=?",
-          [name, description, id],
-          function (err) {
+        // Check if a course with the new name already exists, excluding the current course being updated
+        db.get(
+          "SELECT * FROM courses WHERE name = ? AND id != ?",
+          [name, id],
+          (err, existingCourse) => {
             if (err) {
-              res.writeHead(400);
-              res.end("Errore update corso");
+              res.writeHead(500);
+              res.end("DB error");
               return;
             }
-            res.end("OK");
+            if (existingCourse) {
+              res.writeHead(400);
+              res.end("Nome corso già esistente"); // Course name already exists
+              return;
+            }
+
+            // If no existing course with the same name (excluding itself), proceed with the update
+            db.run(
+              "UPDATE courses SET name=?, description=? WHERE id=?",
+              [name, description, id],
+              function (err) {
+                if (err) {
+                  res.writeHead(400);
+                  res.end("Errore update corso"); // Error updating course
+                  return;
+                }
+                res.end("OK");
+              },
+            );
           },
         );
       });
@@ -794,19 +886,45 @@ const server = http.createServer((req, res) => {
             res.end("Username già esistente");
             return;
           }
-          db.run(
-            "UPDATE users SET username=?, password=? WHERE id=?",
-            [username, password, session.user.id],
-            function (err) {
-              if (err) {
-                res.end("Errore DB");
-                return;
-              }
-              // Aggiorna sessione
-              session.user.username = username;
-              res.end("OK");
-            },
-          );
+          // Solo se la password è stata fornita, la hash
+          if (password) {
+              bcrypt.hash(password, 10, (hashErr, hashedPassword) => {
+                  if (hashErr) {
+                      console.error("Errore hashing password durante modifica profilo utente:", hashErr.message);
+                      res.writeHead(500);
+                      return res.end("Errore interno del server.");
+                  }
+                  db.run(
+                      "UPDATE users SET username=?, password=? WHERE id=?",
+                      [username, hashedPassword, session.user.id],
+                      function (err) {
+                          if (err) {
+                              res.writeHead(500);
+                              res.end("Errore DB");
+                              return;
+                          }
+                          // Aggiorna sessione
+                          session.user.username = username;
+                          res.end("OK");
+                      },
+                  );
+              });
+          } else {
+              // Se la password non è stata fornita, aggiorna solo l'username
+              db.run(
+                  "UPDATE users SET username=? WHERE id=?",
+                  [username, session.user.id],
+                  function (err) {
+                      if (err) {
+                          res.writeHead(500);
+                          res.end("Errore DB");
+                          return;
+                      }
+                      session.user.username = username;
+                      res.end("OK");
+                  },
+              );
+          }
         },
       );
     });
@@ -877,17 +995,42 @@ const server = http.createServer((req, res) => {
             res.end("Username già esistente");
             return;
           }
-          db.run(
-            "UPDATE users SET username=?, password=? WHERE id=?",
-            [username, password, id],
-            function (err) {
-              if (err) {
-                res.end("Scrivi Password");
-                return;
-              }
-              res.end("OK");
-            },
-          );
+          // Solo se la password è stata fornita, la hash
+          if (password) {
+              bcrypt.hash(password, 10, (hashErr, hashedPassword) => {
+                  if (hashErr) {
+                      console.error("Errore hashing password durante modifica utente (admin PUT):", hashErr.message);
+                      res.writeHead(500);
+                      return res.end("Errore interno del server.");
+                  }
+                  db.run(
+                      "UPDATE users SET username=?, password=? WHERE id=?",
+                      [username, hashedPassword, id],
+                      function (err) {
+                          if (err) {
+                              res.writeHead(500);
+                              res.end("Errore aggiornamento utente.");
+                              return;
+                          }
+                          res.end("OK");
+                      },
+                  );
+              });
+          } else {
+              // Se la password non è stata fornita, aggiorna solo l'username
+              db.run(
+                  "UPDATE users SET username=? WHERE id=?",
+                  [username, id],
+                  function (err) {
+                      if (err) {
+                          res.writeHead(500);
+                          res.end("Errore aggiornamento utente.");
+                          return;
+                      }
+                      res.end("OK");
+                  },
+              );
+          }
         },
       );
     });
