@@ -1,6 +1,7 @@
 let courses = [];
 let schedules = [];
 let editingScheduleId = null;
+let deletingScheduleId = null; // New variable to store the ID of the schedule to be deleted
 let searchScheduleCourseInput,
   filterScheduleCourseSelect,
   allSchedules = [],
@@ -184,7 +185,7 @@ function renderSchedules() {
                 ✏️
               </button>
               <button class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105" 
-                      title="Elimina" onclick="deleteSchedule(${s.id})">
+                      title="Elimina" onclick="openDeleteScheduleModal(${s.id})">
                 🗑️
               </button>
             </div>
@@ -262,6 +263,7 @@ document.getElementById("edit-schedule-form").onsubmit = async function (e) {
   const end_time = document.getElementById("edit-end").value;
 
   if (start_time >= end_time) {
+    const el = document.getElementById("edit-schedule-msg"); // Define el here
     el.textContent = "L'ora di inizio deve essere precedente a quella di fine.";
     el.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
     return;
@@ -312,12 +314,48 @@ document.getElementById("edit-schedule-form").onsubmit = async function (e) {
       }
     });
 };
-function deleteSchedule(id) {
-  if (confirm("Sei sicuro di voler eliminare questo orario?"))
-    fetch(`/api/schedules/${id}`, { method: "DELETE" }).then(() =>
-      fetchCoursesAndSchedules(),
-    );
+
+// Function to open the delete confirmation modal
+function openDeleteScheduleModal(id) {
+  deletingScheduleId = id;
+  document.getElementById("delete-schedule-modal").style.display = "flex";
 }
+
+// Function to actually delete the schedule
+function deleteSchedule() {
+  if (deletingScheduleId) {
+    fetch(`/api/schedules/${deletingScheduleId}`, { method: "DELETE" }).then(
+      () => {
+        fetchCoursesAndSchedules();
+        document.getElementById("delete-schedule-modal").style.display = "none";
+        deletingScheduleId = null; // Reset the ID
+      },
+    );
+  }
+}
+
+// Event listeners for the delete confirmation modal
+document.getElementById("close-delete-schedule-modal").onclick = () => {
+  document.getElementById("delete-schedule-modal").style.display = "none";
+  deletingScheduleId = null; // Clear the ID on close
+};
+
+document.getElementById("cancel-delete-schedule").onclick = () => {
+  document.getElementById("delete-schedule-modal").style.display = "none";
+  deletingScheduleId = null; // Clear the ID on cancel
+};
+
+document.getElementById("confirm-delete-schedule").onclick = () => {
+  deleteSchedule(); // Call the actual delete function when confirmed
+};
+
+window.addEventListener("click", (e) => {
+  if (e.target === document.getElementById("delete-schedule-modal")) {
+    document.getElementById("delete-schedule-modal").style.display = "none";
+    deletingScheduleId = null; // Clear the ID if clicking outside
+  }
+});
+
 document.getElementById("add-schedule-btn").onclick = () => {
   const filterVal = document.getElementById("filter-course").value;
   document.getElementById("add-course-select").innerHTML =
@@ -361,6 +399,7 @@ document.getElementById("add-schedule-form").onsubmit = async function (e) {
   const end_time = document.getElementById("add-end").value;
 
   if (start_time >= end_time) {
+    const el = document.getElementById("add-schedule-msg"); // Define el here
     el.textContent = "L'ora di inizio deve essere precedente a quella di fine.";
     el.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
     return;
@@ -479,7 +518,7 @@ function renderSchedulesList() {
               <button class="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105" 
                       title="Modifica" onclick="openEditSchedule(${s.id})">✏️</button>
               <button class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105" 
-                      title="Elimina" onclick="deleteSchedule(${s.id})">🗑️</button>
+                      title="Elimina" onclick="openDeleteScheduleModal(${s.id})">🗑️</button>
             </div>
           </td>
         </tr>
@@ -660,9 +699,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const end = document.getElementById("add-end").value;
       if (end <= start) {
         e.preventDefault();
-        alert(
-          "Non è possibile inserire orario perché ore di fine maggiore di ore di inizio",
-        );
+        const el = document.getElementById("add-schedule-msg"); // Define el here
+        el.textContent = "L'ora di inizio deve essere precedente a quella di fine.";
+        el.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
         return false;
       }
     });
@@ -674,9 +713,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const end = document.getElementById("edit-end").value;
       if (end <= start) {
         e.preventDefault();
-        alert(
-          "Non è possibile inserire orario perché ore di fine maggiore di ore di inizio",
-        );
+        const el = document.getElementById("edit-schedule-msg"); // Define el here
+        el.textContent = "L'ora di inizio deve essere precedente a quella di fine.";
+        el.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
         return false;
       }
     });
