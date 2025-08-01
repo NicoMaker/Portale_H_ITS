@@ -2,12 +2,7 @@ let courses = [];
 let users = [];
 let editingUserId = null;
 let searchUserInput, filterCourseSelect;
-let userToDeleteId = null;
-
-// !!! IMPORTANTE: DEVI IMPOSTARE QUESTO ID QUANDO L'UTENTE EFFETTUA IL LOGIN !!!
-// Ad esempio, potresti recuperarlo da un endpoint API al caricamento della dashboard
-// o passarlo dal backend nel HTML della pagina se usi un template engine.
-let currentlyLoggedInUserId = 1; // Esempio: Sostituisci con l'ID reale dell'utente loggato
+let userToDeleteId = null; // NEW: Variabile per tenere traccia dell'ID dell'utente da eliminare
 
 const fetchCourses = () =>
   fetch("/api/courses")
@@ -30,7 +25,7 @@ function updateNewCourseSelect() {
       courses.map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
   } else {
     select.style.display = "none";
-    label.style.display = "none";
+    label.style.display = "none"; // o 'none' se vuoi nascondere anche la label
     select.innerHTML = "";
   }
 }
@@ -241,6 +236,7 @@ function demote(id) {
   fetch(`/api/users/${id}/demote`, { method: "POST" }).then(fetchUsers);
 }
 
+// NEW: Functions for Delete User Confirmation Modal
 function openDeleteUserConfirmModal(id) {
   userToDeleteId = id;
   const user = users.find((u) => u.id == id);
@@ -250,16 +246,16 @@ function openDeleteUserConfirmModal(id) {
     const adminCount = users.filter((u) => u.role === "admin").length;
     if (user.role === "admin" && adminCount <= 1) {
       document.getElementById("delete-admin-warning").style.display = "block";
-      document.getElementById("confirm-delete-user").disabled = true;
+      document.getElementById("confirm-delete-user").disabled = true; // NEW: Disable confirm button if last admin
       document
         .getElementById("confirm-delete-user")
-        .classList.add("opacity-50", "cursor-not-allowed");
+        .classList.add("opacity-50", "cursor-not-allowed"); // NEW: Add styling for disabled button
     } else {
       document.getElementById("delete-admin-warning").style.display = "none";
-      document.getElementById("confirm-delete-user").disabled = false;
+      document.getElementById("confirm-delete-user").disabled = false; // NEW: Enable confirm button
       document
         .getElementById("confirm-delete-user")
-        .classList.remove("opacity-50", "cursor-not-allowed");
+        .classList.remove("opacity-50", "cursor-not-allowed"); // NEW: Remove styling for disabled button
     }
   }
   document.getElementById("delete-user-confirm-modal").style.display = "flex";
@@ -275,43 +271,22 @@ document.getElementById("cancel-delete-user-modal").onclick = () => {
 
 document.getElementById("confirm-delete-user").onclick = () => {
   if (userToDeleteId) {
-    const userBeingDeleted = users.find((u) => u.id === userToDeleteId);
     fetch(`/api/users/${userToDeleteId}`, { method: "DELETE" })
       .then(() => {
-        if (userToDeleteId === currentlyLoggedInUserId) {
-          showCustomAlert(
-            "Account Eliminato",
-            "Il tuo account è stato eliminato. Verrai reindirizzato alla pagina di login.",
-            "👋",
-            () => {
-              localStorage.setItem("logoutReason", "account_deleted");
-              window.location.href = "/login.html";
-            },
-          );
-        } else {
-          fetchUsers();
-          document.getElementById("delete-user-confirm-modal").style.display =
-            "none";
-          showMessage(
-            "assign-msg",
-            `Utente "${userBeingDeleted ? userBeingDeleted.username : ""}" eliminato con successo!`,
-            "success",
-          );
-        }
+        fetchUsers();
+        document.getElementById("delete-user-confirm-modal").style.display =
+          "none";
       })
       .catch((err) => {
         console.error("Errore durante l'eliminazione:", err);
+        // Potresti aggiungere qui un messaggio di errore all'utente
         document.getElementById("delete-user-confirm-modal").style.display =
           "none";
-        showMessage(
-          "assign-msg",
-          "Errore durante l'eliminazione dell'utente.",
-          "error",
-        );
       });
   }
 };
 
+// Modified deleteUser to open the custom modal
 function deleteUser(id) {
   openDeleteUserConfirmModal(id);
 }
@@ -339,10 +314,8 @@ function openEditUser(id) {
   editingUserId = id;
   const user = users.find((u) => u.id === id);
   document.getElementById("edit_username").value = user.username;
-  document.getElementById("edit_password").value = ""; // Clear password field on open
-  document.getElementById("edit-user-password-hint").textContent =
-    "Lascia vuoto per non cambiare la password."; // Initial hint
-  document.getElementById("edit-user-password-hint").style.color = "#6b7280";
+  document.getElementById("edit_password").value = "";
+  document.getElementById("edit-user-password-hint").textContent = "";
   document.getElementById("edit-user-msg").classList.add("hidden");
   document.getElementById("edit-user-modal").style.display = "flex";
 }
@@ -364,11 +337,6 @@ function showMessage(elementId, message, type) {
 document.getElementById("add-user-btn").onclick = () => {
   document.getElementById("add-user-modal").style.display = "flex";
   document.getElementById("add-user-msg").classList.add("hidden");
-  document.getElementById("new-username").value = "";
-  document.getElementById("new-password").value = "";
-  document.getElementById("new-role").value = "user";
-  document.getElementById("add-password-hint").textContent = ""; // Clear hint on new user modal open
-  document.getElementById("add-password-hint").style.color = "#6b7280";
   updateNewCourseSelect();
 };
 
@@ -400,12 +368,11 @@ window.onclick = (e) => {
   if (e.target === document.getElementById("add-user-modal"))
     document.getElementById("add-user-modal").style.display = "none";
   if (e.target === document.getElementById("delete-user-confirm-modal"))
+    // NEW: Close delete user modal on outside click
     document.getElementById("delete-user-confirm-modal").style.display = "none";
-  if (e.target === document.getElementById("custom-alert-modal"))
-    document.getElementById("custom-alert-modal").style.display = "none";
 };
 
-// Validazione password live (per aggiunta nuovo utente)
+// Validazione password live
 const newPassword = document.getElementById("new-password");
 const addHint = document.getElementById("add-password-hint");
 
@@ -420,35 +387,25 @@ newPassword.addEventListener("input", () => {
   addHint.style.color = msg ? "#ef4444" : "#22c55e";
 });
 
-// Validazione password edit (per modifica utente) - opzionale
+// Validazione password edit
 const editPassword = document.getElementById("edit_password");
 const editHint = document.getElementById("edit-user-password-hint");
 
 editPassword.addEventListener("input", () => {
   const val = editPassword.value;
   let msg = "";
-  // La validazione si applica solo se il campo password non è vuoto
-  if (val.length > 0) {
-    if (val.length < 8) msg += "Min 8 caratteri. ";
-    if (!/[A-Z]/.test(val)) msg += "Almeno una maiuscola. ";
-    if (!/[a-z]/.test(val)) msg += "Almeno una minuscola. ";
-    if (!/[0-9]/.test(val)) msg += "Almeno un numero. ";
-  }
+  if (val.length < 8) msg += "Min 8 caratteri. ";
+  if (!/[A-Z]/.test(val)) msg += "Almeno una maiuscola. ";
+  if (!/[a-z]/.test(val)) msg += "Almeno una minuscola. ";
+  if (!/[0-9]/.test(val)) msg += "Almeno un numero. ";
   editHint.textContent = msg;
-  // Colore del testo basato sulla presenza di messaggi (errori)
-  if (val.length === 0) {
-    editHint.style.color = "#6b7280"; // Grigio, nessuna validazione richiesta
-    editHint.textContent = "Lascia vuoto per non cambiare la password.";
-  } else {
-    editHint.style.color = msg ? "#ef4444" : "#22c55e"; // Rosso per errori, verde per OK
-  }
+  editHint.style.color = msg ? "#ef4444" : "#22c55e";
 });
 
 document.getElementById("add-user-form").onsubmit = function (e) {
   e.preventDefault();
 
-  if (addHint.textContent && newPassword.value.length > 0) {
-    // Check hint only if password is provided
+  if (addHint.textContent) {
     addHint.style.color = "#ef4444";
     showMessage("add-user-msg", "Correggi gli errori nella password", "error");
     return false;
@@ -483,105 +440,35 @@ document.getElementById("add-user-form").onsubmit = function (e) {
 document.getElementById("edit-user-form").onsubmit = function (e) {
   e.preventDefault();
 
-  const newUsername = document.getElementById("edit_username").value;
-  const newPasswordVal = document.getElementById("edit_password").value; // Renamed to avoid conflict
-
-  // Valida la password solo se il campo non è vuoto e ci sono hint
-  if (
-    newPasswordVal.length > 0 &&
-    editHint.textContent &&
-    editHint.style.color === "rgb(239, 68, 68)"
-  ) {
-    // Check if there's an error hint
-    showMessage(
-      "edit-user-msg",
-      "Correggi gli errori nella nuova password",
-      "error",
-    );
+  if (editHint.textContent) {
+    editHint.style.color = "#ef4444";
+    showMessage("edit-user-msg", "Correggi gli errori nella password", "error");
     return false;
-  }
-
-  const userData = {
-    username: newUsername,
-  };
-
-  // Aggiungi la password al payload solo se è stata inserita
-  if (newPasswordVal) {
-    userData.password = newPasswordVal;
   }
 
   fetch(`/api/users/${editingUserId}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(userData),
+    body: JSON.stringify({
+      username: document.getElementById("edit_username").value,
+      password: document.getElementById("edit_password").value,
+    }),
   })
     .then((r) => r.text())
     .then((msg) => {
       if (msg === "OK") {
-        const userEdited = users.find((u) => u.id === editingUserId);
-        if (editingUserId === currentlyLoggedInUserId) {
-          if (newPasswordVal) {
-            // Password was changed
-            showCustomAlert(
-              "Credenziali Aggiornate",
-              "La tua password è stata modificata. Per favore, effettua nuovamente l'accesso.",
-              "🔒",
-              () => {
-                localStorage.setItem("passwordChanged", "true");
-                localStorage.setItem(
-                  "passwordChangedMessage",
-                  "La tua password è stata modificata. Per favore, effettua nuovamente l'accesso.",
-                );
-                window.location.href = "/login.html";
-              },
-            );
-          } else if (userEdited && userEdited.username !== newUsername) {
-            // Only username was changed
-            showCustomAlert(
-              "Nome Utente Aggiornato",
-              "Il tuo nome utente è stato modificato con successo.",
-              "👤",
-              () => {
-                fetchUsers();
-                document.getElementById("edit-user-modal").style.display =
-                  "none";
-              },
-            );
-          } else {
-            // No changes or minor changes not requiring re-login
-            showMessage(
-              "edit-user-msg",
-              "Utente aggiornato con successo!",
-              "success",
-            );
-            fetchUsers();
-            setTimeout(() => {
-              document.getElementById("edit-user-modal").style.display = "none";
-            }, 1500);
-          }
-        } else {
-          // Another user was edited
-          showMessage(
-            "edit-user-msg",
-            "Utente aggiornato con successo!",
-            "success",
-          );
-          fetchUsers();
-          setTimeout(() => {
-            document.getElementById("edit-user-modal").style.display = "none";
-          }, 1500);
-        }
+        showMessage(
+          "edit-user-msg",
+          "Utente aggiornato con successo!",
+          "success",
+        );
+        fetchUsers();
+        setTimeout(() => {
+          document.getElementById("edit-user-modal").style.display = "none";
+        }, 1500);
       } else {
         showMessage("edit-user-msg", msg, "error");
       }
-    })
-    .catch((err) => {
-      console.error("Errore durante l'aggiornamento:", err);
-      showMessage(
-        "edit-user-msg",
-        "Errore durante l'aggiornamento dell'utente.",
-        "error",
-      );
     });
 };
 
