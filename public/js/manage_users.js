@@ -81,7 +81,7 @@ function renderUsersList() {
         u.role === "admin"
           ? !courseId || courseId === ""
           : !courseId ||
-          (u.courses && u.courses[0] && u.courses[0].id == courseId);
+            (u.courses && u.courses[0] && u.courses[0].id == courseId);
       const matchRole = !filterRole || u.role === filterRole;
       const matchDate =
         !dateFilter || (u.created_at && u.created_at.startsWith(dateFilter));
@@ -127,15 +127,16 @@ function renderUsersList() {
                               title="Modifica utente" onclick="openEditUser(${u.id})">
                         <span class="text-lg">✏️</span>
                       </button>
-                      ${adminCount > 1 || u.role !== "admin"
-          ? `
+                      ${
+                        adminCount > 1 || u.role !== "admin"
+                          ? `
                       <button class="bg-white/20 hover:bg-red-500/30 backdrop-blur-sm text-white p-3 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105" 
                               title="Elimina utente" onclick="deleteUser(${u.id})">
                         <span class="text-lg">🗑️</span>
                       </button>
                       `
-          : ""
-        }
+                          : ""
+                      }
                     </div>
                   </div>
                   <h3 class="text-2xl font-bold text-white mb-2 truncate">${u.username}</h3>
@@ -153,26 +154,27 @@ function renderUsersList() {
                     <span class="mr-2">📚</span>
                     Corso Assegnato
                   </h4>
-                  ${u.role === "user"
-          ? `
+                  ${
+                    u.role === "user"
+                      ? `
                     <select onchange='assignCourse(${u.id}, this.value)' 
                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm transition-all duration-200 shadow-sm">
                       <option value="">Nessun corso</option>
                       ${courses
-            .map((c) => {
-              const selected =
-                u.courses && u.courses[0] && u.courses[0].id == c.id
-                  ? "selected"
-                  : "";
-              return `<option value="${c.id}" ${selected}>${c.name}</option>`;
-            })
-            .join("")}
+                        .map((c) => {
+                          const selected =
+                            u.courses && u.courses[0] && u.courses[0].id == c.id
+                              ? "selected"
+                              : "";
+                          return `<option value="${c.id}" ${selected}>${c.name}</option>`;
+                        })
+                        .join("")}
                     </select>
                   `
-          : `
+                      : `
                     <p class="text-gray-500 italic">Gli amministratori non hanno corsi assegnati</p>
                   `
-        }
+                  }
                 </div>
                 
                 <div class="flex flex-wrap gap-3">
@@ -182,37 +184,40 @@ function renderUsersList() {
                     <span>Modifica</span>
                   </button>
                   
-                  ${u.role !== "admin"
-          ? `
+                  ${
+                    u.role !== "admin"
+                      ? `
                   <button onclick="promote(${u.id})" 
                     class="flex-1 bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-semibold py-3 px-4 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
                     <span>👑</span>
                     <span>Rendi Admin</span>
                   </button>
                   `
-          : ""
-        }
+                      : ""
+                  }
                   
-                  ${u.role === "admin" && adminCount > 1
-          ? `
+                  ${
+                    u.role === "admin" && adminCount > 1
+                      ? `
                   <button onclick="demote(${u.id})" 
                     class="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-semibold py-3 px-4 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
                     <span>👤</span>
                     <span>Rendi Utente</span>
                   </button>
                   `
-          : ""
-        }
+                      : ""
+                  }
                   
-                  ${adminCount > 1 || u.role !== "admin"
-          ? `
+                  ${
+                    adminCount > 1 || u.role !== "admin"
+                      ? `
                   <button onclick="deleteUser(${u.id})" 
                     class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold py-3 px-4 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center">
                     <span>🗑️</span>
                   </button>
                   `
-          : ""
-        }
+                      : ""
+                  }
                 </div>
               </div>
             </div>
@@ -228,7 +233,6 @@ const promote = (id) =>
 
 const demote = (id) =>
   fetch(`/api/users/${id}/demote`, { method: "POST" }).then(fetchUsers);
-
 
 // NEW: Functions for Delete User Confirmation Modal
 function openDeleteUserConfirmModal(id) {

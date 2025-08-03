@@ -248,23 +248,47 @@ window.onclick = (e) => {
 };
 document.getElementById("edit-schedule-form").onsubmit = async function (e) {
   e.preventDefault();
-  
+
   // Validazione ora di inizio/fine
   const editStart = document.getElementById("edit-start").value;
   const editEnd = document.getElementById("edit-end").value;
   const editMsgEl = document.getElementById("edit-schedule-msg");
 
   if (editStart >= editEnd) {
-    editMsgEl.textContent = "L'ora di inizio deve essere precedente a quella di fine.";
+    editMsgEl.textContent =
+      "L'ora di inizio deve essere precedente a quella di fine.";
     editMsgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
     return;
   }
 
   // Validazione campi Docente, Aula, Materia
-  if (!validateDatalistField("edit-teacher", "teacher-list", "edit-schedule-msg", "Docente")) return;
-  if (!validateDatalistField("edit-room", "room-list", "edit-schedule-msg", "Aula")) return;
-  if (!validateDatalistField("edit-subject", "subject-list", "edit-schedule-msg", "Materia")) return;
-
+  if (
+    !validateDatalistField(
+      "edit-teacher",
+      "teacher-list",
+      "edit-schedule-msg",
+      "Docente",
+    )
+  )
+    return;
+  if (
+    !validateDatalistField(
+      "edit-room",
+      "room-list",
+      "edit-schedule-msg",
+      "Aula",
+    )
+  )
+    return;
+  if (
+    !validateDatalistField(
+      "edit-subject",
+      "subject-list",
+      "edit-schedule-msg",
+      "Materia",
+    )
+  )
+    return;
 
   await fetch("/api/schedules")
     .then((r) => r.json())
@@ -281,7 +305,6 @@ document.getElementById("edit-schedule-form").onsubmit = async function (e) {
   const date = document.getElementById("edit-date").value;
   const start_time = document.getElementById("edit-start").value;
   const end_time = document.getElementById("edit-end").value;
-
 
   const overlap = schedules.some(
     (s) =>
@@ -330,11 +353,11 @@ document.getElementById("edit-schedule-form").onsubmit = async function (e) {
         }, 1000);
       } else {
         editMsgEl.textContent = msg;
-        editMsgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
+        editMsgEl.className =
+          "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
       }
     });
 };
-
 
 // Function to open the delete confirmation modal
 function openDeleteScheduleModal(id) {
@@ -799,7 +822,7 @@ function setupAddFieldWithButton(inputId, buttonId, listId) {
   if (!input || !button || !list) return;
 
   // Aggiungi un attributo per tenere traccia se un nuovo valore è stato "aggiunto"
-  input.dataset.isAdded = 'false';
+  input.dataset.isAdded = "false";
 
   input.addEventListener("input", () => {
     const val = input.value.trim();
@@ -808,7 +831,7 @@ function setupAddFieldWithButton(inputId, buttonId, listId) {
     );
     button.style.display = val && !exists ? "inline-block" : "none";
     // Resetta lo stato quando l'input cambia
-    input.dataset.isAdded = 'false';
+    input.dataset.isAdded = "false";
   });
 
   button.addEventListener("click", () => {
@@ -819,7 +842,7 @@ function setupAddFieldWithButton(inputId, buttonId, listId) {
     list.appendChild(opt);
     button.style.display = "none";
     // Imposta lo stato a true quando un valore viene aggiunto
-    input.dataset.isAdded = 'true';
+    input.dataset.isAdded = "true";
   });
 }
 
@@ -845,17 +868,18 @@ function validateDatalistField(inputId, listId, msgElementId, fieldName) {
   }
 
   // Se il valore non è nella datalist, controlla se è stato aggiunto esplicitamente
-  if (input.dataset.isAdded === 'true' && input.value.toLowerCase() === val.toLowerCase()) {
-      return true;
+  if (
+    input.dataset.isAdded === "true" &&
+    input.value.toLowerCase() === val.toLowerCase()
+  ) {
+    return true;
   }
-
 
   // Se non è presente e non è stato aggiunto, mostra un messaggio di errore
   msgEl.textContent = `${fieldName} "${val}" non è nella lista. Clicca "+ Aggiungi" o seleziona uno esistente.`;
   msgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
   return false;
 }
-
 
 document.getElementById("add-schedule-form").onsubmit = async function (e) {
   e.preventDefault();
@@ -866,16 +890,35 @@ document.getElementById("add-schedule-form").onsubmit = async function (e) {
   const addMsgEl = document.getElementById("add-schedule-msg");
 
   if (addStart >= addEnd) {
-    addMsgEl.textContent = "L'ora di inizio deve essere precedente a quella di fine.";
+    addMsgEl.textContent =
+      "L'ora di inizio deve essere precedente a quella di fine.";
     addMsgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
     return;
   }
 
   // Validazione campi Docente, Aula, Materia
-  if (!validateDatalistField("add-teacher", "teacher-list", "add-schedule-msg", "Docente")) return;
-  if (!validateDatalistField("add-room", "room-list", "add-schedule-msg", "Aula")) return;
-  if (!validateDatalistField("add-subject", "subject-list", "add-schedule-msg", "Materia")) return;
-
+  if (
+    !validateDatalistField(
+      "add-teacher",
+      "teacher-list",
+      "add-schedule-msg",
+      "Docente",
+    )
+  )
+    return;
+  if (
+    !validateDatalistField("add-room", "room-list", "add-schedule-msg", "Aula")
+  )
+    return;
+  if (
+    !validateDatalistField(
+      "add-subject",
+      "subject-list",
+      "add-schedule-msg",
+      "Materia",
+    )
+  )
+    return;
 
   await fetch("/api/schedules")
     .then((r) => r.json())
@@ -892,7 +935,6 @@ document.getElementById("add-schedule-form").onsubmit = async function (e) {
   const start_time = document.getElementById("add-start").value;
   const end_time = document.getElementById("add-end").value;
 
-
   const overlap = schedules.some(
     (s) =>
       String(s.course_id) === String(course_id) &&
@@ -906,7 +948,7 @@ document.getElementById("add-schedule-form").onsubmit = async function (e) {
     addMsgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
     return;
   }
-  
+
   // Se tutte le validazioni passano, resetta il messaggio e invia
   addMsgEl.textContent = "";
   addMsgEl.className = "hidden"; // Nascondi il messaggio di errore
@@ -939,7 +981,8 @@ document.getElementById("add-schedule-form").onsubmit = async function (e) {
         }, 1000);
       } else {
         addMsgEl.textContent = msg;
-        addMsgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
+        addMsgEl.className =
+          "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
       }
     });
 };
