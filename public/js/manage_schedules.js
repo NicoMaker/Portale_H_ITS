@@ -421,7 +421,10 @@ document.getElementById("add-schedule-btn").onclick = () => {
   document.getElementById("add-course-select").innerHTML =
     `<option value="" disabled selected>Seleziona un corso</option>` +
     courses
-      .map((c) => `<option value="${c.id}"${c.id == filterVal ? " selected" : ""}>${c.name}</option>`)
+      .map(
+        (c) =>
+          `<option value="${c.id}"${c.id == filterVal ? " selected" : ""}>${c.name}</option>`,
+      )
       .join(""); // Pre-select if a course filter is active
   document.getElementById("add-teacher").value = "";
   document.getElementById("add-room").value = "";
@@ -433,7 +436,6 @@ document.getElementById("add-schedule-btn").onclick = () => {
   document.getElementById("add-schedule-msg").textContent = "";
   document.getElementById("add-schedule-modal").style.display = "flex";
 };
-
 
 document.getElementById("close-add-schedule-modal").onclick = () => {
   document.getElementById("add-schedule-modal").style.display = "none";
@@ -508,20 +510,33 @@ document.getElementById("add-schedule-form").onsubmit = async function (e) {
         }, 1500);
       } else {
         el.textContent = msg;
-        el.className =
-          "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
+        el.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
       }
     });
 };
 
 function populateFilterOptions() {
-  const teachers = [...new Set(schedules.map((s) => s.teacher).filter(Boolean))];
+  const teachers = [
+    ...new Set(schedules.map((s) => s.teacher).filter(Boolean)),
+  ];
   const rooms = [...new Set(schedules.map((s) => s.room).filter(Boolean))];
-  const subjects = [...new Set(schedules.map((s) => s.subject).filter(Boolean))];
-  const days = [...new Set(schedules.map((s) => s.day).filter(Boolean))].sort((a, b) => {
-    const dayOrder = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"];
-    return dayOrder.indexOf(a) - dayOrder.indexOf(b);
-  });
+  const subjects = [
+    ...new Set(schedules.map((s) => s.subject).filter(Boolean)),
+  ];
+  const days = [...new Set(schedules.map((s) => s.day).filter(Boolean))].sort(
+    (a, b) => {
+      const dayOrder = [
+        "Lunedì",
+        "Martedì",
+        "Mercoledì",
+        "Giovedì",
+        "Venerdì",
+        "Sabato",
+        "Domenica",
+      ];
+      return dayOrder.indexOf(a) - dayOrder.indexOf(b);
+    },
+  );
 
   if (teacherChoices) teacherChoices.destroy();
   if (roomChoices) roomChoices.destroy();
@@ -547,9 +562,13 @@ function populateFilterOptions() {
 }
 
 function updateDatalists() {
-  const teachers = [...new Set(schedules.map((s) => s.teacher).filter(Boolean))];
+  const teachers = [
+    ...new Set(schedules.map((s) => s.teacher).filter(Boolean)),
+  ];
   const rooms = [...new Set(schedules.map((s) => s.room).filter(Boolean))];
-  const subjects = [...new Set(schedules.map((s) => s.subject).filter(Boolean))];
+  const subjects = [
+    ...new Set(schedules.map((s) => s.subject).filter(Boolean)),
+  ];
   const days = [...new Set(schedules.map((s) => s.day).filter(Boolean))];
 
   document.getElementById("teacher-list").innerHTML = teachers
@@ -567,12 +586,7 @@ function updateDatalists() {
 }
 
 // Funzione di utilità per validare i campi datalist
-function validateDatalistField(
-  inputId,
-  datalistId,
-  msgElementId,
-  fieldName,
-) {
+function validateDatalistField(inputId, datalistId, msgElementId, fieldName) {
   const input = document.getElementById(inputId);
   const datalist = document.getElementById(datalistId);
   const msgEl = document.getElementById(msgElementId);
