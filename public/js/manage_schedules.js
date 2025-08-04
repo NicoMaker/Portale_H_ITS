@@ -986,3 +986,60 @@ document.getElementById("add-schedule-form").onsubmit = async function (e) {
       }
     });
 };
+
+
+// Function to open the delete confirmation modal
+function openDeleteScheduleModal(id) {
+  deletingScheduleId = id;
+  const s = schedules.find((x) => x.id == id); // Find the schedule object
+  if (s) {
+    const course = courses.find((c) => c.id == s.course_id); // Find the course name
+    document.getElementById("delete-schedule-course-display").textContent = course ? course.name : "-";
+    document.getElementById("delete-schedule-teacher-display").textContent = s.teacher || "-";
+    document.getElementById("delete-schedule-room-display").textContent = s.room || "-";
+    document.getElementById("delete-schedule-subject-display").textContent = s.subject || "-";
+    document.getElementById("delete-schedule-day-display").textContent = s.day || "-";
+    document.getElementById("delete-schedule-date-display").textContent = typeof formatDate === "function" ? formatDate(s.date) : s.date;
+    document.getElementById("delete-schedule-start-display").textContent = s.start_time;
+    document.getElementById("delete-schedule-end-display").textContent = s.end_time;
+  }
+  // Change this line:
+  document.getElementById("delete-confirm-modal").style.display = "flex"; // Corrected ID
+}
+
+// Function to actually delete the schedule
+function deleteSchedule() {
+  if (deletingScheduleId) {
+    fetch(`/api/schedules/${deletingScheduleId}`, { method: "DELETE" }).then(
+      () => {
+        fetchCoursesAndSchedules();
+        // Change this line:
+        document.getElementById("delete-confirm-modal").style.display = "none"; // Corrected ID
+        deletingScheduleId = null; // Reset the ID
+      },
+    );
+  }
+}
+
+// Event listeners for the delete confirmation modal
+document.getElementById("close-delete-schedule-modal").onclick = () => {
+  // Change this line:
+  document.getElementById("delete-confirm-modal").style.display = "none"; // Corrected ID
+  deletingScheduleId = null; // Clear the ID on close
+};
+document.getElementById("cancel-delete-schedule").onclick = () => {
+  // Change this line:
+  document.getElementById("delete-confirm-modal").style.display = "none"; // Corrected ID
+  deletingScheduleId = null; // Clear the ID on cancel
+};
+document.getElementById("confirm-delete-schedule").onclick = () => {
+  deleteSchedule(); // Call the actual delete function when confirmed
+};
+window.addEventListener("click", (e) => {
+  // Change this line:
+  if (e.target === document.getElementById("delete-confirm-modal")) { // Corrected ID
+    // Change this line:
+    document.getElementById("delete-confirm-modal").style.display = "none"; // Corrected ID
+    deletingScheduleId = null; // Clear the ID if clicking outside
+  }
+});
