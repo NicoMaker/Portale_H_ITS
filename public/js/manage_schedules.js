@@ -155,7 +155,9 @@ function renderSchedules() {
             ${s.teacher || "-"}
           </td>
           <td class="px-4 py-4 text-sm border-r border-gray-100">
-            <code class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs font-mono">${s.room || "-"}</code>
+            <code class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs font-mono">${
+              s.room || "-"
+            }</code>
           </td>
           <td class="px-4 py-4 text-sm text-gray-700 italic border-r border-gray-100">
             ${s.subject || "-"}
@@ -185,7 +187,9 @@ function renderSchedules() {
                 ✏️
               </button>
               <button class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105" 
-                      title="Elimina" onclick="openDeleteScheduleModal(${s.id})">
+                      title="Elimina" onclick="openDeleteScheduleModal(${
+                        s.id
+                      })">
                 🗑️
               </button>
             </div>
@@ -540,29 +544,45 @@ function renderSchedulesList() {
               ${course.name || "-"}
             </span>
           </td>
-          <td class="px-4 py-4 text-sm text-gray-800 font-medium border-r border-gray-100">${s.teacher}</td>
+          <td class="px-4 py-4 text-sm text-gray-800 font-medium border-r border-gray-100">${
+            s.teacher
+          }</td>
           <td class="px-4 py-4 text-sm border-r border-gray-100">
-            <code class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs font-mono">${s.room}</code>
+            <code class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs font-mono">${
+              s.room
+            }</code>
           </td>
-          <td class="px-4 py-4 text-sm text-gray-700 italic border-r border-gray-100">${s.subject || ""}</td>
-          <td class="px-4 py-4 text-sm text-gray-800 font-semibold border-r border-gray-100">${s.day}</td>
+          <td class="px-4 py-4 text-sm text-gray-700 italic border-r border-gray-100">${
+            s.subject || ""
+          }</td>
+          <td class="px-4 py-4 text-sm text-gray-800 font-semibold border-r border-gray-100">${
+            s.day
+          }</td>
           <td class="px-4 py-4 text-sm border-r border-gray-100">
             <span class="bg-yellow-50 text-yellow-800 px-2 py-1 rounded text-xs font-mono">
               ${typeof formatDate === "function" ? formatDate(s.date) : s.date}
             </span>
           </td>
           <td class="px-4 py-4 text-sm border-r border-gray-100">
-            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">${s.start_time}</span>
+            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">${
+              s.start_time
+            }</span>
           </td>
           <td class="px-4 py-4 text-sm border-r border-gray-100">
-            <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-bold">${s.end_time}</span>
+            <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-bold">${
+              s.end_time
+            }</span>
           </td>
           <td class="px-4 py-4 text-center">
             <div class="flex justify-center space-x-2">
               <button class="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105" 
-                      title="Modifica" onclick="openEditSchedule(${s.id})">✏️</button>
+                      title="Modifica" onclick="openEditSchedule(${
+                        s.id
+                      })">✏️</button>
               <button class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105" 
-                      title="Elimina" onclick="openDeleteScheduleModal(${s.id})">🗑️</button>
+                      title="Elimina" onclick="openDeleteScheduleModal(${
+                        s.id
+                      })">🗑️</button>
             </div>
           </td>
         </tr>
