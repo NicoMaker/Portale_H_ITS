@@ -111,70 +111,68 @@
 
     <div
       id="add-course-modal"
-      class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
       style="display: none"
     >
       <div
-        class="bg-white/95 backdrop-blur-sm rounded-3xl shadow-3xl max-w-lg w-full overflow-hidden border border-gray-100"
+        class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden"
       >
         <div
-          class="flex items-center justify-between p-8 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-blue-50"
+          class="flex items-center justify-between p-6 border-b border-gray-200"
         >
-          <h3 class="text-2xl font-bold text-gray-900">
+          <h3 class="text-xl font-semibold text-gray-900">
             ➕ Aggiungi Nuovo Corso
           </h3>
           <button
             id="close-add-course-modal"
-            class="text-gray-400 hover:text-gray-600 text-3xl font-bold transition-colors"
+            class="text-gray-400 hover:text-gray-600 text-2xl font-bold"
           >
             ×
           </button>
         </div>
 
-        <div class="p-8">
-          <form id="add-course-form" class="space-y-6">
+        <div class="p-6 max-h-96 overflow-y-auto custom-scrollbar">
+          <form id="add-course-form" class="space-y-4">
             <div>
               <label
                 for="course-name"
-                class="block text-sm font-medium text-gray-700 mb-3"
+                class="block text-sm font-medium text-gray-700 mb-2"
+                >Nome del corso</label
               >
-                📝 Nome del corso
-              </label>
               <input
                 type="text"
                 id="course-name"
                 placeholder="Es. Matematica Avanzata"
                 required
-                class="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 bg-white/90 backdrop-blur-sm text-lg transition-all duration-200 shadow-lg"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
 
             <div>
               <label
                 for="course-desc"
-                class="block text-sm font-medium text-gray-700 mb-3"
+                class="block text-sm font-medium text-gray-700 mb-2"
+                >Descrizione (opzionale)</label
               >
-                📋 Descrizione (opzionale)
-              </label>
               <textarea
                 id="course-desc"
                 rows="4"
                 placeholder="Descrivi brevemente il corso..."
-                class="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 bg-white/90 backdrop-blur-sm text-lg transition-all duration-200 shadow-lg resize-none"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
               ></textarea>
             </div>
 
-            <div class="flex justify-end space-x-4 pt-6">
+            <div class="flex justify-end space-x-3 pt-4">
               <button
                 type="button"
                 id="cancel-add-course"
-                class="px-8 py-3 bg-gray-500 text-white rounded-2xl hover:bg-gray-600 transition-all duration-200 font-semibold shadow-lg"
+                class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
               >
                 Annulla
               </button>
               <button
                 type="submit"
-                class="px-8 py-3 bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-2xl hover:from-purple-600 hover:to-blue-700 transition-all duration-200 font-semibold shadow-lg transform hover:-translate-y-0.5"
+                class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
               >
                 Crea Corso
               </button>
@@ -182,7 +180,7 @@
 
             <div
               id="course-msg"
-              class="mt-4 p-4 rounded-2xl text-sm font-medium hidden"
+              class="mt-4 p-3 rounded-lg text-sm"
             ></div>
           </form>
         </div>
@@ -191,68 +189,68 @@
 
     <div
       id="edit-course-modal"
-      class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
       style="display: none"
     >
       <div
-        class="bg-white/95 backdrop-blur-sm rounded-3xl shadow-3xl max-w-lg w-full overflow-hidden border border-gray-100"
+        class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden"
       >
         <div
-          class="flex items-center justify-between p-8 border-b border-gray-200 bg-gradient-to-r from-orange-50 to-yellow-50"
+          class="flex items-center justify-between p-6 border-b border-gray-200"
         >
-          <h3 class="text-2xl font-bold text-gray-900">✏️ Modifica Corso</h3>
+          <h3 class="text-xl font-semibold text-gray-900">
+            ✏️ Modifica Corso
+          </h3>
           <button
             id="close-edit-course-modal"
-            class="text-gray-400 hover:text-gray-600 text-3xl font-bold transition-colors"
+            class="text-gray-400 hover:text-gray-600 text-2xl font-bold"
           >
             ×
           </button>
         </div>
 
-        <div class="p-8">
-          <form id="edit-course-form" class="space-y-6">
+        <div class="p-6 max-h-96 overflow-y-auto custom-scrollbar">
+          <form id="edit-course-form" class="space-y-4">
             <div>
               <label
                 for="edit-course-name"
-                class="block text-sm font-medium text-gray-700 mb-3"
+                class="block text-sm font-medium text-gray-700 mb-2"
+                >Nome del corso</label
               >
-                📝 Nome del corso
-              </label>
               <input
                 type="text"
                 id="edit-course-name"
                 placeholder="Nome corso"
                 required
-                class="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 bg-white/90 backdrop-blur-sm text-lg transition-all duration-200 shadow-lg"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
 
             <div>
               <label
                 for="edit-course-desc"
-                class="block text-sm font-medium text-gray-700 mb-3"
+                class="block text-sm font-medium text-gray-700 mb-2"
+                >Descrizione</label
               >
-                📋 Descrizione
-              </label>
               <textarea
                 id="edit-course-desc"
                 rows="4"
                 placeholder="Descrizione del corso..."
-                class="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 bg-white/90 backdrop-blur-sm text-lg transition-all duration-200 shadow-lg resize-none"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
               ></textarea>
             </div>
 
-            <div class="flex justify-end space-x-4 pt-6">
+            <div class="flex justify-end space-x-3 pt-4">
               <button
                 type="button"
                 id="cancel-edit-course"
-                class="px-8 py-3 bg-gray-500 text-white rounded-2xl hover:bg-gray-600 transition-all duration-200 font-semibold shadow-lg"
+                class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
               >
                 Annulla
               </button>
               <button
                 type="submit"
-                class="px-8 py-3 bg-gradient-to-r from-orange-500 to-yellow-600 text-white rounded-2xl hover:from-orange-600 hover:to-yellow-700 transition-all duration-200 font-semibold shadow-lg transform hover:-translate-y-0.5"
+                class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
               >
                 Salva Modifiche
               </button>
@@ -260,7 +258,7 @@
 
             <div
               id="edit-course-msg"
-              class="mt-4 p-4 rounded-2xl text-sm font-medium hidden"
+              class="mt-4 p-3 rounded-lg text-sm"
             ></div>
           </form>
         </div>
@@ -269,49 +267,44 @@
 
     <div
       id="delete-confirm-modal"
-      class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
       style="display: none"
     >
       <div
-        class="bg-white/95 backdrop-blur-sm rounded-3xl shadow-3xl max-w-sm w-full overflow-hidden border border-gray-100 text-center"
+        class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden"
       >
         <div
-          class="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-red-50 to-orange-50"
+          class="flex items-center justify-between p-6 border-b border-gray-200"
         >
-          <h3
-            class="text-2xl font-bold text-gray-900 flex items-center mx-auto"
-          >
-            <span class="text-4xl mr-2">🗑️</span> Conferma Eliminazione
+          <h3 class="text-xl font-semibold text-gray-900">
+            🗑️ Conferma Eliminazione
           </h3>
           <button
             id="close-delete-confirm-modal"
-            class="text-gray-400 hover:text-gray-600 text-3xl font-bold transition-colors absolute top-4 right-4"
+            class="text-gray-400 hover:text-gray-600 text-2xl font-bold"
           >
             ×
           </button>
         </div>
-
-        <div class="p-8">
-          <p class="text-gray-700 text-lg mb-6">
+        <div class="p-6">
+          <p class="text-gray-700 mb-6">
             Sei sicuro di voler eliminare il corso "<strong
               id="delete-course-name-display"
             ></strong
             >"? Questa azione non può essere annullata.
           </p>
-          <div class="flex justify-center space-x-4">
+          <div class="flex justify-end space-x-3">
             <button
-              type="button"
               id="cancel-delete-course"
-              class="px-8 py-3 bg-gray-500 text-white rounded-2xl hover:bg-gray-600 transition-all duration-200 font-semibold shadow-lg"
+              class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
             >
               Annulla
             </button>
             <button
-              type="button"
               id="confirm-delete-course"
-              class="px-8 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-2xl hover:from-red-700 hover:to-red-800 transition-all duration-200 font-semibold shadow-lg transform hover:-translate-y-0.5"
+              class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
             >
-              Sì, Elimina
+              Elimina
             </button>
           </div>
         </div>
