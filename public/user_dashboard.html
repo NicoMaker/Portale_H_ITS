@@ -17,13 +17,11 @@
   <body
     class="bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 min-h-screen"
   >
-    <!-- Navigation Bar -->
     <nav
       class="bg-white shadow-lg border-b border-gray-200 backdrop-blur-sm bg-white/95 sticky top-0 z-50"
     >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
-          <!-- Desktop Navigation -->
           <div class="hidden md:flex space-x-8 items-center">
             <a
               href="/user_dashboard.html"
@@ -33,7 +31,6 @@
             </a>
           </div>
 
-          <!-- Desktop Actions -->
           <div class="hidden md:flex items-center space-x-4">
             <a
               href="/logout"
@@ -43,7 +40,6 @@
             </a>
           </div>
 
-          <!-- Mobile menu button -->
           <div class="md:hidden flex items-center">
             <button
               id="mobile-menu-btn"
@@ -67,7 +63,6 @@
           </div>
         </div>
 
-        <!-- Mobile Navigation Menu -->
         <div id="mobile-menu" class="md:hidden hidden">
           <div
             class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200"
@@ -89,9 +84,7 @@
       </div>
     </nav>
 
-    <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <!-- Header Section -->
       <div class="mb-8">
         <div
           class="flex flex-col md:flex-row md:items-center md:justify-between"
@@ -109,7 +102,6 @@
         </div>
       </div>
 
-      <!-- Courses Badges Section -->
       <div id="courses-section" class="mb-8 animate-slide-up">
         <div
           class="bg-white/95 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-lg hover-lift overflow-hidden border border-gray-100"
@@ -133,13 +125,11 @@
               </div>
             </div>
             <div id="user-courses" class="flex flex-wrap gap-2 md:gap-3">
-              <!-- Course badges will be inserted here -->
-            </div>
+              </div>
           </div>
         </div>
       </div>
 
-      <!-- Filters Section -->
       <div class="mb-8 animate-slide-up">
         <div
           class="bg-white/95 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-lg hover-lift overflow-hidden border border-gray-100"
@@ -225,11 +215,18 @@
                 />
               </div>
             </div>
+            <div class="mt-6 text-center">
+              <button
+                id="reset-filters-btn-u"
+                class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-xl shadow-sm text-white bg-gray-500 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200"
+              >
+                <span class="mr-2"></span> Azzera Filtri
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Schedules Table Section -->
       <div class="animate-slide-up">
         <div
           class="bg-white/95 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-lg hover-lift overflow-hidden border border-gray-100"
@@ -253,16 +250,13 @@
               </div>
             </div>
 
-            <!-- Mobile table container with horizontal scroll -->
             <div id="user-schedules-table" class="mobile-table-container">
-              <!-- Table will be inserted here -->
-            </div>
+              </div>
           </div>
         </div>
       </div>
     </main>
 
-    <!-- Edit Profile Modal -->
     <div
       id="edit-profile-modal"
       class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
@@ -338,7 +332,6 @@
       </div>
     </div>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script src="js/user_dashboard.js"></script>
   </body>

@@ -3,6 +3,8 @@ let users = [];
 let editingUserId = null;
 let searchUserInput, filterCourseSelect;
 let userToDeleteId = null; // NEW: Variabile per tenere traccia dell'ID dell'utente da eliminare
+let filterRoleSelect; // Add this line
+let filterUserDate; // Add this line
 
 const fetchCourses = () =>
   fetch("/api/courses")
@@ -470,11 +472,22 @@ document.getElementById("edit-user-form").onsubmit = function (e) {
     });
 };
 
+// Function to clear all filters
+function clearAllFilters() {
+  searchUserInput.value = "";
+  filterCourseSelect.value = "";
+  filterRoleSelect.value = "";
+  filterUserDate.value = "";
+  toggleFilterCourseVisibility(); // Ensure course filter visibility is correct after clearing role
+  renderUsersList();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   searchUserInput = document.getElementById("search-user");
   filterCourseSelect = document.getElementById("filter-course");
-  const filterRoleSelect = document.getElementById("filter-role");
-  const filterUserDate = document.getElementById("filter-user-date");
+  filterRoleSelect = document.getElementById("filter-role"); // Assign to the global variable
+  filterUserDate = document.getElementById("filter-user-date"); // Assign to the global variable
+  const clearFiltersBtn = document.getElementById("clear-filters-btn"); // Get the new button
 
   if (searchUserInput && filterCourseSelect) {
     searchUserInput.addEventListener("input", renderUsersList);
@@ -486,6 +499,11 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     if (filterUserDate)
       filterUserDate.addEventListener("input", renderUsersList);
+  }
+
+  // Add event listener for the new clear filters button
+  if (clearFiltersBtn) {
+    clearFiltersBtn.addEventListener("click", clearAllFilters);
   }
 
   toggleFilterCourseVisibility();

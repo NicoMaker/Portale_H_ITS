@@ -25,6 +25,7 @@ document.getElementById("edit-profile-form").appendChild(usernameHidden);
 const newPassword = document.getElementById("new_password");
 const editHint = document.getElementById("edit-password-hint");
 const editMsg = document.getElementById("edit-profile-msg");
+const filterDateExactU = document.getElementById("filter-date-exact-u"); // Added reference
 
 let allCourses = [];
 let allSchedules = [];
@@ -94,11 +95,14 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
       // Listener per input data esatta
+      filterDateExactU.addEventListener("change", () => {
+        renderSchedulesTable(allCourses, allSchedules);
+      });
+
+      // Listener for reset filters button
       document
-        .getElementById("filter-date-exact-u")
-        .addEventListener("change", () => {
-          renderSchedulesTable(allCourses, allSchedules);
-        });
+        .getElementById("reset-filters-btn-u")
+        .addEventListener("click", resetFilters);
     })
     .catch((e) => {
       console.error("Errore nel caricamento dati:", e);
@@ -124,7 +128,7 @@ function populateFilterOptions() {
   ];
 
   // Insegnanti
-  teacherChoices.clearChoices();
+  teacherChoices.clearChoices(); // Clear existing choices before setting new ones
   teacherChoices.setChoices(
     unique(allSchedules, "teacher").map((v) => ({ value: v, label: v })),
     "value",
@@ -133,7 +137,7 @@ function populateFilterOptions() {
   );
 
   // Aule
-  roomChoices.clearChoices();
+  roomChoices.clearChoices(); // Clear existing choices before setting new ones
   roomChoices.setChoices(
     unique(allSchedules, "room").map((v) => ({ value: v, label: v })),
     "value",
@@ -142,7 +146,7 @@ function populateFilterOptions() {
   );
 
   // Materie
-  subjectChoices.clearChoices();
+  subjectChoices.clearChoices(); // Clear existing choices before setting new ones
   subjectChoices.setChoices(
     unique(allSchedules, "subject").map((v) => ({ value: v, label: v })),
     "value",
@@ -158,7 +162,7 @@ function populateFilterOptions() {
     giorniPresentiSet.has(normalize(g)),
   );
 
-  dayChoices.clearChoices();
+  dayChoices.clearChoices(); // Clear existing choices before setting new ones
   dayChoices.setChoices(
     giorniOrdinati.map((d) => ({ value: d, label: d })),
     "value",
@@ -201,7 +205,7 @@ function renderSchedulesTable(courses, schedules) {
   const roomFilter = roomChoices.getValue(true);
   const subjectFilter = subjectChoices.getValue(true);
   const dayFilter = dayChoices.getValue(true);
-  const dateExact = document.getElementById("filter-date-exact-u").value;
+  const dateExact = filterDateExactU.value;
 
   // Applica filtri
   if (teacherFilter.length)
@@ -261,6 +265,22 @@ function renderSchedulesTable(courses, schedules) {
     html += "</tbody></table></div>";
   }
   document.getElementById("user-schedules-table").innerHTML = html;
+}
+
+// ------------------------------
+// Funzione per resettare i filtri
+// ------------------------------
+function resetFilters() {
+  teacherChoices.clearStore();
+  roomChoices.clearStore();
+  subjectChoices.clearStore();
+  dayChoices.clearStore();
+  filterDateExactU.value = ""; // Clear the exact date input
+
+  // Re-populate the filter options after clearing the Choices.js instances
+  populateFilterOptions(); // This will ensure all original options are back in the dropdowns
+
+  renderSchedulesTable(allCourses, allSchedules); // Re-render table with no filters
 }
 
 // ------------------------------
