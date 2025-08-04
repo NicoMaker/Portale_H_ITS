@@ -45,6 +45,14 @@ function setupAutoEndTime() {
   });
 }
 
+// NEW: Function to get the day of the week in Italian
+function getDayOfWeek(dateString) {
+  const date = new Date(dateString);
+  const options = { weekday: 'long' };
+  return new Intl.DateTimeFormat('it-IT', options).format(date);
+}
+
+
 function fetchCoursesAndSchedules() {
   Promise.all([
     fetch("/api/courses").then((r) => r.json()),
@@ -245,13 +253,33 @@ function openEditSchedule(id) {
   document.getElementById("edit-teacher").value = s.teacher;
   document.getElementById("edit-room").value = s.room;
   document.getElementById("edit-subject").value = s.subject || "";
-  document.getElementById("edit-day").textContent = s.day;
+  // document.getElementById("edit-day").textContent = s.day; // This line already exists
   document.getElementById("edit-date").value = s.date;
   document.getElementById("edit-start").value = s.start_time;
   document.getElementById("edit-end").value = s.end_time;
   document.getElementById("edit-schedule-msg").textContent = "";
   document.getElementById("edit-schedule-modal").style.display = "flex";
+
+  // NEW: Update edit-day when edit-date changes
+  const editDateInput = document.getElementById("edit-date");
+  const editDayDisplay = document.getElementById("edit-day");
+
+  // Initial population of day
+  if (editDateInput.value) {
+    editDayDisplay.textContent = getDayOfWeek(editDateInput.value);
+  } else {
+    editDayDisplay.textContent = "-";
+  }
+
+  editDateInput.onchange = () => {
+    if (editDateInput.value) {
+      editDayDisplay.textContent = getDayOfWeek(editDateInput.value);
+    } else {
+      editDayDisplay.textContent = "-";
+    }
+  };
 }
+
 document.getElementById("close-edit-schedule-modal").onclick = () => {
   document.getElementById("edit-schedule-modal").style.display = "none";
 };
@@ -316,9 +344,9 @@ document.getElementById("edit-schedule-form").onsubmit = async function (e) {
   const teacher = document.getElementById("edit-teacher").value;
   const room = document.getElementById("edit-room").value;
   const subject = document.getElementById("edit-subject").value;
-  // Non modifichiamo day in edit modal, è solo visualizzato
-  const day = document.getElementById("edit-day").textContent;
+  // Non modifichiamo day in edit modal, lo prendiamo dalla data
   const date = document.getElementById("edit-date").value;
+  const day = getDayOfWeek(date); // NEW: Get day from date
   const start_time = document.getElementById("edit-start").value;
   const end_time = document.getElementById("edit-end").value;
 
@@ -349,7 +377,7 @@ document.getElementById("edit-schedule-form").onsubmit = async function (e) {
       teacher,
       room,
       subject,
-      day,
+      day, // NEW: Include day in the PUT request
       date,
       start_time,
       end_time,
@@ -429,12 +457,25 @@ document.getElementById("add-schedule-btn").onclick = () => {
   document.getElementById("add-teacher").value = "";
   document.getElementById("add-room").value = "";
   document.getElementById("add-subject").value = "";
-  document.getElementById("add-day").value = ""; // Use .value for input type text
+  // document.getElementById("add-day").value = ""; // REMOVE THIS LINE - day will be set automatically
+  document.getElementById("add-day-display").textContent = "-"; // NEW: Set initial display for day
   document.getElementById("add-date").value = "";
   document.getElementById("add-start").value = "";
   document.getElementById("add-end").value = "";
   document.getElementById("add-schedule-msg").textContent = "";
   document.getElementById("add-schedule-modal").style.display = "flex";
+
+  // NEW: Add event listener for date input in add modal
+  const addDateInput = document.getElementById("add-date");
+  const addDayDisplay = document.getElementById("add-day-display");
+
+  addDateInput.onchange = () => {
+    if (addDateInput.value) {
+      addDayDisplay.textContent = getDayOfWeek(addDateInput.value);
+    } else {
+      addDayDisplay.textContent = "-";
+    }
+  };
 };
 
 document.getElementById("close-add-schedule-modal").onclick = () => {
@@ -459,8 +500,8 @@ document.getElementById("add-schedule-form").onsubmit = async function (e) {
   const teacher = document.getElementById("add-teacher").value;
   const room = document.getElementById("add-room").value;
   const subject = document.getElementById("add-subject").value;
-  const day = document.getElementById("add-day").value;
   const date = document.getElementById("add-date").value;
+  const day = getDayOfWeek(date); // NEW: Get day from date
   const start_time = document.getElementById("add-start").value;
   const end_time = document.getElementById("add-end").value;
 
@@ -492,7 +533,7 @@ document.getElementById("add-schedule-form").onsubmit = async function (e) {
       teacher,
       room,
       subject,
-      day,
+      day, // NEW: Include day in the POST request
       date,
       start_time,
       end_time,
@@ -526,15 +567,15 @@ function populateFilterOptions() {
   const days = [...new Set(schedules.map((s) => s.day).filter(Boolean))].sort(
     (a, b) => {
       const dayOrder = [
-        "Lunedì",
-        "Martedì",
-        "Mercoledì",
-        "Giovedì",
-        "Venerdì",
-        "Sabato",
-        "Domenica",
+        "lunedì", // Lowercase for consistent comparison if needed
+        "martedì",
+        "mercoledì",
+        "giovedì",
+        "venerdì",
+        "sabato",
+        "domenica",
       ];
-      return dayOrder.indexOf(a) - dayOrder.indexOf(b);
+      return dayOrder.indexOf(a.toLowerCase()) - dayOrder.indexOf(b.toLowerCase());
     },
   );
 
