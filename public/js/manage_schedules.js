@@ -71,11 +71,15 @@ function setupAutoDayOfWeek() {
   const editDaySpan = document.getElementById("edit-day");
 
   addDateInput.addEventListener("change", () => {
-    addDayInput.value = addDateInput.value ? getDayOfWeek(addDateInput.value) : "";
+    addDayInput.value = addDateInput.value
+      ? getDayOfWeek(addDateInput.value)
+      : "";
   });
 
   editDateInput.addEventListener("change", () => {
-    editDaySpan.textContent = editDateInput.value ? getDayOfWeek(editDateInput.value) : "";
+    editDaySpan.textContent = editDateInput.value
+      ? getDayOfWeek(editDateInput.value)
+      : "";
   });
 }
 
@@ -349,14 +353,20 @@ function openDeleteScheduleModal(id) {
   const s = schedules.find((x) => x.id == id);
   const course = courses.find((c) => c.id == s.course_id);
 
-  document.getElementById("delete-schedule-course-display").textContent = course.name;
-  document.getElementById("delete-schedule-teacher-display").textContent = s.teacher;
-  document.getElementById("delete-schedule-subject-display").textContent = s.subject;
+  document.getElementById("delete-schedule-course-display").textContent =
+    course.name;
+  document.getElementById("delete-schedule-teacher-display").textContent =
+    s.teacher;
+  document.getElementById("delete-schedule-subject-display").textContent =
+    s.subject;
   document.getElementById("delete-schedule-room-display").textContent = s.room;
   document.getElementById("delete-schedule-day-display").textContent = s.day;
-  document.getElementById("delete-schedule-date-display").textContent = formatDate(s.date);
-  document.getElementById("delete-schedule-start-display").textContent = s.start_time;
-  document.getElementById("delete-schedule-end-display").textContent = s.end_time;
+  document.getElementById("delete-schedule-date-display").textContent =
+    formatDate(s.date);
+  document.getElementById("delete-schedule-start-display").textContent =
+    s.start_time;
+  document.getElementById("delete-schedule-end-display").textContent =
+    s.end_time;
 
   document.getElementById("delete-schedule-modal").style.display = "flex";
 }
@@ -459,16 +469,23 @@ document.getElementById("add-schedule-form").onsubmit = async function (e) {
         }, 1500);
       } else {
         addMsgEl.textContent = msg;
-        addMsgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
+        addMsgEl.className =
+          "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
       }
     });
 };
 
 // Popola i filtri multipli con Choices.js
 function populateFilterOptions() {
-  const teachers = [...new Set(schedules.map((s) => s.teacher).filter(Boolean))].sort();
-  const rooms = [...new Set(schedules.map((s) => s.room).filter(Boolean))].sort();
-  const subjects = [...new Set(schedules.map((s) => s.subject).filter(Boolean))].sort();
+  const teachers = [
+    ...new Set(schedules.map((s) => s.teacher).filter(Boolean)),
+  ].sort();
+  const rooms = [
+    ...new Set(schedules.map((s) => s.room).filter(Boolean)),
+  ].sort();
+  const subjects = [
+    ...new Set(schedules.map((s) => s.subject).filter(Boolean)),
+  ].sort();
   const days = [...new Set(schedules.map((s) => s.day).filter(Boolean))].sort(
     (a, b) => {
       const dayOrder = [
@@ -509,13 +526,23 @@ function populateFilterOptions() {
 
 // Popola i datalist per l'auto-completamento
 function updateDatalists() {
-  const teachers = [...new Set(schedules.map((s) => s.teacher).filter(Boolean))];
+  const teachers = [
+    ...new Set(schedules.map((s) => s.teacher).filter(Boolean)),
+  ];
   const rooms = [...new Set(schedules.map((s) => s.room).filter(Boolean))];
-  const subjects = [...new Set(schedules.map((s) => s.subject).filter(Boolean))];
+  const subjects = [
+    ...new Set(schedules.map((s) => s.subject).filter(Boolean)),
+  ];
 
-  document.getElementById("teacher-list").innerHTML = teachers.map((t) => `<option value="${t}">`).join("");
-  document.getElementById("room-list").innerHTML = rooms.map((r) => `<option value="${r}">`).join("");
-  document.getElementById("subject-list").innerHTML = subjects.map((s) => `<option value="${s}">`).join("");
+  document.getElementById("teacher-list").innerHTML = teachers
+    .map((t) => `<option value="${t}">`)
+    .join("");
+  document.getElementById("room-list").innerHTML = rooms
+    .map((r) => `<option value="${r}">`)
+    .join("");
+  document.getElementById("subject-list").innerHTML = subjects
+    .map((s) => `<option value="${s}">`)
+    .join("");
 }
 
 // Event listeners per la chiusura dei modal
@@ -558,7 +585,9 @@ window.onclick = (e) => {
 // Event listener per i filtri
 document.getElementById("filter-course").onchange = renderSchedules;
 document.getElementById("filter-date").oninput = renderSchedules;
-document.getElementById("clear-filters-btn").addEventListener("click", clearFilters);
+document
+  .getElementById("clear-filters-btn")
+  .addEventListener("click", clearFilters);
 
 // Inizializza l'applicazione al caricamento della pagina
 document.addEventListener("DOMContentLoaded", () => {
