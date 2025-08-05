@@ -1,15 +1,12 @@
 let courses = [];
 let schedules = [];
 let editingScheduleId = null;
-let deletingScheduleId = null; // New variable to store the ID of the schedule to be deleted
-let searchScheduleCourseInput,
-  filterScheduleCourseSelect,
-  allSchedules = [],
-  allCourses = [];
-// Inizializza Choices.js per i filtri multipli
+let deletingScheduleId = null;
 let teacherChoices, roomChoices, subjectChoices, dayChoices;
 
+// Funzione di utilità per aggiungere un'ora all'orario
 function addOneHourToTime(timeStr) {
+  if (!timeStr) return "";
   const [hours, minutes] = timeStr.split(":").map(Number);
   const date = new Date();
   date.setHours(hours, minutes || 0);
@@ -17,6 +14,7 @@ function addOneHourToTime(timeStr) {
   return date.toTimeString().slice(0, 5);
 }
 
+// Configura l'aggiornamento automatico dell'ora di fine
 function setupAutoEndTime() {
   const addStart = document.getElementById("add-start");
   const addEnd = document.getElementById("add-end");
@@ -26,6 +24,8 @@ function setupAutoEndTime() {
     if (!addEndModified && addStart.value) {
       addEnd.value = addOneHourToTime(addStart.value);
     }
+    // Dopo il cambio, si presume che l'utente possa voler modificare l'ora di fine
+    addEndModified = false;
   });
   addEnd.addEventListener("input", () => {
     addEndModified = true;
@@ -39,12 +39,53 @@ function setupAutoEndTime() {
     if (!editEndModified && editStart.value) {
       editEnd.value = addOneHourToTime(editStart.value);
     }
+    editEndModified = false;
   });
   editEnd.addEventListener("input", () => {
     editEndModified = true;
   });
 }
 
+// Funzione per ottenere il giorno della settimana da una data
+function getDayOfWeek(dateStr) {
+  const days = [
+    "Domenica",
+    "Lunedì",
+    "Martedì",
+    "Mercoledì",
+    "Giovedì",
+    "Venerdì",
+    "Sabato",
+  ];
+  if (!dateStr) return "";
+  // Aggiungiamo T00:00:00 per evitare problemi di fuso orario
+  const date = new Date(dateStr + "T00:00:00");
+  return days[date.getDay()];
+}
+
+// Configura l'aggiornamento automatico del giorno della settimana
+function setupAutoDayOfWeek() {
+  const addDateInput = document.getElementById("add-date");
+  const addDayInput = document.getElementById("add-day");
+  const editDateInput = document.getElementById("edit-date");
+  const editDaySpan = document.getElementById("edit-day");
+
+  addDateInput.addEventListener("change", () => {
+    addDayInput.value = addDateInput.value ? getDayOfWeek(addDateInput.value) : "";
+  });
+
+  editDateInput.addEventListener("change", () => {
+    editDaySpan.textContent = editDateInput.value ? getDayOfWeek(editDateInput.value) : "";
+  });
+}
+
+// Funzione per formattare la data per l'interfaccia utente
+function formatDate(dateString) {
+  const [year, month, day] = dateString.split("-");
+  return `${day}/${month}/${year}`;
+}
+
+// Funzione principale per recuperare e renderizzare i dati
 function fetchCoursesAndSchedules() {
   Promise.all([
     fetch("/api/courses").then((r) => r.json()),
@@ -61,23 +102,16 @@ function fetchCoursesAndSchedules() {
     updateDatalists();
   });
 }
-document.getElementById("filter-course").onchange = renderSchedules;
-// Importa la funzione formatDate
-// Se il browser non supporta import/export, assicuriamoci che formatDate sia globale
-if (typeof window.formatDate !== "function") {
-  const script = document.createElement("script");
-  script.src = "js/utils.js";
-  document.head.appendChild(script);
-}
 
+// Funzione per renderizzare la tabella degli orari
 function renderSchedules() {
   const courseId = document.getElementById("filter-course").value;
-  // Ottieni i valori selezionati (array)
   const teacherFilter = teacherChoices ? teacherChoices.getValue(true) : [];
   const roomFilter = roomChoices ? roomChoices.getValue(true) : [];
   const subjectFilter = subjectChoices ? subjectChoices.getValue(true) : [];
   const dayFilter = dayChoices ? dayChoices.getValue(true) : [];
   const dateFilter = document.getElementById("filter-date").value;
+
   let filtered = schedules;
   if (courseId)
     filtered = filtered.filter((s) => String(s.course_id) === String(courseId));
@@ -90,7 +124,7 @@ function renderSchedules() {
   if (dayFilter.length)
     filtered = filtered.filter((s) => dayFilter.includes(s.day));
   if (dateFilter) filtered = filtered.filter((s) => s.date === dateFilter);
-  // Ordina per data e ora
+
   filtered = filtered.slice().sort((a, b) => {
     if (a.date === b.date) return a.start_time.localeCompare(b.start_time);
     return a.date.localeCompare(b.date);
@@ -115,7 +149,7 @@ function renderSchedules() {
                 📚 Corso
               </th>
               <th class="px-4 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">
-                👨‍🏫 Docente  
+                👨‍🏫 Docente   
               </th>
               <th class="px-4 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">
                 🏫 Aula
@@ -167,7 +201,7 @@ function renderSchedules() {
           </td>
           <td class="px-4 py-4 text-sm border-r border-gray-100">
             <span class="bg-yellow-50 text-yellow-800 px-2 py-1 rounded text-xs font-mono">
-              ${typeof formatDate === "function" ? formatDate(s.date) : s.date}
+              ${formatDate(s.date)}
             </span>
           </td>
           <td class="px-4 py-4 text-sm border-r border-gray-100">
@@ -187,9 +221,7 @@ function renderSchedules() {
                 ✏️
               </button>
               <button class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105" 
-                      title="Elimina" onclick="openDeleteScheduleModal(${
-                        s.id
-                      })">
+                      title="Elimina" onclick="openDeleteScheduleModal(${s.id})">
                 🗑️
               </button>
             </div>
@@ -202,125 +234,63 @@ function renderSchedules() {
   document.getElementById("schedules-list").innerHTML = html;
 }
 
-// Aggiorna i filtri per ricerca live
-[
-  "filter-teacher",
-  "filter-room",
-  "filter-subject",
-  "filter-day",
-  "filter-date",
-].forEach((id) => {
-  const el = document.getElementById(id);
-  if (el) {
-    if (el.tagName === "SELECT") {
-      el.onchange = renderSchedules;
-    } else {
-      el.oninput = renderSchedules;
-    }
-  }
-});
-
-// NEW: Function to clear all filters
+// Funzione per azzerare tutti i filtri
 function clearFilters() {
-  document.getElementById("filter-course").value = ""; // Reset course filter
+  document.getElementById("filter-course").value = "";
   if (teacherChoices) teacherChoices.removeActiveItems();
   if (roomChoices) roomChoices.removeActiveItems();
   if (subjectChoices) subjectChoices.removeActiveItems();
   if (dayChoices) dayChoices.removeActiveItems();
-  document.getElementById("filter-date").value = ""; // Clear date input
-  renderSchedules(); // Re-render schedules with cleared filters
+  document.getElementById("filter-date").value = "";
+  renderSchedules();
 }
 
+// Apre il modal di modifica
 function openEditSchedule(id) {
   editingScheduleId = id;
   const s = schedules.find((x) => x.id == id);
+  const course = courses.find((c) => c.id == s.course_id);
+
+  // Popola il selettore del corso
   document.getElementById("edit-course-select").innerHTML = courses
     .map(
       (c) =>
-        `<option value="${c.id}"${c.id == s.course_id ? " selected" : ""}>${
-          c.name
-        }</option>`,
+        `<option value="${c.id}"${c.id == s.course_id ? " selected" : ""}>${c.name}</option>`,
     )
     .join("");
+
   document.getElementById("edit-teacher").value = s.teacher;
   document.getElementById("edit-room").value = s.room;
   document.getElementById("edit-subject").value = s.subject || "";
-  document.getElementById("edit-day").textContent = s.day;
+  document.getElementById("edit-day").textContent = s.day || "";
   document.getElementById("edit-date").value = s.date;
   document.getElementById("edit-start").value = s.start_time;
   document.getElementById("edit-end").value = s.end_time;
   document.getElementById("edit-schedule-msg").textContent = "";
+
   document.getElementById("edit-schedule-modal").style.display = "flex";
 }
-document.getElementById("close-edit-schedule-modal").onclick = () => {
-  document.getElementById("edit-schedule-modal").style.display = "none";
-};
-document.getElementById("cancel-edit-schedule").onclick = function () {
-  document.getElementById("edit-schedule-modal").style.display = "none";
-};
-window.onclick = (e) => {
-  if (e.target === document.getElementById("edit-schedule-modal"))
-    document.getElementById("edit-schedule-modal").style.display = "none";
-};
+
+// Gestione form di modifica
 document.getElementById("edit-schedule-form").onsubmit = async function (e) {
   e.preventDefault();
-
-  // Validazione ora di inizio/fine
-  const editStart = document.getElementById("edit-start").value;
-  const editEnd = document.getElementById("edit-end").value;
   const editMsgEl = document.getElementById("edit-schedule-msg");
-
-  if (editStart >= editEnd) {
-    editMsgEl.textContent =
-      "L'ora di inizio deve essere precedente a quella di fine.";
-    editMsgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
-    return;
-  }
-
-  // Validazione campi Docente, Aula, Materia
-  if (
-    !validateDatalistField(
-      "edit-teacher",
-      "teacher-list",
-      "edit-schedule-msg",
-      "Docente",
-    )
-  )
-    return;
-  if (
-    !validateDatalistField(
-      "edit-room",
-      "room-list",
-      "edit-schedule-msg",
-      "Aula",
-    )
-  )
-    return;
-  if (
-    !validateDatalistField(
-      "edit-subject",
-      "subject-list",
-      "edit-schedule-msg",
-      "Materia",
-    )
-  )
-    return;
-
-  await fetch("/api/schedules")
-    .then((r) => r.json())
-    .then((data) => {
-      schedules = data;
-    });
 
   const course_id = document.getElementById("edit-course-select").value;
   const teacher = document.getElementById("edit-teacher").value;
   const room = document.getElementById("edit-room").value;
   const subject = document.getElementById("edit-subject").value;
-  // Non modifichiamo day in edit modal, è solo visualizzato
   const day = document.getElementById("edit-day").textContent;
   const date = document.getElementById("edit-date").value;
   const start_time = document.getElementById("edit-start").value;
   const end_time = document.getElementById("edit-end").value;
+
+  if (start_time >= end_time) {
+    editMsgEl.textContent =
+      "L'ora di inizio deve essere precedente a quella di fine.";
+    editMsgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
+    return;
+  }
 
   const overlap = schedules.some(
     (s) =>
@@ -337,9 +307,7 @@ document.getElementById("edit-schedule-form").onsubmit = async function (e) {
     return;
   }
 
-  // Se tutte le validazioni passano, resetta il messaggio e invia
   editMsgEl.textContent = "";
-  editMsgEl.className = "hidden"; // Nascondi il messaggio di errore
 
   fetch(`/api/schedules/${editingScheduleId}`, {
     method: "PUT",
@@ -375,47 +343,38 @@ document.getElementById("edit-schedule-form").onsubmit = async function (e) {
     });
 };
 
-// Function to open the delete confirmation modal
+// Apre il modal di eliminazione
 function openDeleteScheduleModal(id) {
   deletingScheduleId = id;
+  const s = schedules.find((x) => x.id == id);
+  const course = courses.find((c) => c.id == s.course_id);
+
+  document.getElementById("delete-schedule-course-display").textContent = course.name;
+  document.getElementById("delete-schedule-teacher-display").textContent = s.teacher;
+  document.getElementById("delete-schedule-subject-display").textContent = s.subject;
+  document.getElementById("delete-schedule-room-display").textContent = s.room;
+  document.getElementById("delete-schedule-day-display").textContent = s.day;
+  document.getElementById("delete-schedule-date-display").textContent = formatDate(s.date);
+  document.getElementById("delete-schedule-start-display").textContent = s.start_time;
+  document.getElementById("delete-schedule-end-display").textContent = s.end_time;
+
   document.getElementById("delete-schedule-modal").style.display = "flex";
 }
 
-// Function to actually delete the schedule
+// Funzione per eliminare l'orario
 function deleteSchedule() {
   if (deletingScheduleId) {
     fetch(`/api/schedules/${deletingScheduleId}`, { method: "DELETE" }).then(
       () => {
         fetchCoursesAndSchedules();
         document.getElementById("delete-schedule-modal").style.display = "none";
-        deletingScheduleId = null; // Reset the ID
+        deletingScheduleId = null;
       },
     );
   }
 }
 
-// Event listeners for the delete confirmation modal
-document.getElementById("close-delete-schedule-modal").onclick = () => {
-  document.getElementById("delete-schedule-modal").style.display = "none";
-  deletingScheduleId = null; // Clear the ID on close
-};
-
-document.getElementById("cancel-delete-schedule").onclick = () => {
-  document.getElementById("delete-schedule-modal").style.display = "none";
-  deletingScheduleId = null; // Clear the ID on cancel
-};
-
-document.getElementById("confirm-delete-schedule").onclick = () => {
-  deleteSchedule(); // Call the actual delete function when confirmed
-};
-
-window.addEventListener("click", (e) => {
-  if (e.target === document.getElementById("delete-schedule-modal")) {
-    document.getElementById("delete-schedule-modal").style.display = "none";
-    deletingScheduleId = null; // Clear the ID if clicking outside
-  }
-});
-
+// Apre il modal di aggiunta
 document.getElementById("add-schedule-btn").onclick = () => {
   const filterVal = document.getElementById("filter-course").value;
   document.getElementById("add-course-select").innerHTML =
@@ -425,11 +384,11 @@ document.getElementById("add-schedule-btn").onclick = () => {
         (c) =>
           `<option value="${c.id}"${c.id == filterVal ? " selected" : ""}>${c.name}</option>`,
       )
-      .join(""); // Pre-select if a course filter is active
+      .join("");
   document.getElementById("add-teacher").value = "";
   document.getElementById("add-room").value = "";
   document.getElementById("add-subject").value = "";
-  document.getElementById("add-day").value = ""; // Use .value for input type text
+  document.getElementById("add-day").value = "";
   document.getElementById("add-date").value = "";
   document.getElementById("add-start").value = "";
   document.getElementById("add-end").value = "";
@@ -437,23 +396,10 @@ document.getElementById("add-schedule-btn").onclick = () => {
   document.getElementById("add-schedule-modal").style.display = "flex";
 };
 
-document.getElementById("close-add-schedule-modal").onclick = () => {
-  document.getElementById("add-schedule-modal").style.display = "none";
-};
-document.getElementById("cancel-add-schedule").onclick = function () {
-  document.getElementById("add-schedule-modal").style.display = "none";
-};
-window.addEventListener("click", function (e) {
-  if (e.target === document.getElementById("add-schedule-modal"))
-    document.getElementById("add-schedule-modal").style.display = "none";
-});
+// Gestione form di aggiunta
 document.getElementById("add-schedule-form").onsubmit = async function (e) {
   e.preventDefault();
-  await fetch("/api/schedules")
-    .then((r) => r.json())
-    .then((data) => {
-      schedules = data;
-    });
+  const addMsgEl = document.getElementById("add-schedule-msg");
 
   const course_id = document.getElementById("add-course-select").value;
   const teacher = document.getElementById("add-teacher").value;
@@ -465,24 +411,27 @@ document.getElementById("add-schedule-form").onsubmit = async function (e) {
   const end_time = document.getElementById("add-end").value;
 
   if (start_time >= end_time) {
-    const el = document.getElementById("add-schedule-msg"); // Define el here
-    el.textContent = "L'ora di inizio deve essere precedente a quella di fine.";
-    el.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
+    addMsgEl.textContent =
+      "L'ora di inizio deve essere precedente a quella di fine.";
+    addMsgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
     return;
   }
+
   const overlap = schedules.some(
     (s) =>
       String(s.course_id) === String(course_id) &&
       s.date === date &&
       s.start_time === start_time,
   );
-  const el = document.getElementById("add-schedule-msg");
+
   if (overlap) {
-    el.textContent =
+    addMsgEl.textContent =
       "Esiste già un orario per questo corso, data e ora di inizio.";
-    el.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
+    addMsgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
     return;
   }
+
+  addMsgEl.textContent = "";
 
   fetch("/api/schedules", {
     method: "POST",
@@ -500,29 +449,26 @@ document.getElementById("add-schedule-form").onsubmit = async function (e) {
   })
     .then((r) => r.text())
     .then((msg) => {
-      fetchCoursesAndSchedules();
       if (msg === "OK") {
-        el.textContent = "Orario aggiunto con successo!";
-        el.className =
+        addMsgEl.textContent = "Orario aggiunto con successo!";
+        addMsgEl.className =
           "mt-4 p-3 rounded-lg text-sm bg-green-100 text-green-800";
+        fetchCoursesAndSchedules();
         setTimeout(() => {
           document.getElementById("add-schedule-modal").style.display = "none";
         }, 1500);
       } else {
-        el.textContent = msg;
-        el.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
+        addMsgEl.textContent = msg;
+        addMsgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
       }
     });
 };
 
+// Popola i filtri multipli con Choices.js
 function populateFilterOptions() {
-  const teachers = [
-    ...new Set(schedules.map((s) => s.teacher).filter(Boolean)),
-  ];
-  const rooms = [...new Set(schedules.map((s) => s.room).filter(Boolean))];
-  const subjects = [
-    ...new Set(schedules.map((s) => s.subject).filter(Boolean)),
-  ];
+  const teachers = [...new Set(schedules.map((s) => s.teacher).filter(Boolean))].sort();
+  const rooms = [...new Set(schedules.map((s) => s.room).filter(Boolean))].sort();
+  const subjects = [...new Set(schedules.map((s) => s.subject).filter(Boolean))].sort();
   const days = [...new Set(schedules.map((s) => s.day).filter(Boolean))].sort(
     (a, b) => {
       const dayOrder = [
@@ -561,53 +507,62 @@ function populateFilterOptions() {
   });
 }
 
+// Popola i datalist per l'auto-completamento
 function updateDatalists() {
-  const teachers = [
-    ...new Set(schedules.map((s) => s.teacher).filter(Boolean)),
-  ];
+  const teachers = [...new Set(schedules.map((s) => s.teacher).filter(Boolean))];
   const rooms = [...new Set(schedules.map((s) => s.room).filter(Boolean))];
-  const subjects = [
-    ...new Set(schedules.map((s) => s.subject).filter(Boolean)),
-  ];
-  const days = [...new Set(schedules.map((s) => s.day).filter(Boolean))];
+  const subjects = [...new Set(schedules.map((s) => s.subject).filter(Boolean))];
 
-  document.getElementById("teacher-list").innerHTML = teachers
-    .map((t) => `<option value="${t}">`)
-    .join("");
-  document.getElementById("room-list").innerHTML = rooms
-    .map((r) => `<option value="${r}">`)
-    .join("");
-  document.getElementById("subject-list").innerHTML = subjects
-    .map((s) => `<option value="${s}">`)
-    .join("");
-  document.getElementById("day-list").innerHTML = days
-    .map((d) => `<option value="${d}">`)
-    .join("");
+  document.getElementById("teacher-list").innerHTML = teachers.map((t) => `<option value="${t}">`).join("");
+  document.getElementById("room-list").innerHTML = rooms.map((r) => `<option value="${r}">`).join("");
+  document.getElementById("subject-list").innerHTML = subjects.map((s) => `<option value="${s}">`).join("");
 }
 
-// Funzione di utilità per validare i campi datalist
-function validateDatalistField(inputId, datalistId, msgElementId, fieldName) {
-  const input = document.getElementById(inputId);
-  const datalist = document.getElementById(datalistId);
-  const msgEl = document.getElementById(msgElementId);
-  const options = Array.from(datalist.options).map((opt) => opt.value);
+// Event listeners per la chiusura dei modal
+document.getElementById("close-edit-schedule-modal").onclick = () => {
+  document.getElementById("edit-schedule-modal").style.display = "none";
+};
+document.getElementById("cancel-edit-schedule").onclick = function () {
+  document.getElementById("edit-schedule-modal").style.display = "none";
+};
+document.getElementById("close-add-schedule-modal").onclick = () => {
+  document.getElementById("add-schedule-modal").style.display = "none";
+};
+document.getElementById("cancel-add-schedule").onclick = function () {
+  document.getElementById("add-schedule-modal").style.display = "none";
+};
+document.getElementById("close-delete-schedule-modal").onclick = () => {
+  document.getElementById("delete-schedule-modal").style.display = "none";
+  deletingScheduleId = null;
+};
+document.getElementById("cancel-delete-schedule").onclick = () => {
+  document.getElementById("delete-schedule-modal").style.display = "none";
+  deletingScheduleId = null;
+};
+document.getElementById("confirm-delete-schedule").onclick = deleteSchedule;
 
-  if (input.value && !options.includes(input.value)) {
-    msgEl.textContent = `${fieldName} selezionato non è valido. Seleziona un valore dall'elenco o aggiungine uno nuovo (se il pulsante 'Aggiungi' è visibile).`;
-    msgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
-    return false;
+// Chiusura dei modal cliccando al di fuori
+window.onclick = (e) => {
+  if (e.target === document.getElementById("edit-schedule-modal")) {
+    document.getElementById("edit-schedule-modal").style.display = "none";
   }
-  return true;
-}
+  if (e.target === document.getElementById("add-schedule-modal")) {
+    document.getElementById("add-schedule-modal").style.display = "none";
+  }
+  if (e.target === document.getElementById("delete-schedule-modal")) {
+    document.getElementById("delete-schedule-modal").style.display = "none";
+    deletingScheduleId = null;
+  }
+};
 
-// Ensure event listeners are attached after DOM is fully loaded
+// Event listener per i filtri
+document.getElementById("filter-course").onchange = renderSchedules;
+document.getElementById("filter-date").oninput = renderSchedules;
+document.getElementById("clear-filters-btn").addEventListener("click", clearFilters);
+
+// Inizializza l'applicazione al caricamento della pagina
 document.addEventListener("DOMContentLoaded", () => {
   setupAutoEndTime();
+  setupAutoDayOfWeek();
   fetchCoursesAndSchedules();
-
-  // Add event listener for the new clear filters button
-  const clearFiltersBtn = document.getElementById("clear-filters-btn");
-  if (clearFiltersBtn) {
-    clearFiltersBtn.addEventListener("click", clearFilters);
-  }
 });
