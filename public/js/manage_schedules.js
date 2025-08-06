@@ -273,6 +273,11 @@ function openEditSchedule(id) {
   document.getElementById("edit-schedule-msg").textContent = "";
 
   document.getElementById("edit-schedule-modal").style.display = "flex";
+
+  // Inizializza i controlli della visibilità dei pulsanti di aggiunta
+  toggleAddButtonVisibility("edit", "teacher");
+  toggleAddButtonVisibility("edit", "room");
+  toggleAddButtonVisibility("edit", "subject");
 }
 
 // Gestione form di modifica
@@ -288,6 +293,18 @@ document.getElementById("edit-schedule-form").onsubmit = async function (e) {
   const date = document.getElementById("edit-date").value;
   const start_time = document.getElementById("edit-start").value;
   const end_time = document.getElementById("edit-end").value;
+
+  // Validazione: controlla se i nuovi valori sono stati aggiunti
+  if (
+    document.getElementById("edit-teacher-btn").style.display !== "none" ||
+    document.getElementById("edit-room-btn").style.display !== "none" ||
+    document.getElementById("edit-subject-btn").style.display !== "none"
+  ) {
+    editMsgEl.textContent =
+      "Per favore, aggiungi i nuovi valori prima di salvare l'orario.";
+    editMsgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
+    return;
+  }
 
   if (start_time >= end_time) {
     editMsgEl.textContent =
@@ -404,6 +421,11 @@ document.getElementById("add-schedule-btn").onclick = () => {
   document.getElementById("add-end").value = "";
   document.getElementById("add-schedule-msg").textContent = "";
   document.getElementById("add-schedule-modal").style.display = "flex";
+
+  // Inizializza i controlli della visibilità dei pulsanti di aggiunta
+  toggleAddButtonVisibility("add", "teacher");
+  toggleAddButtonVisibility("add", "room");
+  toggleAddButtonVisibility("add", "subject");
 };
 
 // Gestione form di aggiunta
@@ -419,6 +441,18 @@ document.getElementById("add-schedule-form").onsubmit = async function (e) {
   const date = document.getElementById("add-date").value;
   const start_time = document.getElementById("add-start").value;
   const end_time = document.getElementById("add-end").value;
+
+  // Validazione: controlla se i nuovi valori sono stati aggiunti
+  if (
+    document.getElementById("add-teacher-btn").style.display !== "none" ||
+    document.getElementById("add-room-btn").style.display !== "none" ||
+    document.getElementById("add-subject-btn").style.display !== "none"
+  ) {
+    addMsgEl.textContent =
+      "Per favore, aggiungi i nuovi valori prima di aggiungere l'orario.";
+    addMsgEl.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
+    return;
+  }
 
   if (start_time >= end_time) {
     addMsgEl.textContent =
@@ -475,14 +509,88 @@ document.getElementById("add-schedule-form").onsubmit = async function (e) {
     });
 };
 
+// Funzione per controllare la visibilità del pulsante di aggiunta
+function toggleAddButtonVisibility(modalType, field) {
+  const input = document.getElementById(`${modalType}-${field}`);
+  const button = document.getElementById(`${modalType}-${field}-btn`);
+  const value = input.value.trim();
+  const existingValues = [
+    ...new Set(schedules.map((s) => s[field]).filter(Boolean)),
+  ];
+  if (value && !existingValues.includes(value)) {
+    button.style.display = "block";
+  } else {
+    button.style.display = "none";
+  }
+}
+
+// Gestione dell'aggiunta dinamica di docente, aula o materia
+function handleAdd(inputId, listId, key, modalType) {
+  const input = document.getElementById(`${modalType}-${inputId}`);
+  const value = input.value.trim();
+  if (value && !schedules.some((s) => s[key] === value)) {
+    const newSchedule = {
+      id: Date.now(),
+      course_id:
+        modalType === "add"
+          ? document.getElementById("add-course-select").value
+          : document.getElementById("edit-course-select").value,
+      teacher: key === "teacher" ? value : "",
+      room: key === "room" ? value : "",
+      subject: key === "subject" ? value : "",
+      day: "",
+      date: "",
+      start_time: "",
+      end_time: "",
+    };
+    schedules.push(newSchedule);
+    updateDatalists();
+    input.value = value;
+    toggleAddButtonVisibility(modalType, inputId); // Nascondi il pulsante dopo l'aggiunta
+  }
+}
+
+document.getElementById("add-teacher-btn").onclick = () =>
+  handleAdd("teacher", "teacher-list", "teacher", "add");
+document.getElementById("add-room-btn").onclick = () =>
+  handleAdd("room", "room-list", "room", "add");
+document.getElementById("add-subject-btn").onclick = () =>
+  handleAdd("subject", "subject-list", "subject", "add");
+
+document.getElementById("edit-teacher-btn").onclick = () =>
+  handleAdd("teacher", "teacher-list", "teacher", "edit");
+document.getElementById("edit-room-btn").onclick = () =>
+  handleAdd("room", "room-list", "room", "edit");
+document.getElementById("edit-subject-btn").onclick = () =>
+  handleAdd("subject", "subject-list", "subject", "edit");
+
+// Aggiungi event listener per input
+document.getElementById("add-teacher").addEventListener("input", () => {
+  toggleAddButtonVisibility("add", "teacher");
+});
+document.getElementById("add-room").addEventListener("input", () => {
+  toggleAddButtonVisibility("add", "room");
+});
+document.getElementById("add-subject").addEventListener("input", () => {
+  toggleAddButtonVisibility("add", "subject");
+});
+
+document.getElementById("edit-teacher").addEventListener("input", () => {
+  toggleAddButtonVisibility("edit", "teacher");
+});
+document.getElementById("edit-room").addEventListener("input", () => {
+  toggleAddButtonVisibility("edit", "room");
+});
+document.getElementById("edit-subject").addEventListener("input", () => {
+  toggleAddButtonVisibility("edit", "subject");
+});
+
 // Popola i filtri multipli con Choices.js
 function populateFilterOptions() {
   const teachers = [
     ...new Set(schedules.map((s) => s.teacher).filter(Boolean)),
   ].sort();
-  const rooms = [
-    ...new Set(schedules.map((s) => s.room).filter(Boolean)),
-  ].sort();
+  const rooms = [...new Set(schedules.map((s) => s.room).filter(Boolean))].sort();
   const subjects = [
     ...new Set(schedules.map((s) => s.subject).filter(Boolean)),
   ].sort();
@@ -528,21 +636,28 @@ function populateFilterOptions() {
 function updateDatalists() {
   const teachers = [
     ...new Set(schedules.map((s) => s.teacher).filter(Boolean)),
-  ];
-  const rooms = [...new Set(schedules.map((s) => s.room).filter(Boolean))];
+  ].sort();
+  const rooms = [...new Set(schedules.map((s) => s.room).filter(Boolean))].sort();
   const subjects = [
     ...new Set(schedules.map((s) => s.subject).filter(Boolean)),
-  ];
+  ].sort();
 
-  document.getElementById("teacher-list").innerHTML = teachers
-    .map((t) => `<option value="${t}">`)
-    .join("");
-  document.getElementById("room-list").innerHTML = rooms
-    .map((r) => `<option value="${r}">`)
-    .join("");
-  document.getElementById("subject-list").innerHTML = subjects
-    .map((s) => `<option value="${s}">`)
-    .join("");
+  const teacherDatalist = document.getElementById("teacher-list");
+  if (teacherDatalist) {
+    teacherDatalist.innerHTML = teachers
+      .map((t) => `<option value="${t}">`)
+      .join("");
+  }
+  const roomDatalist = document.getElementById("room-list");
+  if (roomDatalist) {
+    roomDatalist.innerHTML = rooms.map((r) => `<option value="${r}">`).join("");
+  }
+  const subjectDatalist = document.getElementById("subject-list");
+  if (subjectDatalist) {
+    subjectDatalist.innerHTML = subjects
+      .map((s) => `<option value="${s}">`)
+      .join("");
+  }
 }
 
 // Event listeners per la chiusura dei modal
