@@ -97,18 +97,17 @@ function fetchCoursesAndSchedules() {
     courses = allCourses;
     schedules = allSchedules;
 
-    // --- Inizio della modifica ---
-    // Filtra i corsi per mostrare solo opzioni uniche nel menu a tendina
-    const uniqueCourseNames = [...new Set(courses.map((c) => c.name))];
-    const uniqueCourses = uniqueCourseNames.map((name) =>
-      courses.find((c) => c.name === name),
-    );
+    // --- Modifica inizio ---
+    // Crea un elenco di nomi di corsi unici per il menu a tendina
+    const uniqueCourseNames = [...new Set(courses.map((c) => c.name))].sort();
 
     const select = document.getElementById("filter-course");
     select.innerHTML =
       '<option value="">Tutti i corsi</option>' +
-      uniqueCourses.map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
-    // --- Fine della modifica ---
+      uniqueCourseNames
+        .map((name) => `<option value="${name}">${name}</option>`)
+        .join("");
+    // --- Modifica fine ---
 
     populateFilterOptions();
     renderSchedules();
@@ -118,7 +117,7 @@ function fetchCoursesAndSchedules() {
 
 // Funzione per renderizzare la tabella degli orari
 function renderSchedules() {
-  const courseId = document.getElementById("filter-course").value;
+  const courseNameFilter = document.getElementById("filter-course").value;
   const teacherFilter = teacherChoices ? teacherChoices.getValue(true) : [];
   const roomFilter = roomChoices ? roomChoices.getValue(true) : [];
   const subjectFilter = subjectChoices ? subjectChoices.getValue(true) : [];
@@ -126,7 +125,7 @@ function renderSchedules() {
   const dateFilter = document.getElementById("filter-date").value;
 
   console.log("Filtri applicati:", {
-    courseId,
+    courseNameFilter,
     teacherFilter,
     roomFilter,
     subjectFilter,
@@ -135,9 +134,19 @@ function renderSchedules() {
   });
 
   let filtered = schedules;
-  if (courseId) {
-    filtered = filtered.filter((s) => String(s.course_id) === String(courseId));
+
+  // --- Modifica inizio ---
+  // Filtra per nome del corso, non per ID, in modo da catturare tutti i corsi con quel nome
+  if (courseNameFilter) {
+    const matchingCourseIds = courses
+      .filter((c) => c.name === courseNameFilter)
+      .map((c) => String(c.id));
+    filtered = filtered.filter((s) =>
+      matchingCourseIds.includes(String(s.course_id)),
+    );
   }
+  // --- Modifica fine ---
+
   if (teacherFilter.length) {
     filtered = filtered.filter((s) => teacherFilter.includes(s.teacher));
   }
