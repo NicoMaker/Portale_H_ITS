@@ -96,10 +96,20 @@ function fetchCoursesAndSchedules() {
   ]).then(([allCourses, allSchedules]) => {
     courses = allCourses;
     schedules = allSchedules;
+
+    // --- Inizio della modifica ---
+    // Filtra i corsi per mostrare solo opzioni uniche nel menu a tendina
+    const uniqueCourseNames = [...new Set(courses.map((c) => c.name))];
+    const uniqueCourses = uniqueCourseNames.map((name) =>
+      courses.find((c) => c.name === name),
+    );
+
     const select = document.getElementById("filter-course");
     select.innerHTML =
       '<option value="">Tutti i corsi</option>' +
-      courses.map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
+      uniqueCourses.map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
+    // --- Fine della modifica ---
+
     populateFilterOptions();
     renderSchedules();
     updateDatalists();
