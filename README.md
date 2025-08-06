@@ -237,5 +237,3 @@ Per contribuire al progetto:
 Questo progetto è rilasciato sotto licenza MIT. Vedi il file `LICENSE` per i dettagli.
 
 ---
-
-**Sviluppato con ❤️ per l'ITS - Istituto Tecnico Superiore**
