@@ -197,15 +197,21 @@ Portale_H_ITS/
 - `GET /api/dashboard/stats` - Statistiche generali
 - `GET /api/dashboard/user/:id` - Dati utente specifico
 
-## 🗄️ Database
+Perfetto! Qui sotto trovi una **versione Markdown completa e migliorata** del tuo schema, in cui viene **spiegato chiaramente cosa significa FK (Foreign Key)**, indicando che si tratta di una **chiave esterna** che **fa riferimento a una chiave primaria di un’altra tabella**.
 
-Il sistema utilizza SQLite3 con le seguenti tabelle principali:
+---
 
+# 🗄️ **Database Schema**
 
-## Struttura delle Tabelle
+Il sistema utilizza **SQLite3** per la gestione dei dati, con un modello relazionale composto da 4 tabelle principali:
 
-### 1. Tabella `users`
-Gestisce gli utenti del sistema (amministratori e studenti).
+---
+
+## 📋 **Struttura delle Tabelle**
+
+### 1. `users`
+
+Gestisce gli utenti del sistema, sia amministratori che studenti.
 
 ```sql
 CREATE TABLE IF NOT EXISTS users (
@@ -217,13 +223,17 @@ CREATE TABLE IF NOT EXISTS users (
 ```
 
 **Campi:**
-- `id`: Chiave primaria auto-incrementale
-- `username`: Nome utente univoco (UNIQUE constraint)
-- `password`: Password hashata con bcrypt
-- `role`: Ruolo utente (`admin` o `student`)
 
-### 2. Tabella `courses`
-Contiene i corsi disponibili nel portale.
+* `id`: Chiave primaria auto-incrementale
+* `username`: Nome utente univoco
+* `password`: Password protetta mediante hash con **bcrypt**
+* `role`: Ruolo dell’utente (`admin` o `student`)
+
+---
+
+### 2. `courses`
+
+Contiene i corsi disponibili nel sistema.
 
 ```sql
 CREATE TABLE IF NOT EXISTS courses (
@@ -234,12 +244,16 @@ CREATE TABLE IF NOT EXISTS courses (
 ```
 
 **Campi:**
-- `id`: Chiave primaria auto-incrementale
-- `name`: Nome del corso (UNIQUE constraint)
-- `description`: Descrizione dettagliata del corso (opzionale)
 
-### 3. Tabella `user_courses`
-Tabella di collegamento many-to-many tra utenti e corsi.
+* `id`: Chiave primaria auto-incrementale
+* `name`: Nome univoco del corso
+* `description`: Descrizione del corso (opzionale)
+
+---
+
+### 3. `user_courses`
+
+Tabella ponte per la relazione **many-to-many** tra utenti e corsi.
 
 ```sql
 CREATE TABLE IF NOT EXISTS user_courses (
@@ -252,12 +266,16 @@ CREATE TABLE IF NOT EXISTS user_courses (
 ```
 
 **Campi:**
-- `user_id`: Riferimento all'utente (FK verso `users.id`)
-- `course_id`: Riferimento al corso (FK verso `courses.id`)
-- **Chiave primaria composita**: `(user_id, course_id)`
-- **CASCADE DELETE**: Eliminazione automatica delle relazioni quando viene eliminato un utente o un corso
 
-### 4. Tabella `schedules`
+* `user_id`: **Chiave esterna (FK)** → si riferisce a `users.id`, cioè legge la chiave primaria della tabella `users`
+* `course_id`: **Chiave esterna (FK)** → si riferisce a `courses.id`, cioè legge la chiave primaria della tabella `courses`
+* **Chiave primaria composita**: unione di `user_id` e `course_id`
+* **ON DELETE CASCADE**: se un utente o corso viene eliminato, vengono eliminati anche i collegamenti associati
+
+---
+
+### 4. `schedules`
+
 Gestisce gli orari delle lezioni per ogni corso.
 
 ```sql
@@ -276,37 +294,67 @@ CREATE TABLE IF NOT EXISTS schedules (
 ```
 
 **Campi:**
-- `id`: Chiave primaria auto-incrementale
-- `course_id`: Riferimento al corso (FK verso `courses.id`)
-- `teacher`: Nome del docente
-- `room`: Aula/stanza della lezione
-- `subject`: Materia insegnata
-- `start_time`: Orario di inizio (formato HH:MM)
-- `end_time`: Orario di fine (formato HH:MM)
-- `day`: Giorno della settimana
-- `date`: Data specifica della lezione (formato YYYY-MM-DD)
 
-## Relazioni del Database
+* `id`: Chiave primaria auto-incrementale
+* `course_id`: **Chiave esterna (FK)** → si riferisce a `courses.id`
+* `teacher`: Nome del docente
+* `room`: Aula in cui si svolge la lezione
+* `subject`: Materia insegnata
+* `start_time`: Orario di inizio lezione (**HH\:MM**, 24h)
+* `end_time`: Orario di fine lezione (**HH\:MM**, 24h)
+* `day`: Giorno della settimana
+* `date`: Data specifica della lezione (**YYYY-MM-DD**)
 
+---
+
+## 🔗 **Relazioni tra le Tabelle**
+
+```text
+users ←→ courses    (many-to-many tramite user_courses)
+courses → schedules (one-to-many)
 ```
-users ←→ courses (Many-to-Many via user_courses)
-courses → schedules (One-to-Many)
-```
 
-## Vincoli e Caratteristiche
+* Un **utente** può iscriversi a più **corsi**
+* Un **corso** può essere frequentato da più **utenti**
+* Ogni **corso** ha più **lezioni** pianificate in `schedules`
 
-- **Vincoli UNIQUE**: `users.username`, `courses.name`
-- **Foreign Keys con CASCADE DELETE**: Eliminazione automatica dei record correlati
-- **Inizializzazione automatica**: Le tabelle vengono create automaticamente all'avvio del server tramite `db.js`
-- **Chiave primaria composita**: `user_courses` utilizza una combinazione di `user_id` e `course_id`
+---
 
-## Note Tecniche
+## 🧩 **Definizione: Cos'è una Foreign Key (FK)?**
 
-- Database: **SQLite**
-- Tipo di ID: **INTEGER AUTOINCREMENT**
-- Gestione password: **bcrypt hashing**
-- Formato orari: **HH:MM (24h)**
-- Formato date: **YYYY-MM-DD**
+Una **Foreign Key** (chiave esterna) è un campo che **fa riferimento alla chiave primaria di un'altra tabella**.
+Serve per **collegare logicamente** due tabelle e **mantenere l'integrità referenziale** dei dati.
+
+✅ Una Foreign Key:
+
+* Permette di **associare i dati** tra tabelle diverse
+* Impedisce l'inserimento di riferimenti non validi (es: non puoi assegnare un `user_id` che non esiste)
+* Può essere configurata con **ON DELETE CASCADE** per eliminare automaticamente i dati collegati
+
+---
+
+## ⚙️ **Vincoli e Caratteristiche del Database**
+
+* 🔐 **Password sicure**: archiviate con algoritmo **bcrypt**
+* ✅ **Vincoli di unicità**:
+
+  * `users.username`
+  * `courses.name`
+* 🔁 **Foreign Key con ON DELETE CASCADE**:
+
+  * I record collegati vengono eliminati automaticamente
+* 🔗 **Chiave primaria composita**:
+
+  * Presente in `user_courses (user_id, course_id)`
+* 🛠️ **Inizializzazione automatica**:
+
+  * Le tabelle vengono create all’avvio del server tramite `db.js`
+* ⏰ **Formati standard**:
+
+  * Orari: `HH:MM` (24 ore)
+  * Date: `YYYY-MM-DD` (ISO 8601)
+
+---
 
 ## 🎨 Design System
 
