@@ -307,9 +307,4 @@ router.post("/profile", requireAuth, (req, res) => {
   );
 });
 
-// Current user info
-router.get("/current", requireAuth, (req, res) => {
-  res.json({ username: req.session.user.username });
-});
-
 module.exports = router;
