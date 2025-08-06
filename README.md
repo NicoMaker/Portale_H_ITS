@@ -16,6 +16,7 @@ Un'applicazione web moderna per la gestione di corsi, utenti e orari per l'Istit
 ## 🌟 Panoramica
 
 Il Portale H ITS è un sistema completo di gestione per istituti formativi che permette di:
+
 - 👥 Gestire utenti (studenti, docenti, amministratori)
 - 📚 Organizzare corsi e materie
 - 📅 Pianificare orari e lezioni
@@ -66,6 +67,7 @@ Portale_H_ITS/
 ## �️ Tecnologie Utilizzate
 
 ### Backend
+
 - **Node.js** - Runtime JavaScript server-side
 - **Express.js** - Framework web minimalista
 - **SQLite3** - Database relazionale leggero
@@ -73,6 +75,7 @@ Portale_H_ITS/
 - **cookie-parser** - Gestione cookie HTTP
 
 ### Frontend
+
 - **HTML5** - Markup semantico moderno
 - **CSS3** - Styling avanzato con glassmorphism
 - **JavaScript ES6+** - Logica frontend interattiva
@@ -81,36 +84,42 @@ Portale_H_ITS/
 - **Select2** - Componenti select avanzati con ricerca
 
 ### Strumenti di Sviluppo
+
 - **Nodemon** - Auto-restart del server in sviluppo
 - **Git** - Sistema di controllo versione
 
 ## ✨ Funzionalità
 
 ### 🔐 Sistema di Autenticazione
+
 - Login sicuro con hash delle password
 - Gestione sessioni con cookie
 - Middleware di protezione delle route
 - Ruoli utente (Admin/User)
 
 ### 👨‍💼 Dashboard Amministratore
+
 - Panoramica statistiche sistema
 - Gestione completa utenti
 - Controllo corsi e orari
 - Interfaccia moderna con glassmorphism
 
 ### 👨‍🎓 Dashboard Utente
+
 - Vista personalizzata per studenti/docenti
 - Orari personali
 - Corsi assegnati
 - Notifiche e aggiornamenti
 
 ### 📚 Gestione Corsi
+
 - CRUD completo per i corsi
 - Ricerca e filtri avanzati
 - Modal per aggiunta/modifica
 - Validazione form lato client
 
 ### 📅 Gestione Orari
+
 - Pianificazione orari complessa
 - Filtri multipli con Select2
 - Aggiunta dinamica di docenti, aule, materie
@@ -118,6 +127,7 @@ Portale_H_ITS/
 - Ricerca in tempo reale
 
 ### 👥 Gestione Utenti
+
 - Creazione e modifica utenti
 - Assegnazione ruoli
 - Gestione password sicura
@@ -126,6 +136,7 @@ Portale_H_ITS/
 ## 🚀 Installazione
 
 ### Prerequisiti
+
 - Node.js (v14 o superiore)
 - npm o yarn
 - Git
@@ -133,21 +144,24 @@ Portale_H_ITS/
 ### Passi di Installazione
 
 1. **Clona il repository**
+
    ```bash
    git clone https://github.com/tuousername/Portale_H_ITS.git
    cd Portale_H_ITS
    ```
 
 2. **Installa le dipendenze**
+
    ```bash
    npm install
    ```
 
 3. **Avvia il server**
+
    ```bash
    # Modalità sviluppo (con auto-restart)
    npm run dev
-   
+
    # Modalità produzione
    npm start
    ```
@@ -159,14 +173,15 @@ Portale_H_ITS/
 ## 💻 Utilizzo
 
 ### Primo Accesso
+
 1. Naviga su `http://localhost:3000`
 2. Effettua il login con le credenziali amministratore
 3. Configura utenti, corsi e orari dal pannello admin
 
 ### Gestione Quotidiana
+
 - **Amministratori**: Accesso completo a tutte le funzionalità
 - **Utenti**: Vista limitata ai propri corsi e orari
-
 
 # 🗄️ **Database Schema**
 
@@ -191,10 +206,10 @@ CREATE TABLE IF NOT EXISTS users (
 
 **Campi:**
 
-* `id`: Chiave primaria auto-incrementale
-* `username`: Nome utente univoco
-* `password`: Password protetta mediante hash con **bcrypt**
-* `role`: Ruolo dell’utente (`admin` o `student`)
+- `id`: Chiave primaria auto-incrementale
+- `username`: Nome utente univoco
+- `password`: Password protetta mediante hash con **bcrypt**
+- `role`: Ruolo dell’utente (`admin` o `student`)
 
 ---
 
@@ -212,9 +227,9 @@ CREATE TABLE IF NOT EXISTS courses (
 
 **Campi:**
 
-* `id`: Chiave primaria auto-incrementale
-* `name`: Nome univoco del corso
-* `description`: Descrizione del corso (opzionale)
+- `id`: Chiave primaria auto-incrementale
+- `name`: Nome univoco del corso
+- `description`: Descrizione del corso (opzionale)
 
 ---
 
@@ -234,10 +249,10 @@ CREATE TABLE IF NOT EXISTS user_courses (
 
 **Campi:**
 
-* `user_id`: **Chiave esterna (FK)** → si riferisce a `users.id`, cioè legge la chiave primaria della tabella `users`
-* `course_id`: **Chiave esterna (FK)** → si riferisce a `courses.id`, cioè legge la chiave primaria della tabella `courses`
-* **Chiave primaria composita**: unione di `user_id` e `course_id`
-* **ON DELETE CASCADE**: se un utente o corso viene eliminato, vengono eliminati anche i collegamenti associati
+- `user_id`: **Chiave esterna (FK)** → si riferisce a `users.id`, cioè legge la chiave primaria della tabella `users`
+- `course_id`: **Chiave esterna (FK)** → si riferisce a `courses.id`, cioè legge la chiave primaria della tabella `courses`
+- **Chiave primaria composita**: unione di `user_id` e `course_id`
+- **ON DELETE CASCADE**: se un utente o corso viene eliminato, vengono eliminati anche i collegamenti associati
 
 ---
 
@@ -262,15 +277,15 @@ CREATE TABLE IF NOT EXISTS schedules (
 
 **Campi:**
 
-* `id`: Chiave primaria auto-incrementale
-* `course_id`: **Chiave esterna (FK)** → si riferisce a `courses.id`
-* `teacher`: Nome del docente
-* `room`: Aula in cui si svolge la lezione
-* `subject`: Materia insegnata
-* `start_time`: Orario di inizio lezione (**HH\:MM**, 24h)
-* `end_time`: Orario di fine lezione (**HH\:MM**, 24h)
-* `day`: Giorno della settimana
-* `date`: Data specifica della lezione (**YYYY-MM-DD**)
+- `id`: Chiave primaria auto-incrementale
+- `course_id`: **Chiave esterna (FK)** → si riferisce a `courses.id`
+- `teacher`: Nome del docente
+- `room`: Aula in cui si svolge la lezione
+- `subject`: Materia insegnata
+- `start_time`: Orario di inizio lezione (**HH\:MM**, 24h)
+- `end_time`: Orario di fine lezione (**HH\:MM**, 24h)
+- `day`: Giorno della settimana
+- `date`: Data specifica della lezione (**YYYY-MM-DD**)
 
 ---
 
@@ -281,9 +296,9 @@ users ←→ courses    (many-to-many tramite user_courses)
 courses → schedules (one-to-many)
 ```
 
-* Un **utente** può iscriversi a più **corsi**
-* Un **corso** può essere frequentato da più **utenti**
-* Ogni **corso** ha più **lezioni** pianificate in `schedules`
+- Un **utente** può iscriversi a più **corsi**
+- Un **corso** può essere frequentato da più **utenti**
+- Ogni **corso** ha più **lezioni** pianificate in `schedules`
 
 ---
 
@@ -294,44 +309,45 @@ Serve per **collegare logicamente** due tabelle e **mantenere l'integrità refer
 
 ✅ Una Foreign Key:
 
-* Permette di **associare i dati** tra tabelle diverse
-* Impedisce l'inserimento di riferimenti non validi (es: non puoi assegnare un `user_id` che non esiste)
-* Può essere configurata con **ON DELETE CASCADE** per eliminare automaticamente i dati collegati
+- Permette di **associare i dati** tra tabelle diverse
+- Impedisce l'inserimento di riferimenti non validi (es: non puoi assegnare un `user_id` che non esiste)
+- Può essere configurata con **ON DELETE CASCADE** per eliminare automaticamente i dati collegati
 
 ---
 
 ## ⚙️ **Vincoli e Caratteristiche del Database**
 
-* 🔐 **Password sicure**: archiviate con algoritmo **bcrypt**
-* ✅ **Vincoli di unicità**:
+- 🔐 **Password sicure**: archiviate con algoritmo **bcrypt**
+- ✅ **Vincoli di unicità**:
+  - `users.username`
+  - `courses.name`
 
-  * `users.username`
-  * `courses.name`
-* 🔁 **Foreign Key con ON DELETE CASCADE**:
+- 🔁 **Foreign Key con ON DELETE CASCADE**:
+  - I record collegati vengono eliminati automaticamente
 
-  * I record collegati vengono eliminati automaticamente
-* 🔗 **Chiave primaria composita**:
+- 🔗 **Chiave primaria composita**:
+  - Presente in `user_courses (user_id, course_id)`
 
-  * Presente in `user_courses (user_id, course_id)`
-* 🛠️ **Inizializzazione automatica**:
+- 🛠️ **Inizializzazione automatica**:
+  - Le tabelle vengono create all’avvio del server tramite `db.js`
 
-  * Le tabelle vengono create all’avvio del server tramite `db.js`
-* ⏰ **Formati standard**:
-
-  * Orari: `HH:MM` (24 ore)
-  * Date: `YYYY-MM-DD` (ISO 8601)
+- ⏰ **Formati standard**:
+  - Orari: `HH:MM` (24 ore)
+  - Date: `YYYY-MM-DD` (ISO 8601)
 
 ---
 
 ## 🎨 Design System
 
 ### Colori Principali
+
 - **Primary**: Gradient blu-viola
 - **Secondary**: Gradient rosa-arancione
 - **Background**: Sfumature scure con glassmorphism
 - **Text**: Bianco e grigi per contrasto ottimale
 
 ### Componenti UI
+
 - **Cards**: Effetto glassmorphism con backdrop-blur
 - **Buttons**: Gradient animati con hover effects
 - **Forms**: Input moderni con validazione visiva
