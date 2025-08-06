@@ -46,44 +46,6 @@ router.post("/login", (req, res) => {
   });
 });
 
-// Register
-router.post("/register", (req, res) => {
-  const { username, password, role } = req.body;
-  let userRole = "user";
-  const session = getSession(req);
-  if (
-    role === "admin" &&
-    session &&
-    session.user &&
-    session.user.role === "admin"
-  ) {
-    userRole = "admin";
-  }
-
-  bcrypt.hash(password, 10, (err, hashedPassword) => {
-    if (err) {
-      console.error(
-        "Errore hashing password durante la registrazione:",
-        err.message,
-      );
-      return res.status(500).send("Errore interno del server.");
-    }
-
-    db.run(
-      "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
-      [username, hashedPassword, userRole],
-      function (err) {
-        if (err) {
-          return res.send(
-            "<script>alert(\"Username già esistente\");window.location='/register.html';</script>",
-          );
-        }
-        res.send("Registrazione avvenuta!");
-      },
-    );
-  });
-});
-
 // Logout
 router.get("/logout", (req, res) => {
   destroySession(req, res);
