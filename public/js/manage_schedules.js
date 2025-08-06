@@ -638,25 +638,31 @@ function populateFilterOptions() {
     choices: teachers.map((t) => ({ value: t, label: t })),
     removeItemButton: true,
   });
-  teacherChoices.passedElement.element.addEventListener('change', renderSchedules);
+  teacherChoices.passedElement.element.addEventListener(
+    "change",
+    renderSchedules,
+  );
 
   roomChoices = new Choices("#filter-room", {
     choices: rooms.map((r) => ({ value: r, label: r })),
     removeItemButton: true,
   });
-  roomChoices.passedElement.element.addEventListener('change', renderSchedules);
+  roomChoices.passedElement.element.addEventListener("change", renderSchedules);
 
   subjectChoices = new Choices("#filter-subject", {
     choices: subjects.map((s) => ({ value: s, label: s })),
     removeItemButton: true,
   });
-  subjectChoices.passedElement.element.addEventListener('change', renderSchedules);
+  subjectChoices.passedElement.element.addEventListener(
+    "change",
+    renderSchedules,
+  );
 
   dayChoices = new Choices("#filter-day", {
     choices: days.map((d) => ({ value: d, label: d })),
     removeItemButton: true,
   });
-  dayChoices.passedElement.element.addEventListener('change', renderSchedules);
+  dayChoices.passedElement.element.addEventListener("change", renderSchedules);
 }
 
 // Popola i datalist per l'auto-completamento
@@ -729,7 +735,9 @@ window.onclick = (e) => {
 // Event listener per i filtri
 document.getElementById("filter-course").onchange = renderSchedules;
 document.getElementById("filter-date").oninput = renderSchedules;
-document.getElementById("clear-filters-btn").addEventListener("click", clearFilters);
+document
+  .getElementById("clear-filters-btn")
+  .addEventListener("click", clearFilters);
 
 // Inizializza l'applicazione al caricamento della pagina
 document.addEventListener("DOMContentLoaded", () => {
