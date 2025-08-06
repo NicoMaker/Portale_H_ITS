@@ -590,7 +590,9 @@ function populateFilterOptions() {
   const teachers = [
     ...new Set(schedules.map((s) => s.teacher).filter(Boolean)),
   ].sort();
-  const rooms = [...new Set(schedules.map((s) => s.room).filter(Boolean))].sort();
+  const rooms = [
+    ...new Set(schedules.map((s) => s.room).filter(Boolean)),
+  ].sort();
   const subjects = [
     ...new Set(schedules.map((s) => s.subject).filter(Boolean)),
   ].sort();
@@ -637,7 +639,9 @@ function updateDatalists() {
   const teachers = [
     ...new Set(schedules.map((s) => s.teacher).filter(Boolean)),
   ].sort();
-  const rooms = [...new Set(schedules.map((s) => s.room).filter(Boolean))].sort();
+  const rooms = [
+    ...new Set(schedules.map((s) => s.room).filter(Boolean)),
+  ].sort();
   const subjects = [
     ...new Set(schedules.map((s) => s.subject).filter(Boolean)),
   ].sort();
