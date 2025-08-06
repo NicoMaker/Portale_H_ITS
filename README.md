@@ -201,12 +201,112 @@ Portale_H_ITS/
 
 Il sistema utilizza SQLite3 con le seguenti tabelle principali:
 
-- **users** - Informazioni utenti e credenziali
-- **courses** - Catalogo corsi disponibili
-- **schedules** - Pianificazione orari e lezioni
-- **subjects** - Materie di insegnamento
-- **classrooms** - Aule disponibili
-- **teachers** - Docenti del sistema
+
+## Struttura delle Tabelle
+
+### 1. Tabella `users`
+Gestisce gli utenti del sistema (amministratori e studenti).
+
+```sql
+CREATE TABLE IF NOT EXISTS users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  username TEXT UNIQUE NOT NULL,
+  password TEXT NOT NULL,
+  role TEXT NOT NULL
+);
+```
+
+**Campi:**
+- `id`: Chiave primaria auto-incrementale
+- `username`: Nome utente univoco (UNIQUE constraint)
+- `password`: Password hashata con bcrypt
+- `role`: Ruolo utente (`admin` o `student`)
+
+### 2. Tabella `courses`
+Contiene i corsi disponibili nel portale.
+
+```sql
+CREATE TABLE IF NOT EXISTS courses (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT UNIQUE NOT NULL,
+  description TEXT
+);
+```
+
+**Campi:**
+- `id`: Chiave primaria auto-incrementale
+- `name`: Nome del corso (UNIQUE constraint)
+- `description`: Descrizione dettagliata del corso (opzionale)
+
+### 3. Tabella `user_courses`
+Tabella di collegamento many-to-many tra utenti e corsi.
+
+```sql
+CREATE TABLE IF NOT EXISTS user_courses (
+  user_id INTEGER NOT NULL,
+  course_id INTEGER NOT NULL,
+  PRIMARY KEY (user_id, course_id),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
+);
+```
+
+**Campi:**
+- `user_id`: Riferimento all'utente (FK verso `users.id`)
+- `course_id`: Riferimento al corso (FK verso `courses.id`)
+- **Chiave primaria composita**: `(user_id, course_id)`
+- **CASCADE DELETE**: Eliminazione automatica delle relazioni quando viene eliminato un utente o un corso
+
+### 4. Tabella `schedules`
+Gestisce gli orari delle lezioni per ogni corso.
+
+```sql
+CREATE TABLE IF NOT EXISTS schedules (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  course_id INTEGER NOT NULL,
+  teacher TEXT NOT NULL,
+  room TEXT NOT NULL,
+  subject TEXT NOT NULL,
+  start_time TEXT NOT NULL,
+  end_time TEXT NOT NULL,
+  day TEXT NOT NULL,
+  date TEXT NOT NULL,
+  FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
+);
+```
+
+**Campi:**
+- `id`: Chiave primaria auto-incrementale
+- `course_id`: Riferimento al corso (FK verso `courses.id`)
+- `teacher`: Nome del docente
+- `room`: Aula/stanza della lezione
+- `subject`: Materia insegnata
+- `start_time`: Orario di inizio (formato HH:MM)
+- `end_time`: Orario di fine (formato HH:MM)
+- `day`: Giorno della settimana
+- `date`: Data specifica della lezione (formato YYYY-MM-DD)
+
+## Relazioni del Database
+
+```
+users ←→ courses (Many-to-Many via user_courses)
+courses → schedules (One-to-Many)
+```
+
+## Vincoli e Caratteristiche
+
+- **Vincoli UNIQUE**: `users.username`, `courses.name`
+- **Foreign Keys con CASCADE DELETE**: Eliminazione automatica dei record correlati
+- **Inizializzazione automatica**: Le tabelle vengono create automaticamente all'avvio del server tramite `db.js`
+- **Chiave primaria composita**: `user_courses` utilizza una combinazione di `user_id` e `course_id`
+
+## Note Tecniche
+
+- Database: **SQLite**
+- Tipo di ID: **INTEGER AUTOINCREMENT**
+- Gestione password: **bcrypt hashing**
+- Formato orari: **HH:MM (24h)**
+- Formato date: **YYYY-MM-DD**
 
 ## 🎨 Design System
 
