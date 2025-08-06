@@ -1,63 +1,28 @@
-# 🎓 Portale ITS - Sistema di Gestione Corsi
+# 🎓 Portale H ITS - Sistema di Gestione Corsi
 
-Un moderno sistema di gestione per Istituti Tecnici Superiori (ITS) con interfaccia web responsive e design glassmorphism.
+Un'applicazione web moderna per la gestione di corsi, utenti e orari per l'Istituto Tecnico Superiore (ITS) con design glassmorphism e interfaccia responsive.
 
-## 📋 Panoramica
+## 📋 Indice
 
-Il Portale ITS è un'applicazione web completa per la gestione di corsi, utenti, orari e attività didattiche. Progettato specificamente per gli Istituti Tecnici Superiori, offre un'interfaccia moderna e intuitiva per amministratori, docenti e studenti.
+- [Panoramica](#panoramica)
+- [Struttura del Progetto](#struttura-del-progetto)
+- [Tecnologie Utilizzate](#tecnologie-utilizzate)
+- [Funzionalità](#funzionalità)
+- [Installazione](#installazione)
+- [Utilizzo](#utilizzo)
+- [API Endpoints](#api-endpoints)
+- [Database](#database)
+- [Contributi](#contributi)
 
-## ✨ Caratteristiche Principali
+## 🌟 Panoramica
 
-### 🔐 Sistema di Autenticazione
-- Login sicuro con hash delle password (bcrypt)
-- Gestione sessioni con cookie
-- Controllo accessi basato sui ruoli (Admin, Docente, Studente)
+Il Portale H ITS è un sistema completo di gestione per istituti formativi che permette di:
+- 👥 Gestire utenti (studenti, docenti, amministratori)
+- 📚 Organizzare corsi e materie
+- 📅 Pianificare orari e lezioni
+- 📊 Monitorare dashboard personalizzate
 
-### 👥 Gestione Utenti
-- Creazione, modifica ed eliminazione utenti
-- Assegnazione ruoli e permessi
-- Profili utente personalizzabili
-- Sistema di ricerca e filtri avanzati
-
-### 📚 Gestione Corsi
-- CRUD completo per i corsi
-- Organizzazione per categorie
-- Descrizioni dettagliate e metadati
-- Contatore dinamico dei corsi
-
-### 🗓️ Gestione Orari
-- Pianificazione orari con interfaccia drag & drop
-- Assegnazione docenti, aule e materie
-- Filtri avanzati con Select2
-- Aggiunta rapida di nuove entità
-- Ricerca in tempo reale
-
-### 🎨 Design Moderno
-- Interfaccia glassmorphism con effetti di trasparenza
-- Design responsive per tutti i dispositivi
-- Animazioni fluide e gradienti dinamici
-- Icone Lucide per un look professionale
-- Tema scuro/chiaro
-
-## 🛠️ Tecnologie Utilizzate
-
-### Backend
-- **Node.js** - Runtime JavaScript
-- **Express.js** - Framework web
-- **SQLite3** - Database leggero e veloce
-- **bcryptjs** - Hashing delle password
-- **cookie-parser** - Gestione cookie
-
-### Frontend
-- **HTML5** - Markup semantico
-- **Tailwind CSS** - Framework CSS utility-first
-- **JavaScript ES6+** - Logica client-side
-- **Select2** - Componenti select avanzati
-- **Lucide Icons** - Libreria di icone moderne
-
-### Database
-- **SQLite** - Database relazionale embedded
-- Tabelle: users, courses, schedules, teachers, rooms, subjects
+L'applicazione utilizza un design moderno con effetti glassmorphism, gradients animati e un'interfaccia responsive ottimizzata per tutti i dispositivi.
 
 ## 📁 Struttura del Progetto
 
@@ -67,7 +32,17 @@ Portale_H_ITS/
 ├── 📁 node_modules/          # Dipendenze npm
 ├── 📁 public/               # File statici frontend
 │   ├── 📁 CSS/              # Fogli di stile personalizzati
+│   │   ├── style.css            # Foglio di stile principale
+│   │   └── styleuser.css        # Foglio di stile utente
 │   ├── 📁 js/               # Script JavaScript
+│   │   ├── admin_dashboard.js   # Script dashboard amministratore
+│   │   ├── login.js             # Script login
+│   │   ├── manage_courses.js    # Script gestione corsi
+│   │   ├── manage_schedules.js  # Script gestione orari
+│   │   ├── manage_users.js      # Script gestione utenti
+│   │   ├── tailwind.js          # Script tailwind
+│   │   ├── user_dashboard.js    # Script dashboard utente
+│   │   └── utils.js             # Script utils
 │   ├── admin_dashboard.html  # Dashboard amministratore
 │   ├── login.html           # Pagina di login
 │   ├── manage_courses.html  # Gestione corsi
@@ -84,20 +59,82 @@ Portale_H_ITS/
 ├── db.js                    # Configurazione database
 ├── server.js                # Server principale
 ├── package.json             # Dipendenze e script
+├── package-lock.json        # Lock file dipendenze
 └── README.md               # Documentazione
 ```
 
-## 🚀 Installazione e Configurazione
+## �️ Tecnologie Utilizzate
+
+### Backend
+- **Node.js** - Runtime JavaScript server-side
+- **Express.js** - Framework web minimalista
+- **SQLite3** - Database relazionale leggero
+- **bcryptjs** - Hashing sicuro delle password
+- **cookie-parser** - Gestione cookie HTTP
+
+### Frontend
+- **HTML5** - Markup semantico moderno
+- **CSS3** - Styling avanzato con glassmorphism
+- **JavaScript ES6+** - Logica frontend interattiva
+- **Tailwind CSS** - Framework CSS utility-first
+- **Lucide Icons** - Libreria icone moderne
+- **Select2** - Componenti select avanzati con ricerca
+
+### Strumenti di Sviluppo
+- **Nodemon** - Auto-restart del server in sviluppo
+- **Git** - Sistema di controllo versione
+
+## ✨ Funzionalità
+
+### 🔐 Sistema di Autenticazione
+- Login sicuro con hash delle password
+- Gestione sessioni con cookie
+- Middleware di protezione delle route
+- Ruoli utente (Admin/User)
+
+### 👨‍💼 Dashboard Amministratore
+- Panoramica statistiche sistema
+- Gestione completa utenti
+- Controllo corsi e orari
+- Interfaccia moderna con glassmorphism
+
+### 👨‍🎓 Dashboard Utente
+- Vista personalizzata per studenti/docenti
+- Orari personali
+- Corsi assegnati
+- Notifiche e aggiornamenti
+
+### 📚 Gestione Corsi
+- CRUD completo per i corsi
+- Ricerca e filtri avanzati
+- Modal per aggiunta/modifica
+- Validazione form lato client
+
+### 📅 Gestione Orari
+- Pianificazione orari complessa
+- Filtri multipli con Select2
+- Aggiunta dinamica di docenti, aule, materie
+- Integrazione con backend per nuove entità
+- Ricerca in tempo reale
+
+### 👥 Gestione Utenti
+- Creazione e modifica utenti
+- Assegnazione ruoli
+- Gestione password sicura
+- Interfaccia responsive
+
+## 🚀 Installazione
 
 ### Prerequisiti
-- **Node.js** (versione 14 o superiore)
-- **npm** (incluso con Node.js)
+- Node.js (v14 o superiore)
+- npm o yarn
+- Git
 
-### Installazione
+### Passi di Installazione
 
 1. **Clona il repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/tuousername/Portale_H_ITS.git
    cd Portale_H_ITS
    ```
 
@@ -108,51 +145,34 @@ Portale_H_ITS/
 
 3. **Avvia il server**
    ```bash
+   # Modalità sviluppo (con auto-restart)
+   npm run dev
+   
    # Modalità produzione
    npm start
-   
-   # Modalità sviluppo (con auto-reload)
-   npm run dev
    ```
 
 4. **Accedi all'applicazione**
    - Apri il browser su `http://localhost:3000`
-   - Usa le credenziali di default:
-     - **Admin**: admin@its.it / admin123
-     - **Docente**: docente@its.it / docente123
-     - **Studente**: studente@its.it / studente123
+   - Usa le credenziali di default per il primo accesso
 
-## 📊 Schema Database
+## 💻 Utilizzo
 
-### Tabella Users
-- `id` - Chiave primaria
-- `username` - Nome utente unico
-- `email` - Email utente
-- `password` - Password hashata
-- `role` - Ruolo (admin, teacher, student)
-- `created_at` - Data creazione
+### Primo Accesso
+1. Naviga su `http://localhost:3000`
+2. Effettua il login con le credenziali amministratore
+3. Configura utenti, corsi e orari dal pannello admin
 
-### Tabella Courses
-- `id` - Chiave primaria
-- `name` - Nome corso
-- `description` - Descrizione dettagliata
-- `created_at` - Data creazione
+### Gestione Quotidiana
+- **Amministratori**: Accesso completo a tutte le funzionalità
+- **Utenti**: Vista limitata ai propri corsi e orari
 
-### Tabella Schedules
-- `id` - Chiave primaria
-- `course_id` - Riferimento al corso
-- `teacher` - Nome docente
-- `room` - Aula
-- `subject` - Materia
-- `day` - Giorno della settimana
-- `start_time` - Ora inizio
-- `end_time` - Ora fine
-
-## 🔧 API Endpoints
+## � API Endpoints
 
 ### Autenticazione
-- `POST /login` - Login utente
-- `POST /logout` - Logout utente
+- `POST /api/auth/login` - Login utente
+- `POST /api/auth/logout` - Logout utente
+- `GET /api/auth/check` - Verifica sessione
 
 ### Utenti
 - `GET /api/users` - Lista utenti
@@ -172,89 +192,49 @@ Portale_H_ITS/
 - `PUT /api/schedules/:id` - Aggiorna orario
 - `DELETE /api/schedules/:id` - Elimina orario
 
-## 🎨 Caratteristiche UI/UX
+### Dashboard
+- `GET /api/dashboard/stats` - Statistiche generali
+- `GET /api/dashboard/user/:id` - Dati utente specifico
 
-### Design System
-- **Glassmorphism**: Effetti di vetro smerigliato
-- **Gradienti animati**: Sfondi dinamici e colorati
-- **Responsive Design**: Ottimizzato per mobile, tablet e desktop
-- **Microinterazioni**: Animazioni fluide e feedback visivo
+## 🗄️ Database
 
-### Componenti Principali
-- **Navigation Bar**: Menu di navigazione con glassmorphism
-- **Cards**: Contenitori con effetti di trasparenza
-- **Modals**: Finestre popup per azioni rapide
-- **Forms**: Input moderni con validazione
-- **Tables**: Tabelle responsive con azioni inline
+Il sistema utilizza SQLite3 con le seguenti tabelle principali:
 
-## 🔒 Sicurezza
+- **users** - Informazioni utenti e credenziali
+- **courses** - Catalogo corsi disponibili
+- **schedules** - Pianificazione orari e lezioni
+- **subjects** - Materie di insegnamento
+- **classrooms** - Aule disponibili
+- **teachers** - Docenti del sistema
 
-- **Hash delle password** con bcrypt (salt rounds: 10)
-- **Validazione input** lato server e client
-- **Controllo accessi** basato sui ruoli
-- **Sanitizzazione dati** per prevenire SQL injection
-- **Gestione sessioni** sicura con cookie HTTP-only
+## 🎨 Design System
 
-## 🚀 Funzionalità Avanzate
+### Colori Principali
+- **Primary**: Gradient blu-viola
+- **Secondary**: Gradient rosa-arancione
+- **Background**: Sfumature scure con glassmorphism
+- **Text**: Bianco e grigi per contrasto ottimale
 
-### Gestione Orari
-- **Select2 Integration**: Combobox con ricerca e selezione multipla
-- **Aggiunta dinamica**: Creazione rapida di docenti, aule, materie
-- **Filtri avanzati**: Ricerca per docente, aula, materia, giorno
-- **Modal per corsi**: Aggiunta rapida corsi con nome e descrizione
+### Componenti UI
+- **Cards**: Effetto glassmorphism con backdrop-blur
+- **Buttons**: Gradient animati con hover effects
+- **Forms**: Input moderni con validazione visiva
+- **Modals**: Overlay con blur e animazioni smooth
 
-### Dashboard Interattive
-- **Statistiche in tempo reale**: Contatori dinamici
-- **Grafici e metriche**: Visualizzazione dati
-- **Azioni rapide**: Accesso diretto alle funzioni principali
-- **Notifiche**: Sistema di feedback per le azioni
+## 🤝 Contributi
 
-## 📱 Compatibilità
+Per contribuire al progetto:
 
-- ✅ **Chrome** (versione 90+)
-- ✅ **Firefox** (versione 88+)
-- ✅ **Safari** (versione 14+)
-- ✅ **Edge** (versione 90+)
-- ✅ **Mobile browsers** (iOS Safari, Chrome Mobile)
-
-## 🤝 Contribuire
-
-1. Fork del progetto
-2. Crea un branch per la feature (`git checkout -b feature/AmazingFeature`)
+1. Fork del repository
+2. Crea un branch per la tua feature (`git checkout -b feature/AmazingFeature`)
 3. Commit delle modifiche (`git commit -m 'Add some AmazingFeature'`)
 4. Push del branch (`git push origin feature/AmazingFeature`)
 5. Apri una Pull Request
 
-## 📄 Licenza
+## � Licenza
 
-Questo progetto è distribuito sotto licenza MIT. Vedi il file `LICENSE` per maggiori dettagli.
-
-## 👨‍💻 Autore
-
-**Nicola Marano**  
-Studente ITS - Corso Front End Development
-
-## 📞 Supporto
-
-Per supporto o domande:
-- 📧 Email: [inserire email]
-- 🐛 Issues: [GitHub Issues]
-- 📖 Wiki: [GitHub Wiki]
+Questo progetto è rilasciato sotto licenza MIT. Vedi il file `LICENSE` per i dettagli.
 
 ---
 
-## 🔄 Changelog
-
-### v1.0.0 (Attuale)
-- ✅ Sistema di autenticazione completo
-- ✅ Gestione utenti con CRUD
-- ✅ Gestione corsi con interfaccia moderna
-- ✅ Gestione orari con Select2 e filtri avanzati
-- ✅ Design glassmorphism responsive
-- ✅ Dashboard interattive per tutti i ruoli
-- ✅ API RESTful complete
-- ✅ Database SQLite con relazioni
-
----
-
-*Sviluppato con ❤️ per l'Istituto Tecnico Superiore*
+**Sviluppato con ❤️ per l'ITS - Istituto Tecnico Superiore**
