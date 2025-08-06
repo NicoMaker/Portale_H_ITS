@@ -2,9 +2,13 @@ let courses = [];
 let users = [];
 let editingUserId = null;
 let searchUserInput, filterCourseSelect;
-let userToDeleteId = null; // NEW: Variabile per tenere traccia dell'ID dell'utente da eliminare
-let filterRoleSelect; // Add this line
-let filterUserDate; // Add this line
+let userToDeleteId = null; // Variabile per tenere traccia dell'ID dell'utente da eliminare
+let filterRoleSelect;
+let filterUserDate;
+
+// Aggiungi queste variabili globali
+let userToChangeId = null;
+let userToChangeRole = null;
 
 const fetchCourses = () =>
   fetch("/api/courses")
@@ -27,7 +31,7 @@ function updateNewCourseSelect() {
       courses.map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
   } else {
     select.style.display = "none";
-    label.style.display = "none"; // o 'none' se vuoi nascondere anche la label
+    label.style.display = "none";
     select.innerHTML = "";
   }
 }
@@ -189,7 +193,7 @@ function renderUsersList() {
                   ${
                     u.role !== "admin"
                       ? `
-                  <button onclick="promote(${u.id})" 
+                  <button onclick="showChangeRoleModal(${u.id}, '${u.username}', '${u.role}')" 
                     class="flex-1 bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-semibold py-3 px-4 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
                     <span>👑</span>
                     <span>Rendi Admin</span>
@@ -201,7 +205,7 @@ function renderUsersList() {
                   ${
                     u.role === "admin" && adminCount > 1
                       ? `
-                  <button onclick="demote(${u.id})" 
+                  <button onclick="showChangeRoleModal(${u.id}, '${u.username}', '${u.role}')" 
                     class="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-semibold py-3 px-4 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
                     <span>👤</span>
                     <span>Rendi Utente</span>
@@ -236,7 +240,63 @@ const promote = (id) =>
 const demote = (id) =>
   fetch(`/api/users/${id}/demote`, { method: "POST" }).then(fetchUsers);
 
-// NEW: Functions for Delete User Confirmation Modal
+// NEW: Funzioni per il modal di conferma del cambio ruolo
+function showChangeRoleModal(userId, username, currentRole) {
+  userToChangeId = userId;
+  userToChangeRole = currentRole === "admin" ? "user" : "admin";
+
+  const modal = document.getElementById("change-role-modal");
+  const title = document.getElementById("change-role-modal-title");
+  const text = document.getElementById("change-role-modal-text");
+  const confirmBtn = document.getElementById("confirm-change-role-btn");
+
+  title.textContent = `Cambia ruolo per ${username}?`;
+  text.textContent = `Sei sicuro di voler cambiare il ruolo di ${username} da ${currentRole} a ${userToChangeRole}?`;
+  confirmBtn.textContent = `Sì, rendi ${userToChangeRole}`;
+
+  // Mostra il modal
+  modal.classList.remove("hidden");
+}
+
+function hideChangeRoleModal() {
+  const modal = document.getElementById("change-role-modal");
+  modal.classList.add("hidden");
+  userToChangeId = null;
+  userToChangeRole = null;
+}
+
+function changeUserRole() {
+  if (!userToChangeId || !userToChangeRole) {
+    console.error("ID utente o ruolo non definiti.");
+    return;
+  }
+
+  fetch(`/api/users/${userToChangeId}/role`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ role: userToChangeRole }),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Errore durante il cambio di ruolo");
+      }
+      return response.json();
+    })
+    .then(() => {
+      hideChangeRoleModal();
+      fetchUsers(); // Aggiorna la lista degli utenti dopo la modifica
+      // Puoi anche aggiungere una notifica di successo
+    })
+    .catch((error) => {
+      console.error("Errore:", error);
+      hideChangeRoleModal();
+      // Puoi aggiungere una notifica di errore
+    });
+}
+
+// Funzioni per il modal di conferma eliminazione
 function openDeleteUserConfirmModal(id) {
   userToDeleteId = id;
   const user = users.find((u) => u.id == id);
@@ -246,16 +306,16 @@ function openDeleteUserConfirmModal(id) {
     const adminCount = users.filter((u) => u.role === "admin").length;
     if (user.role === "admin" && adminCount <= 1) {
       document.getElementById("delete-admin-warning").style.display = "block";
-      document.getElementById("confirm-delete-user").disabled = true; // NEW: Disable confirm button if last admin
+      document.getElementById("confirm-delete-user").disabled = true;
       document
         .getElementById("confirm-delete-user")
-        .classList.add("opacity-50", "cursor-not-allowed"); // NEW: Add styling for disabled button
+        .classList.add("opacity-50", "cursor-not-allowed");
     } else {
       document.getElementById("delete-admin-warning").style.display = "none";
-      document.getElementById("confirm-delete-user").disabled = false; // NEW: Enable confirm button
+      document.getElementById("confirm-delete-user").disabled = false;
       document
         .getElementById("confirm-delete-user")
-        .classList.remove("opacity-50", "cursor-not-allowed"); // NEW: Remove styling for disabled button
+        .classList.remove("opacity-50", "cursor-not-allowed");
     }
   }
   document.getElementById("delete-user-confirm-modal").style.display = "flex";
@@ -279,7 +339,6 @@ document.getElementById("confirm-delete-user").onclick = () => {
       })
       .catch((err) => {
         console.error("Errore durante l'eliminazione:", err);
-        // Potresti aggiungere qui un messaggio di errore all'utente
         document.getElementById("delete-user-confirm-modal").style.display =
           "none";
       });
@@ -368,8 +427,9 @@ window.onclick = (e) => {
   if (e.target === document.getElementById("add-user-modal"))
     document.getElementById("add-user-modal").style.display = "none";
   if (e.target === document.getElementById("delete-user-confirm-modal"))
-    // NEW: Close delete user modal on outside click
     document.getElementById("delete-user-confirm-modal").style.display = "none";
+  if (e.target === document.getElementById("change-role-modal"))
+    hideChangeRoleModal();
 };
 
 // Validazione password live
@@ -485,9 +545,13 @@ function clearAllFilters() {
 document.addEventListener("DOMContentLoaded", () => {
   searchUserInput = document.getElementById("search-user");
   filterCourseSelect = document.getElementById("filter-course");
-  filterRoleSelect = document.getElementById("filter-role"); // Assign to the global variable
-  filterUserDate = document.getElementById("filter-user-date"); // Assign to the global variable
-  const clearFiltersBtn = document.getElementById("clear-filters-btn"); // Get the new button
+  filterRoleSelect = document.getElementById("filter-role");
+  filterUserDate = document.getElementById("filter-user-date");
+  const clearFiltersBtn = document.getElementById("clear-filters-btn");
+  const confirmChangeRoleBtn = document.getElementById(
+    "confirm-change-role-btn",
+  );
+  const cancelChangeRoleBtn = document.getElementById("cancel-change-role-btn");
 
   if (searchUserInput && filterCourseSelect) {
     searchUserInput.addEventListener("input", renderUsersList);
@@ -501,10 +565,13 @@ document.addEventListener("DOMContentLoaded", () => {
       filterUserDate.addEventListener("input", renderUsersList);
   }
 
-  // Add event listener for the new clear filters button
   if (clearFiltersBtn) {
     clearFiltersBtn.addEventListener("click", clearAllFilters);
   }
+
+  // Aggiungi gli event listener per i bottoni del nuovo modal
+  confirmChangeRoleBtn.addEventListener("click", changeUserRole);
+  cancelChangeRoleBtn.addEventListener("click", hideChangeRoleModal);
 
   toggleFilterCourseVisibility();
   fetchCourses().then(fetchUsers);
