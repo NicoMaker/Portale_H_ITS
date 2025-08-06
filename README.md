@@ -10,7 +10,6 @@ Un'applicazione web moderna per la gestione di corsi, utenti e orari per l'Istit
 - [Funzionalità](#funzionalità)
 - [Installazione](#installazione)
 - [Utilizzo](#utilizzo)
-- [API Endpoints](#api-endpoints)
 - [Database](#database)
 - [Contributi](#contributi)
 
@@ -168,38 +167,6 @@ Portale_H_ITS/
 - **Amministratori**: Accesso completo a tutte le funzionalità
 - **Utenti**: Vista limitata ai propri corsi e orari
 
-## � API Endpoints
-
-### Autenticazione
-- `POST /api/auth/login` - Login utente
-- `POST /api/auth/logout` - Logout utente
-- `GET /api/auth/check` - Verifica sessione
-
-### Utenti
-- `GET /api/users` - Lista utenti
-- `POST /api/users` - Crea utente
-- `PUT /api/users/:id` - Aggiorna utente
-- `DELETE /api/users/:id` - Elimina utente
-
-### Corsi
-- `GET /api/courses` - Lista corsi
-- `POST /api/courses` - Crea corso
-- `PUT /api/courses/:id` - Aggiorna corso
-- `DELETE /api/courses/:id` - Elimina corso
-
-### Orari
-- `GET /api/schedules` - Lista orari
-- `POST /api/schedules` - Crea orario
-- `PUT /api/schedules/:id` - Aggiorna orario
-- `DELETE /api/schedules/:id` - Elimina orario
-
-### Dashboard
-- `GET /api/dashboard/stats` - Statistiche generali
-- `GET /api/dashboard/user/:id` - Dati utente specifico
-
-Perfetto! Qui sotto trovi una **versione Markdown completa e migliorata** del tuo schema, in cui viene **spiegato chiaramente cosa significa FK (Foreign Key)**, indicando che si tratta di una **chiave esterna** che **fa riferimento a una chiave primaria di un’altra tabella**.
-
----
 
 # 🗄️ **Database Schema**
 
