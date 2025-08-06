@@ -29,6 +29,7 @@ L'applicazione utilizza un design moderno con effetti glassmorphism, gradients a
 ```
 Portale_H_ITS/
 ├── 📁 db/                    # Database SQLite
+│   ├── database.db           # File database SQLite
 ├── 📁 node_modules/          # Dipendenze npm
 ├── 📁 public/               # File statici frontend
 │   ├── 📁 CSS/              # Fogli di stile personalizzati
