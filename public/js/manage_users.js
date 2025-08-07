@@ -193,7 +193,7 @@ function renderUsersList() {
                   ${
                     u.role !== "admin"
                       ? `
-                  <button onclick="showChangeRoleModal(${u.id}, '${u.username}', '${u.role}')" 
+                  <button onclick="showChangeRoleModal(${u.id}, 'admin')" 
                     class="flex-1 bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-semibold py-3 px-4 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
                     <span>👑</span>
                     <span>Rendi Admin</span>
@@ -205,7 +205,7 @@ function renderUsersList() {
                   ${
                     u.role === "admin" && adminCount > 1
                       ? `
-                  <button onclick="showChangeRoleModal(${u.id}, '${u.username}', '${u.role}')" 
+                  <button onclick="showChangeRoleModal(${u.id}, 'user')" 
                     class="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-semibold py-3 px-4 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
                     <span>👤</span>
                     <span>Rendi Utente</span>
@@ -240,59 +240,71 @@ const promote = (id) =>
 const demote = (id) =>
   fetch(`/api/users/${id}/demote`, { method: "POST" }).then(fetchUsers);
 
-// NEW: Funzioni per il modal di conferma del cambio ruolo
-function showChangeRoleModal(userId, username, currentRole) {
-  userToChangeId = userId;
-  userToChangeRole = currentRole === "admin" ? "user" : "admin";
+// Funzioni per il modal di conferma del cambio ruolo
+function showChangeRoleModal(userId, newRole) {
+  const user = users.find(u => u.id === userId);
+  if (!user) {
+    console.error("Utente non trovato per ID:", userId);
+    return;
+  }
+
+  userToChangeId = user.id;
+  userToChangeRole = newRole;
 
   const modal = document.getElementById("change-role-modal");
   const title = document.getElementById("change-role-modal-title");
   const text = document.getElementById("change-role-modal-text");
   const confirmBtn = document.getElementById("confirm-change-role-btn");
+  const cancelBtn = document.getElementById("cancel-change-role-btn");
 
-  title.textContent = `Cambia ruolo per ${username}?`;
-  text.textContent = `Sei sicuro di voler cambiare il ruolo di ${username} da ${currentRole} a ${userToChangeRole}?`;
+  title.textContent = `Cambia ruolo per ${user.username}?`;
+  text.textContent = `Sei sicuro di voler cambiare il ruolo di ${user.username} da ${user.role} a ${userToChangeRole}?`;
   confirmBtn.textContent = `Sì, rendi ${userToChangeRole}`;
+  cancelBtn.textContent = "Annulla";
 
-  // Mostra il modal
-  modal.classList.remove("hidden");
+  if (userToChangeRole === 'admin') {
+    confirmBtn.className = "px-6 py-2 bg-green-500 text-gray-900 rounded-lg hover:bg-green-600 transition-colors";
+  } else {
+    confirmBtn.className = "px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors";
+  }
+
+  modal.style.display = 'flex';
 }
 
 function hideChangeRoleModal() {
   const modal = document.getElementById("change-role-modal");
-  modal.classList.add("hidden");
+  modal.style.display = 'none';
   userToChangeId = null;
   userToChangeRole = null;
 }
 
+// Funzione modificata per il cambio di ruolo
 function changeUserRole() {
   if (!userToChangeId || !userToChangeRole) {
     console.error("ID utente o ruolo non definiti.");
     return;
   }
 
-  fetch(`/api/users/${userToChangeId}/role`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ role: userToChangeRole }),
+  // Utilizza gli endpoint POST esistenti nel backend
+  const apiEndpoint = userToChangeRole === 'admin' ? `/api/users/${userToChangeId}/promote` : `/api/users/${userToChangeId}/demote`;
+
+  fetch(apiEndpoint, {
+    method: "POST",
   })
     .then((response) => {
       if (!response.ok) {
-        throw new Error("Errore durante il cambio di ruolo");
+        return response.text().then(text => { throw new Error(text || "Errore durante il cambio di ruolo"); });
       }
-      return response.json();
+      return response.text();
     })
     .then(() => {
       hideChangeRoleModal();
-      fetchUsers(); // Aggiorna la lista degli utenti dopo la modifica
-      // Puoi anche aggiungere una notifica di successo
+      fetchUsers();
     })
     .catch((error) => {
       console.error("Errore:", error);
+      alert(error.message); // Mostra un alert con il messaggio di errore
       hideChangeRoleModal();
-      // Puoi aggiungere una notifica di errore
     });
 }
 
@@ -358,14 +370,24 @@ function assignCourse(id, courseId) {
   })
     .then((r) => r.text())
     .then((msg) => {
-      fetchUsers();
-      const el = document.getElementById("assign-msg");
-      el.textContent = msg === "OK" ? "Corso assegnato con successo!" : msg;
-      el.className = `mt-4 p-4 rounded-2xl text-sm font-medium ${msg === "OK" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`;
-      el.classList.remove("hidden");
-      setTimeout(() => {
-        el.classList.add("hidden");
-      }, 3000);
+      if (msg === "OK") {
+        fetchUsers();
+        const el = document.getElementById("assign-msg");
+        el.textContent = "Corso assegnato con successo!";
+        el.className = `mt-4 p-4 rounded-2xl text-sm font-medium bg-green-100 text-green-800`;
+        el.classList.remove("hidden");
+        setTimeout(() => {
+          el.classList.add("hidden");
+        }, 3000);
+      } else {
+        const el = document.getElementById("assign-msg");
+        el.textContent = msg;
+        el.className = `mt-4 p-4 rounded-2xl text-sm font-medium bg-red-100 text-red-800`;
+        el.classList.remove("hidden");
+        setTimeout(() => {
+          el.classList.add("hidden");
+        }, 3000);
+      }
     });
 }
 
@@ -552,6 +574,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "confirm-change-role-btn",
   );
   const cancelChangeRoleBtn = document.getElementById("cancel-change-role-btn");
+  const closeChangeRoleBtn = document.getElementById("close-change-role-modal");
 
   if (searchUserInput && filterCourseSelect) {
     searchUserInput.addEventListener("input", renderUsersList);
@@ -572,6 +595,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Aggiungi gli event listener per i bottoni del nuovo modal
   confirmChangeRoleBtn.addEventListener("click", changeUserRole);
   cancelChangeRoleBtn.addEventListener("click", hideChangeRoleModal);
+  closeChangeRoleBtn.addEventListener("click", hideChangeRoleModal);
 
   toggleFilterCourseVisibility();
   fetchCourses().then(fetchUsers);
