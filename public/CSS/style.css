@@ -364,3 +364,29 @@
 .custom-scrollbar::-webkit-scrollbar-thumb {
   @apply bg-gray-400 rounded-full hover:bg-gray-500;
 }
+
+.login-link {
+    color: #4f46e5; /* A nice indigo color */
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+.login-link:hover {
+    color: #4338ca; /* A darker indigo on hover */
+    text-decoration: underline;
+}
+
+.login-link-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border: 2px solid #a5b4fc; /* A light blue border */
+    color: #4f46e5;
+    border-radius: 9999px; /* Pill shape */
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+.login-link-btn:hover {
+    background-color: #e0e7ff; /* Light blue background on hover */
+    transform: translateY(-2px);
+}
+
