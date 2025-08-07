@@ -28,6 +28,9 @@ L'applicazione utilizza un design moderno con effetti glassmorphism, gradients a
 
 ```
 Portale_H_ITS/
+├── 📁 configuration/       # Configurazioni
+│   ├── db.js                # Configurazione database
+│   └── auth.js              # Configurazione autenticazione
 ├── 📁 db/                    # Database SQLite
 │   ├── database.db           # File database SQLite
 ├── 📁 node_modules/          # Dipendenze npm
@@ -56,8 +59,6 @@ Portale_H_ITS/
 │   ├── dashboardRoutes.js   # Dashboard
 │   ├── scheduleRoutes.js    # API orari
 │   └── userRoutes.js        # API utenti
-├── auth.js                  # Middleware autenticazione
-├── db.js                    # Configurazione database
 ├── server.js                # Server principale
 ├── package.json             # Dipendenze e script
 ├── package-lock.json        # Lock file dipendenze

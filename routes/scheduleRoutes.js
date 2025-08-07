@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
-const { db } = require("../db");
-const { requireAdmin } = require("../auth");
+const { db } = require("../configuration/db");
+const { requireAdmin } = require("../configuration/auth");
 
 // GET /api/schedules + search
 router.get("/", requireAdmin, (req, res) => {

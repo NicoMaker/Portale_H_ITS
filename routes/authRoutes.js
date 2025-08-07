@@ -2,8 +2,8 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const router = express.Router();
 
-const { db } = require("../db");
-const { createSession, destroySession } = require("../auth");
+const { db } = require("../configuration/db");
+const { createSession, destroySession } = require("../configuration/auth");
 
 // Login
 router.post("/login", (req, res) => {

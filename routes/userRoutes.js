@@ -2,8 +2,8 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const router = express.Router();
 
-const { db } = require("../db");
-const { requireAdmin, requireAuth } = require("../auth");
+const { db } = require("../configuration/db");
+const { requireAdmin, requireAuth } = require("../configuration/auth");
 
 // GET /api/users
 router.get("/", requireAdmin, (req, res) => {

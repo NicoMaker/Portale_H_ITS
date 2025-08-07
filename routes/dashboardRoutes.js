@@ -2,8 +2,8 @@ const express = require("express");
 const path = require("path");
 const router = express.Router();
 
-const { db } = require("../db");
-const { requireAdmin, requireUser } = require("../auth");
+const { db } = require("../configuration/db");
+const { requireAdmin, requireUser } = require("../configuration/auth");
 
 // Dashboard admin: serve page
 router.get("/admin_dashboard.html", requireAdmin, (req, res) => {
