@@ -28,41 +28,44 @@ L'applicazione utilizza un design moderno con effetti glassmorphism, gradients a
 
 ```
 Portale_H_ITS/
-├── 📁 configuration/       # Configurazioni
+├── 📁 backend
+│   ├── 📁 configuration/       # Configurazion
 │   ├── db.js                # Configurazione database
-│   └── auth.js              # Configurazione autenticazione
-├── 📁 db/                    # Database SQLite
+│   ├── auth.js              # Configurazione autenticazione
+│   ├── 📁 db/                    # Database SQLite
 │   ├── database.db           # File database SQLite
-├── 📁 node_modules/          # Dipendenze npm
-├── 📁 public/               # File statici frontend
-│   ├── 📁 CSS/              # Fogli di stile personalizzati
-│   │   ├── style.css            # Foglio di stile principale
-│   │   └── styleuser.css        # Foglio di stile utente
+│   ├── 📁 node_modules/          # Dipendenze npm
+│   ├── 📁 routes/
+│   ├── authRoutes.js         # Autenticazione
+│   ├── courseRoutes.js       # API corsi
+│   ├── dashboardRoutes.js    # Dashboard
+│   ├── scheduleRoutes.js     # API orari
+│   └── userRoutes.js         # API utenti
+│   ├── server.js             # Configurazione server
+│   └── package.json          # Dipendenze e script
+│   └── package-lock.json     # Lock file dipendenze
+├── 📁 frontend
 │   ├── 📁 HTML/             # File HTML
-│   │   └── admin_dashboard.html # Dashboard amministratore
-│   │   ├── login.html           # Pagina di login
-│   │   ├── manage_courses.html  # Gestione corsi
-│   │   ├── manage_schedules.html # Gestione orari
-│   │   ├── manage_users.html    # Gestione utenti
-│   │   └── user_dashboard.html  # Dashboard utente
-│   ├── 📁 js/               # Script JavaScript
-│   │   ├── admin_dashboard.js   # Script dashboard amministratore
-│   │   ├── login.js             # Script login
-│   │   ├── manage_courses.js    # Script gestione corsi
-│   │   ├── manage_schedules.js  # Script gestione orari
-│   │   ├── manage_users.js      # Script gestione utenti
-│   │   ├── tailwind.js          # Script tailwind
-│   │   ├── user_dashboard.js    # Script dashboard utente
-│   │   └── utils.js             # Script utils
-├── 📁 routes/               # Route API Express
-│   ├── authRoutes.js        # Autenticazione
-│   ├── courseRoutes.js      # API corsi
-│   ├── dashboardRoutes.js   # Dashboard
-│   ├── scheduleRoutes.js    # API orari
-│   └── userRoutes.js        # API utenti
-├── server.js                # Server principale
-├── package.json             # Dipendenze e script
-├── package-lock.json        # Lock file dipendenze
+│   ├── admin_dashboard.html # Dashboard amministratore
+│   ├── login.html           # Pagina di login
+│   ├── manage_courses.html  # Gestione corsi
+│   ├── manage_schedules.html # Gestione orari
+│   ├── manage_users.html    # Gestione utenti
+│   ├── user_dashboard.html  # Dashboard utente
+│   ├── 📁 CSS/              # File CSS
+│   ├── style.css            # Stile generale
+│   ├── styleuser.css        # Stile dashboard utente
+│   ├── 📁 JS/               # File JavaScript
+│   ├── admin_dashboard.js   # Dashboard amministratore
+│   ├── login.js             # Gestione login
+│   ├── manage_courses.js    # Gestione corsi
+│   ├── manage_schedules.js  # Gestione orari
+│   ├── manage_users.js      # Gestione utenti
+│   ├── tailwind.js          # Configurazione Tailwind
+│   ├── user_dashboard.js    # Dashboard utente
+│   ├── utils.js             # Funzioni utili
+└── gitignore                # File di configurazione Git
+└── LICENSE                  # Licenza
 └── README.md               # Documentazione
 ```
 
