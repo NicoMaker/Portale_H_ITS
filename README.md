@@ -38,6 +38,13 @@ Portale_H_ITS/
 │   ├── 📁 CSS/              # Fogli di stile personalizzati
 │   │   ├── style.css            # Foglio di stile principale
 │   │   └── styleuser.css        # Foglio di stile utente
+│   ├── 📁 HTML/             # File HTML
+│   │   └── admin_dashboard.html # Dashboard amministratore
+│   │   ├── login.html           # Pagina di login
+│   │   ├── manage_courses.html  # Gestione corsi
+│   │   ├── manage_schedules.html # Gestione orari
+│   │   ├── manage_users.html    # Gestione utenti
+│   │   └── user_dashboard.html  # Dashboard utente
 │   ├── 📁 js/               # Script JavaScript
 │   │   ├── admin_dashboard.js   # Script dashboard amministratore
 │   │   ├── login.js             # Script login
@@ -47,12 +54,6 @@ Portale_H_ITS/
 │   │   ├── tailwind.js          # Script tailwind
 │   │   ├── user_dashboard.js    # Script dashboard utente
 │   │   └── utils.js             # Script utils
-│   ├── admin_dashboard.html  # Dashboard amministratore
-│   ├── login.html           # Pagina di login
-│   ├── manage_courses.html  # Gestione corsi
-│   ├── manage_schedules.html # Gestione orari
-│   ├── manage_users.html    # Gestione utenti
-│   └── user_dashboard.html  # Dashboard utente
 ├── 📁 routes/               # Route API Express
 │   ├── authRoutes.js        # Autenticazione
 │   ├── courseRoutes.js      # API corsi
