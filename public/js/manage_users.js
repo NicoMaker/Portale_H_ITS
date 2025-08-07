@@ -242,7 +242,7 @@ const demote = (id) =>
 
 // Funzioni per il modal di conferma del cambio ruolo
 function showChangeRoleModal(userId, newRole) {
-  const user = users.find(u => u.id === userId);
+  const user = users.find((u) => u.id === userId);
   if (!user) {
     console.error("Utente non trovato per ID:", userId);
     return;
@@ -262,18 +262,20 @@ function showChangeRoleModal(userId, newRole) {
   confirmBtn.textContent = `Sì, rendi ${userToChangeRole}`;
   cancelBtn.textContent = "Annulla";
 
-  if (userToChangeRole === 'admin') {
-    confirmBtn.className = "px-6 py-2 bg-green-500 text-gray-900 rounded-lg hover:bg-green-600 transition-colors";
+  if (userToChangeRole === "admin") {
+    confirmBtn.className =
+      "px-6 py-2 bg-green-500 text-gray-900 rounded-lg hover:bg-green-600 transition-colors";
   } else {
-    confirmBtn.className = "px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors";
+    confirmBtn.className =
+      "px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors";
   }
 
-  modal.style.display = 'flex';
+  modal.style.display = "flex";
 }
 
 function hideChangeRoleModal() {
   const modal = document.getElementById("change-role-modal");
-  modal.style.display = 'none';
+  modal.style.display = "none";
   userToChangeId = null;
   userToChangeRole = null;
 }
@@ -286,14 +288,19 @@ function changeUserRole() {
   }
 
   // Utilizza gli endpoint POST esistenti nel backend
-  const apiEndpoint = userToChangeRole === 'admin' ? `/api/users/${userToChangeId}/promote` : `/api/users/${userToChangeId}/demote`;
+  const apiEndpoint =
+    userToChangeRole === "admin"
+      ? `/api/users/${userToChangeId}/promote`
+      : `/api/users/${userToChangeId}/demote`;
 
   fetch(apiEndpoint, {
     method: "POST",
   })
     .then((response) => {
       if (!response.ok) {
-        return response.text().then(text => { throw new Error(text || "Errore durante il cambio di ruolo"); });
+        return response.text().then((text) => {
+          throw new Error(text || "Errore durante il cambio di ruolo");
+        });
       }
       return response.text();
     })
