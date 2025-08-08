@@ -32,8 +32,8 @@ Portale_H_ITS/
 │   ├── 📁 configuration/       # Configurazioni
 │   |   ├── db.js                # Configurazione database
 │   |   ├── auth.js              # Configurazione autenticazione
-│   ├── 📁 db/                    # Database SQLite
-│   │   ├── database.db           # File database SQLite
+|   |   |── 📁 db/
+|   |   |   ├── database.db       # Database SQLite
 │   ├── 📁 node_modules/          # Dipendenze npm
 │   ├── 📁 routes/
 │   │   ├── authRoutes.js         # Autenticazione
