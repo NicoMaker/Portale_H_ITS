@@ -4,14 +4,14 @@ Un'applicazione web moderna per la gestione di corsi, utenti e orari per l'Istit
 
 ## 📋 Indice
 
-- [Panoramica](#panoramica)
-- [Struttura del Progetto](#struttura-del-progetto)
-- [Tecnologie Utilizzate](#tecnologie-utilizzate)
-- [Funzionalità](#funzionalità)
-- [Installazione](#installazione)
-- [Utilizzo](#utilizzo)
-- [Database](#database)
-- [Contributi](#contributi)
+- [Panoramica](#-panoramica)
+- [Struttura del Progetto](#-struttura-del-progetto)
+- [Tecnologie Utilizzate](#️-tecnologie-utilizzate)
+- [Funzionalità](#-funzionalità)
+- [Installazione](#-installazione)
+- [Utilizzo](#-utilizzo)
+- [Database](#️-database-schema)
+- [Contributi](#-contributi)
 
 ## 🌟 Panoramica
 
