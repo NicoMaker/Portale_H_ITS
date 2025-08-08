@@ -389,3 +389,8 @@
   background-color: #e0e7ff; /* Light blue background on hover */
   transform: translateY(-2px);
 }
+
+.gradient-animate {
+  background-size: 200% 200%;
+  animation: gradientShift 3s ease infinite;
+}
