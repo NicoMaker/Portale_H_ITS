@@ -332,7 +332,7 @@ async function populateDatabase() {
 
     do {
       numStudents = parseInt(
-        await ask("Quanti studenti vuoi generare? (1-1000): ")
+        await ask("Quanti studenti (Users) vuoi generare? (1-1000): ")
       );
     } while (isNaN(numStudents) || numStudents < 1 || numStudents > 1000);
 
