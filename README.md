@@ -30,11 +30,11 @@ L'applicazione utilizza un design moderno con effetti glassmorphism, gradients a
 Portale_H_ITS/
 ├── 📁 backend
 │   ├── 📁 configuration/       # Configurazioni
+|   |   |── 📁 db/
+|   |   |   ├── database.db       # Database SQLite
 │   |   ├── db.js                # Configurazione database
 │   |   ├── auth.js              # Configurazione autenticazione
 │   |   ├── init.js              # creazione file fasulli dei dati 
-|   |   |── 📁 db/
-|   |   |   ├── database.db       # Database SQLite
 │   ├── 📁 node_modules/          # Dipendenze npm
 │   ├── 📁 routes/
 │   │   ├── authRoutes.js         # Autenticazione
