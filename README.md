@@ -32,6 +32,7 @@ Portale_H_ITS/
 │   ├── 📁 configuration/       # Configurazioni
 │   |   ├── db.js                # Configurazione database
 │   |   ├── auth.js              # Configurazione autenticazione
+│   |   ├── init.js              # creazione file fasulli dei dati 
 |   |   |── 📁 db/
 |   |   |   ├── database.db       # Database SQLite
 │   ├── 📁 node_modules/          # Dipendenze npm
@@ -170,6 +171,18 @@ Portale_H_ITS/
 
    # Modalità produzione
    npm start
+
+   # Modalità Creazione dati 
+
+   npm run dati
+
+   # Modalità Creazione dati + Avvio server
+
+   npm run start_dati
+
+   # Modalità Creazione dati + Avvio server + Auto-restart
+
+   npm run dev_dati
    ```
 
 4. **Accedi all'applicazione**
