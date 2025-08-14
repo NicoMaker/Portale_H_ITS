@@ -384,7 +384,7 @@ async function populateDatabase() {
     // Studenti come utenti con role 'user'
     for (let i = 0; i < numStudents; i++) {
       const uname = randomUsername("user");
-      const hash = await hashPassword("password123");
+      const hash = await hashPassword("User123");
       await runQuery(
         "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
         [uname, hash, "user"]
