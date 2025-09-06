@@ -696,7 +696,6 @@ function updateFilterCourseSelect() {
   const select = document.getElementById("filter-course");
   select.innerHTML =
     '<option value="">Tutti i corsi</option>' +
-    '<option value="_no_course_">Senza corso</option>' +
     courses.map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
 }
 
@@ -924,5 +923,3 @@ function getFilteredUsers() {
 
   return filtered;
 }
-
-
