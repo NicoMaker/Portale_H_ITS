@@ -56,13 +56,100 @@
               Organizza e gestisci gli orari delle lezioni
             </p>
           </div>
-          <button
-            id="add-schedule-btn"
-            class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-2"
-          >
-            <span class="text-lg">+</span>
-            <span>Aggiungi Orario</span>
-          </button>
+          <div class="flex items-center space-x-4">
+            <button id="refresh-data" class="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-all duration-200 hover:bg-blue-50 rounded-lg">
+            </button>
+            <button
+              id="add-schedule-btn"
+              class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-2"
+            >
+              <span class="text-lg">+</span>
+              <span>Aggiungi Orario</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistiche Orari -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+        <!-- Totale Lezioni -->
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Totale Lezioni</p>
+              <p id="total-schedules" class="text-3xl font-bold text-gray-900">-</p>
+            </div>
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-3 rounded-xl">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v16a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex items-center text-sm">
+              <span class="text-blue-600 font-medium">Lezioni Programmate</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lezioni Questa Settimana -->
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Questa Settimana</p>
+              <p id="week-schedules" class="text-3xl font-bold text-gray-900">-</p>
+            </div>
+            <div class="bg-gradient-to-r from-green-500 to-green-600 p-3 rounded-xl">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex items-center text-sm">
+              <span class="text-green-600 font-medium">In Arrivo</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Docenti Unici -->
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Docenti</p>
+              <p id="unique-teachers" class="text-3xl font-bold text-gray-900">-</p>
+            </div>
+            <div class="bg-gradient-to-r from-purple-500 to-purple-600 p-3 rounded-xl">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex items-center text-sm">
+              <span class="text-purple-600 font-medium">Attivi</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lezioni Filtate -->
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Visualizzate</p>
+              <p id="filtered-schedules" class="text-3xl font-bold text-gray-900">-</p>
+            </div>
+            <div class="bg-gradient-to-r from-orange-500 to-orange-600 p-3 rounded-xl">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex items-center text-sm">
+              <span class="text-orange-600 font-medium">Con Filtri</span>
+            </div>
+          </div>
         </div>
       </div>
 

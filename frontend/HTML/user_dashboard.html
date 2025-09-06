@@ -102,6 +102,90 @@
         </div>
       </div>
 
+      <!-- Statistiche Personali -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+        <!-- Totale Lezioni -->
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Lezioni Totali</p>
+              <p id="total-lessons" class="text-3xl font-bold text-gray-900">-</p>
+            </div>
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-3 rounded-xl">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v16a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex items-center text-sm">
+              <span class="text-blue-600 font-medium">Lezioni Programmate</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lezioni Questa Settimana -->
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Questa Settimana</p>
+              <p id="week-lessons" class="text-3xl font-bold text-gray-900">-</p>
+            </div>
+            <div class="bg-gradient-to-r from-green-500 to-green-600 p-3 rounded-xl">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex items-center text-sm">
+              <span class="text-green-600 font-medium">Lezioni in Arrivo</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Prossima Lezione -->
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Prossima Lezione</p>
+              <p id="next-lesson" class="text-lg font-bold text-gray-900">-</p>
+            </div>
+            <div class="bg-gradient-to-r from-purple-500 to-purple-600 p-3 rounded-xl">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex items-center text-sm">
+              <span class="text-purple-600 font-medium">In Arrivo</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lezioni Filtate -->
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Visualizzate</p>
+              <p id="filtered-lessons" class="text-3xl font-bold text-gray-900">-</p>
+            </div>
+            <div class="bg-gradient-to-r from-orange-500 to-orange-600 p-3 rounded-xl">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex items-center text-sm">
+              <span class="text-orange-600 font-medium">Con Filtri</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
       <div id="courses-section" class="mb-8 animate-slide-up">
         <div
           class="bg-white/95 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-lg hover-lift overflow-hidden border border-gray-100"

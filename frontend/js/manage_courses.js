@@ -282,4 +282,67 @@ function renderCoursesList() {
   }
 
   document.getElementById("courses-list").innerHTML = html;
+  updateCourseStats();
 }
+
+// ------------------------------
+// Funzioni per statistiche
+// ------------------------------
+function updateCourseStats() {
+  // Total courses
+  const totalCoursesEl = document.getElementById('total-courses');
+  if (totalCoursesEl) {
+    totalCoursesEl.textContent = allCourses.length;
+  }
+  
+  // Courses with users (need to fetch user data for this)
+  fetch("/api/users")
+    .then(r => r.json())
+    .then(users => {
+      const coursesWithUsers = allCourses.filter(course => 
+        users.some(user => user.courses && user.courses.some(uc => uc.id === course.id))
+      ).length;
+      
+      const coursesWithUsersEl = document.getElementById('courses-with-users');
+      if (coursesWithUsersEl) {
+        coursesWithUsersEl.textContent = coursesWithUsers;
+      }
+      
+      const coursesWithoutUsers = allCourses.length - coursesWithUsers;
+      const coursesWithoutUsersEl = document.getElementById('courses-without-users');
+      if (coursesWithoutUsersEl) {
+        coursesWithoutUsersEl.textContent = coursesWithoutUsers;
+      }
+    })
+    .catch(err => {
+      console.error('Errore nel caricamento utenti per statistiche:', err);
+    });
+  
+  // Filtered courses (based on current search)
+  const searchTerm = document.getElementById('search-course')?.value?.toLowerCase() || '';
+  const filteredCourses = allCourses.filter(course => 
+    course.name.toLowerCase().includes(searchTerm) ||
+    (course.description && course.description.toLowerCase().includes(searchTerm))
+  );
+  
+  const filteredCoursesEl = document.getElementById('filtered-courses');
+  if (filteredCoursesEl) {
+    filteredCoursesEl.textContent = filteredCourses.length;
+  }
+}
+
+// Setup refresh button
+document.addEventListener('DOMContentLoaded', () => {
+  const refreshBtn = document.getElementById('refresh-data');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', () => {
+      fetchCourses();
+    });
+  }
+  
+  // Update stats when search changes
+  const searchInput = document.getElementById('search-course');
+  if (searchInput) {
+    searchInput.addEventListener('input', updateCourseStats);
+  }
+});

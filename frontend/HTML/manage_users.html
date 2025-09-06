@@ -62,14 +62,101 @@
               Crea e gestisci gli utenti della tua piattaforma
             </p>
           </div>
-          <div class="float-animation">
-            <button
-              id="add-user-btn"
-              class="bg-gradient-to-r from-green-500 via-blue-500 to-purple-600 hover:from-green-600 hover:via-blue-600 hover:to-purple-700 text-white font-semibold px-8 py-4 rounded-2xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300 flex items-center space-x-3 text-lg"
-            >
-              <span class="text-2xl">+</span>
-              <span>Aggiungi Utente</span>
-            </button>
+          <div class="flex items-center space-x-4">
+            <div class="float-animation">
+              <button
+                id="add-user-btn"
+                class="bg-gradient-to-r from-green-500 via-blue-500 to-purple-600 hover:from-green-600 hover:via-blue-600 hover:to-purple-700 text-white font-semibold px-8 py-4 rounded-2xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300 flex items-center space-x-3 text-lg"
+              >
+                <span class="text-2xl">+</span>
+                <span>Aggiungi Utente</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistiche Utenti -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+        <!-- Totale Utenti -->
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Totale Utenti</p>
+              <p id="total-users" class="text-3xl font-bold text-gray-900">-</p>
+            </div>
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-3 rounded-xl">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex items-center text-sm">
+              <span id="users-admin" class="text-blue-600 font-medium">Admin: -</span>
+              <span class="mx-2">•</span>
+              <span id="users-regular" class="text-green-600 font-medium">Utenti: -</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Utenti con Corso -->
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Con Corso</p>
+              <p id="users-with-course" class="text-3xl font-bold text-gray-900">-</p>
+            </div>
+            <div class="bg-gradient-to-r from-green-500 to-green-600 p-3 rounded-xl">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex items-center text-sm">
+              <span class="text-green-600 font-medium">Assegnati</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Utenti senza Corso -->
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6 disabled">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Senza Corso</p>
+              <p id="users-without-course" class="text-3xl font-bold text-gray-900">-</p>
+            </div>
+            <div class="bg-gradient-to-r from-orange-500 to-orange-600 p-3 rounded-xl">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex items-center text-sm">
+              <span class="text-orange-600 font-medium">Non Assegnati</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Utenti Filtati -->
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Visualizzati</p>
+              <p id="filtered-users" class="text-3xl font-bold text-gray-900">-</p>
+            </div>
+            <div class="bg-gradient-to-r from-purple-500 to-purple-600 p-3 rounded-xl">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex items-center text-sm">
+              <span class="text-purple-600 font-medium">Con Filtri</span>
+            </div>
           </div>
         </div>
       </div>

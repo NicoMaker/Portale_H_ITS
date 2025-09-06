@@ -126,7 +126,6 @@
           </div>
 
           <!-- User Actions -->
-          <div class="flex items-center space-x-4">
             <a
               href="/logout"
               class="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 transition-all duration-200 hover:bg-red-50 rounded-lg"
@@ -177,6 +176,92 @@
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 py-12">
+      <!-- Statistiche Principali -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <!-- Totale Utenti -->
+        <div class="glass-effect rounded-2xl p-6 card-hover animate-slide-up">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Totale Utenti</p>
+              <p id="total-users" class="text-3xl font-bold text-gray-900">-</p>
+            </div>
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-3 rounded-xl">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex items-center text-sm">
+              <span id="users-admin" class="text-blue-600 font-medium">Admin: -</span>
+              <span class="mx-2">•</span>
+              <span id="users-regular" class="text-green-600 font-medium">Utenti: -</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Totale Corsi -->
+        <div class="glass-effect rounded-2xl p-6 card-hover animate-slide-up animation-delay-200">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Totale Corsi</p>
+              <p id="total-courses" class="text-3xl font-bold text-gray-900">-</p>
+            </div>
+            <div class="bg-gradient-to-r from-green-500 to-green-600 p-3 rounded-xl">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex items-center text-sm">
+              <span class="text-green-600 font-medium">Corsi Attivi</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Totale Lezioni -->
+        <div class="glass-effect rounded-2xl p-6 card-hover animate-slide-up animation-delay-300">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Totale Lezioni</p>
+              <p id="total-schedules" class="text-3xl font-bold text-gray-900">-</p>
+            </div>
+            <div class="bg-gradient-to-r from-purple-500 to-purple-600 p-3 rounded-xl">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v16a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex items-center text-sm">
+              <span class="text-purple-600 font-medium">Lezioni Programmate</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Attività Recente -->
+        <div class="glass-effect rounded-2xl p-6 card-hover animate-slide-up animation-delay-500">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Attività (7gg)</p>
+              <p id="recent-activity" class="text-3xl font-bold text-gray-900">-</p>
+            </div>
+            <div class="bg-gradient-to-r from-orange-500 to-orange-600 p-3 rounded-xl">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex items-center text-sm">
+              <span class="text-orange-600 font-medium">Lezioni Recenti</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
       <!-- Quick Actions Grid - Fixed to ensure equal height and alignment -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
         <!-- Gestione Utenti Card -->

@@ -1,3 +1,73 @@
+// Dashboard functionality
+class AdminDashboard {
+    constructor() {
+        this.init();
+    }
+
+    init() {
+        this.setupEventListeners();
+        this.loadDashboardData();
+    }
+
+    setupEventListeners() {
+        // Refresh button
+        const refreshBtn = document.getElementById('refresh-data');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => {
+                this.loadDashboardData();
+            });
+        }
+    }
+
+    async loadDashboardData() {
+        try {
+            // Load basic stats
+            const statsResponse = await fetch('/admin/stats');
+            const stats = await statsResponse.json();
+            this.updateStatsCards(stats);
+
+        } catch (error) {
+            console.error('Errore nel caricamento dei dati:', error);
+        }
+    }
+
+    updateStatsCards(stats) {
+        // Update total users
+        const totalUsersEl = document.getElementById('total-users');
+        if (totalUsersEl) {
+            totalUsersEl.textContent = stats.totalUsers || 0;
+        }
+        
+        const usersAdminEl = document.getElementById('users-admin');
+        if (usersAdminEl) {
+            usersAdminEl.textContent = `Admin: ${stats.usersByRole?.admin || 0}`;
+        }
+        
+        const usersRegularEl = document.getElementById('users-regular');
+        if (usersRegularEl) {
+            usersRegularEl.textContent = `Utenti: ${stats.usersByRole?.user || 0}`;
+        }
+
+        // Update total courses
+        const totalCoursesEl = document.getElementById('total-courses');
+        if (totalCoursesEl) {
+            totalCoursesEl.textContent = stats.totalCourses || 0;
+        }
+
+        // Update total schedules
+        const totalSchedulesEl = document.getElementById('total-schedules');
+        if (totalSchedulesEl) {
+            totalSchedulesEl.textContent = stats.totalSchedules || 0;
+        }
+    }
+}
+
+// Initialize dashboard
+let adminDashboard;
+document.addEventListener('DOMContentLoaded', () => {
+    adminDashboard = new AdminDashboard();
+});
+
 // Modal functionality
 const modal = document.getElementById("edit-profile-modal");
 const usernameDisplay = document.getElementById("new_username");

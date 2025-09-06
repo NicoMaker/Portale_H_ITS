@@ -112,6 +112,7 @@ function fetchCoursesAndSchedules() {
     populateFilterOptions();
     renderSchedules();
     updateDatalists();
+    updateScheduleStats();
   });
 }
 
@@ -270,6 +271,7 @@ function renderSchedules() {
     html += "</tbody></table></div>";
   }
   document.getElementById("schedules-list").innerHTML = html;
+  updateScheduleStats();
 }
 
 // Funzione per azzerare tutti i filtri
@@ -758,9 +760,133 @@ document
   .getElementById("clear-filters-btn")
   .addEventListener("click", clearFilters);
 
+// ------------------------------
+// Funzioni per statistiche
+// ------------------------------
+function updateScheduleStats() {
+  // Total schedules
+  const totalSchedulesEl = document.getElementById('total-schedules');
+  if (totalSchedulesEl) {
+    totalSchedulesEl.textContent = schedules.length;
+  }
+  
+  // This week schedules
+  const today = new Date();
+  const weekStart = new Date(today.setDate(today.getDate() - today.getDay()));
+  const weekEnd = new Date(today.setDate(today.getDate() - today.getDay() + 6));
+  
+  const weekSchedules = schedules.filter(schedule => {
+    const scheduleDate = new Date(schedule.date);
+    return scheduleDate >= weekStart && scheduleDate <= weekEnd;
+  }).length;
+  
+  const weekSchedulesEl = document.getElementById('week-schedules');
+  if (weekSchedulesEl) {
+    weekSchedulesEl.textContent = weekSchedules;
+  }
+  
+  // Unique teachers
+  const uniqueTeachers = [...new Set(schedules.map(s => s.teacher))].length;
+  const uniqueTeachersEl = document.getElementById('unique-teachers');
+  if (uniqueTeachersEl) {
+    uniqueTeachersEl.textContent = uniqueTeachers;
+  }
+  
+  // Filtered schedules (based on current filters)
+  const filteredSchedules = getFilteredSchedules();
+  const filteredSchedulesEl = document.getElementById('filtered-schedules');
+  if (filteredSchedulesEl) {
+    filteredSchedulesEl.textContent = filteredSchedules.length;
+  }
+}
+
+function getFilteredSchedules() {
+  let filtered = [...schedules];
+  
+  // Apply course filter
+  const courseFilter = document.getElementById('filter-course')?.value;
+  if (courseFilter) {
+    filtered = filtered.filter(s => s.course_id == courseFilter);
+  }
+  
+  // Apply teacher filter
+  const teacherFilter = document.getElementById('filter-teacher')?.value;
+  if (teacherFilter) {
+    filtered = filtered.filter(s => s.teacher === teacherFilter);
+  }
+  
+  // Apply room filter
+  const roomFilter = document.getElementById('filter-room')?.value;
+  if (roomFilter) {
+    filtered = filtered.filter(s => s.room === roomFilter);
+  }
+  
+  // Apply subject filter
+  const subjectFilter = document.getElementById('filter-subject')?.value;
+  if (subjectFilter) {
+    filtered = filtered.filter(s => s.subject === subjectFilter);
+  }
+  
+  // Apply day filter
+  const dayFilter = document.getElementById('filter-day')?.value;
+  if (dayFilter) {
+    filtered = filtered.filter(s => s.day === dayFilter);
+  }
+  
+  return filtered;
+}
+
 // Inizializza l'applicazione al caricamento della pagina
 document.addEventListener("DOMContentLoaded", () => {
   setupAutoEndTime();
   setupAutoDayOfWeek();
   fetchCoursesAndSchedules();
+  
+  // Setup refresh button
+  const refreshBtn = document.getElementById('refresh-data');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', () => {
+      fetchCoursesAndSchedules();
+    });
+  }
 });
+
+function getFilteredSchedules() {
+  const courseNameFilter = document.getElementById("filter-course").value;
+  const teacherFilter = teacherChoices ? teacherChoices.getValue(true) : [];
+  const roomFilter = roomChoices ? roomChoices.getValue(true) : [];
+  const subjectFilter = subjectChoices ? subjectChoices.getValue(true) : [];
+  const dayFilter = dayChoices ? dayChoices.getValue(true) : [];
+  const dateFilter = document.getElementById("filter-date").value;
+
+  let filtered = schedules;
+
+  // Filtra per nome del corso
+  if (courseNameFilter) {
+    const matchingCourseIds = courses
+      .filter((c) => c.name === courseNameFilter)
+      .map((c) => String(c.id));
+    filtered = filtered.filter((s) =>
+      matchingCourseIds.includes(String(s.course_id)),
+    );
+  }
+
+  // Filtra per docente, aula, materia e giorno utilizzando i valori di Choices.js
+  if (teacherFilter.length) {
+    filtered = filtered.filter((s) => teacherFilter.includes(s.teacher));
+  }
+  if (roomFilter.length) {
+    filtered = filtered.filter((s) => roomFilter.includes(s.room));
+  }
+  if (subjectFilter.length) {
+    filtered = filtered.filter((s) => subjectFilter.includes(s.subject));
+  }
+  if (dayFilter.length) {
+    filtered = filtered.filter((s) => dayFilter.includes(s.day));
+  }
+  if (dateFilter) {
+    filtered = filtered.filter((s) => s.date === dateFilter);
+  }
+
+  return filtered;
+}

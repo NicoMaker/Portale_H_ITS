@@ -66,6 +66,7 @@ function fetchUsers() {
     .then((data) => {
       users = data;
       renderUsersList();
+      updateUserStats();
     });
 }
 
@@ -232,6 +233,7 @@ function renderUsersList() {
   }
 
   document.getElementById("users-list").innerHTML = html;
+  updateUserStats();
 }
 
 const promote = (id) =>
@@ -606,7 +608,321 @@ document.addEventListener("DOMContentLoaded", () => {
 
   toggleFilterCourseVisibility();
   fetchCourses().then(fetchUsers);
+  
+  // Setup refresh button
+  const refreshBtn = document.getElementById('refresh-data');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', () => {
+      fetchCourses().then(fetchUsers);
+    });
+  }
 });
+
+// ------------------------------
+// Funzioni per statistiche
+// ------------------------------
+function updateUserStats() {
+  // Total users
+  const totalUsersEl = document.getElementById('total-users');
+  if (totalUsersEl) {
+    totalUsersEl.textContent = users.length;
+  }
+  
+  // Users by role
+  const adminCount = users.filter(u => u.role === 'admin').length;
+  const userCount = users.filter(u => u.role === 'user').length;
+  
+  const usersAdminEl = document.getElementById('users-admin');
+  if (usersAdminEl) {
+    usersAdminEl.textContent = `Admin: ${adminCount}`;
+  }
+  
+  const usersRegularEl = document.getElementById('users-regular');
+  if (usersRegularEl) {
+    usersRegularEl.textContent = `Utenti: ${userCount}`;
+  }
+  
+  // Users with course
+  const usersWithCourse = users.filter(u => u.courses && u.courses.length > 0).length;
+  const usersWithCourseEl = document.getElementById('users-with-course');
+  if (usersWithCourseEl) {
+    usersWithCourseEl.textContent = usersWithCourse;
+  }
+  
+  // Users without course
+  const usersWithoutCourse = users.filter(u => !u.courses || u.courses.length === 0).length;
+  const usersWithoutCourseEl = document.getElementById('users-without-course');
+  if (usersWithoutCourseEl) {
+    usersWithoutCourseEl.textContent = usersWithoutCourse;
+  }
+  
+  // Filtered users (based on current filters)
+  const filteredUsers = getFilteredUsers();
+  const filteredUsersEl = document.getElementById('filtered-users');
+  if (filteredUsersEl) {
+    filteredUsersEl.textContent = filteredUsers.length;
+  }
+}
+
+function getFilteredUsers() {
+  let filtered = [...users];
+  
+  // Apply role filter
+  const roleFilter = document.getElementById('filter-role')?.value;
+  if (roleFilter) {
+    filtered = filtered.filter(u => u.role === roleFilter);
+  }
+  
+  // Apply course filter
+  const courseFilter = document.getElementById('filter-course')?.value;
+  if (courseFilter) {
+    filtered = filtered.filter(u => u.courses && u.courses.some(c => c.id == courseFilter));
+  }
+  
+  // Apply search filter
+  const searchTerm = document.getElementById('search-user')?.value?.toLowerCase();
+  if (searchTerm) {
+    filtered = filtered.filter(u => u.username.toLowerCase().includes(searchTerm));
+  }
+  
+  return filtered;
+}
 
 // Initialize
 fetchCourses().then(fetchUsers);
+
+
+function updateFilterCourseSelect() {
+  const select = document.getElementById("filter-course");
+  select.innerHTML =
+    '<option value="">Tutti i corsi</option>' +
+    '<option value="_no_course_">Senza corso</option>' +
+    courses.map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
+}
+
+function getFilteredUsers() {
+  let filtered = [...users];
+
+  // Applica il filtro del ruolo
+  const roleFilter = document.getElementById("filter-role")?.value;
+  if (roleFilter) {
+    filtered = filtered.filter((u) => u.role === roleFilter);
+  }
+
+  // Applica il filtro del corso
+  const courseFilter = document.getElementById("filter-course")?.value;
+  if (courseFilter) {
+    if (courseFilter === "_no_course_") {
+      // Filtra solo gli utenti con ruolo 'user' che non hanno corsi
+      filtered = filtered.filter((u) => u.role === "user" && (!u.courses || u.courses.length === 0));
+    } else {
+      // Filtra gli utenti in base all'ID del corso
+      filtered = filtered.filter(
+        (u) => u.courses && u.courses.some((c) => c.id == courseFilter),
+      );
+    }
+  }
+
+  // Applica il filtro di ricerca
+  const searchTerm = document.getElementById("search-user").value.toLowerCase();
+  if (searchTerm) {
+    filtered = filtered.filter(
+      (u) =>
+        u.name.toLowerCase().includes(searchTerm) ||
+        u.email.toLowerCase().includes(searchTerm) ||
+        u.role.toLowerCase().includes(searchTerm) ||
+        (u.courses &&
+          u.courses.some((c) => c.name.toLowerCase().includes(searchTerm))),
+    );
+  }
+
+  // Applica il filtro per data
+  const dateFilter = document.getElementById("filter-user-date")?.value;
+  if (dateFilter) {
+    filtered = filtered.filter((u) => u.registration_date === dateFilter);
+  }
+
+  return filtered;
+}
+
+function updateUserStats() {
+  const totalUsers = users.length;
+  const totalUsersEl = document.getElementById("total-users");
+  if (totalUsersEl) {
+    totalUsersEl.textContent = totalUsers;
+  }
+
+  // Conta gli utenti per ruolo
+  const admins = users.filter((u) => u.role === "admin").length;
+  const adminCountEl = document.getElementById("admin-count");
+  if (adminCountEl) {
+    adminCountEl.textContent = admins;
+  }
+
+  const userCount = users.filter((u) => u.role === "user").length;
+  const userCountEl = document.getElementById("user-count");
+  if (userCountEl) {
+    userCountEl.textContent = userCount;
+  }
+
+  // Utenti con corso
+  const usersWithCourse = users.filter(u => u.courses && u.courses.length > 0).length;
+  const usersWithCourseEl = document.getElementById('users-with-course');
+  if (usersWithCourseEl) {
+    usersWithCourseEl.textContent = usersWithCourse;
+  }
+
+  // Utenti senza corso (solo utenti normali)
+  const usersWithoutCourse = users.filter(u => u.role === 'user' && (!u.courses || u.courses.length === 0)).length;
+  const usersWithoutCourseEl = document.getElementById('users-without-course');
+  if (usersWithoutCourseEl) {
+    usersWithoutCourseEl.textContent = usersWithoutCourse;
+  }
+  
+  // Utenti filtrati (in base ai filtri correnti)
+  const filteredUsers = getFilteredUsers();
+  const filteredUsersEl = document.getElementById("filtered-users");
+  if (filteredUsersEl) {
+    filteredUsersEl.textContent = filteredUsers.length;
+  }
+}
+
+function getFilteredUsers() {
+  let filtered = [...users];
+
+  // Applica il filtro del ruolo
+  const roleFilter = document.getElementById("filter-role")?.value;
+  if (roleFilter) {
+    filtered = filtered.filter((u) => u.role === roleFilter);
+  }
+
+  // Applica il filtro del corso
+  const courseFilter = document.getElementById("filter-course")?.value;
+  if (courseFilter) {
+    if (courseFilter === "_no_course_") {
+      // ✅ LOGICA CORRETTA: Filtra solo gli utenti con ruolo 'user'
+      //    che non hanno corsi (l'array `courses` è vuoto o non esiste)
+      filtered = filtered.filter(
+        (u) => u.role === "user" && (!u.courses || u.courses.length === 0)
+      );
+    } else {
+      // Filtra gli utenti in base all'ID del corso selezionato
+      filtered = filtered.filter(
+        (u) => u.courses && u.courses.some((c) => c.id == courseFilter)
+      );
+    }
+  }
+
+  // Applica il filtro di ricerca
+  const searchTerm = document.getElementById("search-user").value.toLowerCase();
+  if (searchTerm) {
+    filtered = filtered.filter(
+      (u) =>
+        u.name.toLowerCase().includes(searchTerm) ||
+        u.email.toLowerCase().includes(searchTerm) ||
+        u.role.toLowerCase().includes(searchTerm) ||
+        (u.courses &&
+          u.courses.some((c) => c.name.toLowerCase().includes(searchTerm)))
+    );
+  }
+
+  // Applica il filtro per data
+  const dateFilter = document.getElementById("filter-user-date")?.value;
+  if (dateFilter) {
+    filtered = filtered.filter((u) => u.registration_date === dateFilter);
+  }
+
+  return filtered;
+}
+
+function updateUserStats() {
+  const totalUsers = users.length;
+  const totalUsersEl = document.getElementById("total-users");
+  if (totalUsersEl) {
+    totalUsersEl.textContent = totalUsers;
+  }
+
+  // Conta gli utenti per ruolo
+  const admins = users.filter((u) => u.role === "admin").length;
+  const adminCountEl = document.getElementById("admin-count");
+  if (adminCountEl) {
+    adminCountEl.textContent = admins;
+  }
+
+  const userCount = users.filter((u) => u.role === "user").length;
+  const userCountEl = document.getElementById("user-count");
+  if (userCountEl) {
+    userCountEl.textContent = userCount;
+  }
+
+  // Utenti con corso
+  const usersWithCourse = users.filter(u => u.courses && u.courses.length > 0).length;
+  const usersWithCourseEl = document.getElementById('users-with-course');
+  if (usersWithCourseEl) {
+    usersWithCourseEl.textContent = usersWithCourse;
+  }
+
+  // ✅ LOGICA CORRETTA: Conta solo gli utenti con ruolo 'user' senza corso
+  const usersWithoutCourse = users.filter(u => u.role === 'user' && (!u.courses || u.courses.length === 0)).length;
+  const usersWithoutCourseEl = document.getElementById('users-without-course');
+  if (usersWithoutCourseEl) {
+    usersWithoutCourseEl.textContent = usersWithoutCourse;
+  }
+  
+  // Utenti filtrati (in base ai filtri correnti)
+  const filteredUsers = getFilteredUsers();
+  const filteredUsersEl = document.getElementById("filtered-users");
+  if (filteredUsersEl) {
+    filteredUsersEl.textContent = filteredUsers.length;
+  }
+}
+
+function getFilteredUsers() {
+  let filtered = [...users];
+
+  // Applica il filtro del ruolo
+  const roleFilter = document.getElementById("filter-role")?.value;
+  if (roleFilter) {
+    filtered = filtered.filter((u) => u.role === roleFilter);
+  }
+
+  // Applica il filtro del corso
+  const courseFilter = document.getElementById("filter-course")?.value;
+  if (courseFilter) {
+    if (courseFilter === "_no_course_") {
+      // ✅ LOGICA CORRETTA: Filtra solo gli utenti con ruolo 'user'
+      //    che non hanno corsi (l'array `courses` è vuoto o non esiste)
+      filtered = filtered.filter(
+        (u) => u.role === "user" && (!u.courses || u.courses.length === 0)
+      );
+    } else {
+      // Filtra gli utenti in base all'ID del corso selezionato
+      filtered = filtered.filter(
+        (u) => u.courses && u.courses.some((c) => c.id == courseFilter)
+      );
+    }
+  }
+
+  // Applica il filtro di ricerca
+  const searchTerm = document.getElementById("search-user").value.toLowerCase();
+  if (searchTerm) {
+    filtered = filtered.filter(
+      (u) =>
+        u.name.toLowerCase().includes(searchTerm) ||
+        u.email.toLowerCase().includes(searchTerm) ||
+        u.role.toLowerCase().includes(searchTerm) ||
+        (u.courses &&
+          u.courses.some((c) => c.name.toLowerCase().includes(searchTerm)))
+    );
+  }
+
+  // Applica il filtro per data
+  const dateFilter = document.getElementById("filter-user-date")?.value;
+  if (dateFilter) {
+    filtered = filtered.filter((u) => u.registration_date === dateFilter);
+  }
+
+  return filtered;
+}
+
+

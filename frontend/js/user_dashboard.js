@@ -81,6 +81,9 @@ document.addEventListener("DOMContentLoaded", () => {
       populateFilterOptions();
       renderCoursesBadges(allCourses);
       renderSchedulesTable(allCourses, allSchedules);
+      
+      // Update stats
+      updateUserStats();
 
       // Aggiungi event listener per i filtri (usa istanze Choices già create)
       [teacherChoices, roomChoices, subjectChoices, dayChoices].forEach(
@@ -103,6 +106,31 @@ document.addEventListener("DOMContentLoaded", () => {
       document
         .getElementById("reset-filters-btn-u")
         .addEventListener("click", resetFilters);
+        
+      // Setup refresh button
+      const refreshBtn = document.getElementById('refresh-data');
+      if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => {
+          // Reload data
+          fetch("/user/courses")
+            .then((r) => r.json())
+            .then((courses) => {
+              allCourses = courses;
+              return fetch("/user/schedules");
+            })
+            .then((r) => r.json())
+            .then((schedules) => {
+              allSchedules = schedules;
+              populateFilterOptions();
+              renderCoursesBadges(allCourses);
+              renderSchedulesTable(allCourses, allSchedules);
+              updateUserStats();
+            })
+            .catch((e) => {
+              console.error("Errore nel caricamento dati:", e);
+            });
+        });
+      }
     })
     .catch((e) => {
       console.error("Errore nel caricamento dati:", e);
@@ -265,6 +293,7 @@ function renderSchedulesTable(courses, schedules) {
     html += "</tbody></table></div>";
   }
   document.getElementById("user-schedules-table").innerHTML = html;
+  updateUserStats();
 }
 
 // ------------------------------
@@ -382,3 +411,90 @@ document
           "text-center text-xs md:text-sm font-medium text-red-500";
       });
   });
+
+// ------------------------------
+// Funzioni per statistiche
+// ------------------------------
+function updateUserStats() {
+  // Total lessons
+  const totalLessonsEl = document.getElementById('total-lessons');
+  if (totalLessonsEl) {
+    totalLessonsEl.textContent = allSchedules.length;
+  }
+
+  // This week lessons
+  const today = new Date();
+  const weekStart = new Date(today.setDate(today.getDate() - today.getDay()));
+  const weekEnd = new Date(today.setDate(today.getDate() - today.getDay() + 6));
+  
+  const weekLessons = allSchedules.filter(schedule => {
+    const scheduleDate = new Date(schedule.date);
+    return scheduleDate >= weekStart && scheduleDate <= weekEnd;
+  }).length;
+  
+  const weekLessonsEl = document.getElementById('week-lessons');
+  if (weekLessonsEl) {
+    weekLessonsEl.textContent = weekLessons;
+  }
+
+  // Next lesson
+  const now = new Date();
+  const upcomingLessons = allSchedules
+    .filter(schedule => new Date(schedule.date) >= now)
+    .sort((a, b) => new Date(a.date) - new Date(b.date));
+  
+  const nextLessonEl = document.getElementById('next-lesson');
+  if (nextLessonEl) {
+    if (upcomingLessons.length > 0) {
+      const nextLesson = upcomingLessons[0];
+      const nextDate = new Date(nextLesson.date);
+      const timeStr = nextLesson.start_time;
+      nextLessonEl.textContent = `${nextDate.toLocaleDateString('it-IT')} alle ${timeStr}`;
+    } else {
+      nextLessonEl.textContent = 'Nessuna lezione programmata';
+    }
+  }
+
+  // Filtered lessons (based on current filters)
+  const filteredLessons = getFilteredUserSchedules();
+  const filteredLessonsEl = document.getElementById('filtered-lessons');
+  if (filteredLessonsEl) {
+    filteredLessonsEl.textContent = filteredLessons.length;
+  }
+}
+
+function getFilteredUserSchedules() {
+  let filtered = [...allSchedules];
+  
+  // Apply teacher filter
+  const teacherFilter = teacherChoices ? teacherChoices.getValue(true) : [];
+  if (teacherFilter.length > 0) {
+    filtered = filtered.filter(schedule => teacherFilter.includes(schedule.teacher));
+  }
+  
+  // Apply room filter
+  const roomFilter = roomChoices ? roomChoices.getValue(true) : [];
+  if (roomFilter.length > 0) {
+    filtered = filtered.filter(schedule => roomFilter.includes(schedule.room));
+  }
+  
+  // Apply subject filter
+  const subjectFilter = subjectChoices ? subjectChoices.getValue(true) : [];
+  if (subjectFilter.length > 0) {
+    filtered = filtered.filter(schedule => subjectFilter.includes(schedule.subject));
+  }
+  
+  // Apply day filter
+  const dayFilter = dayChoices ? dayChoices.getValue(true) : [];
+  if (dayFilter.length > 0) {
+    filtered = filtered.filter(schedule => dayFilter.includes(schedule.day));
+  }
+  
+  // Apply date filter
+  const dateFilter = document.getElementById('filter-date-exact-u')?.value;
+  if (dateFilter) {
+    filtered = filtered.filter(schedule => schedule.date === dateFilter);
+  }
+  
+  return filtered;
+}
