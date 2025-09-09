@@ -532,7 +532,7 @@ async function populateDatabase() {
       "   👨‍💼 Admin principale: username='Admin', password='Admin123!'"
     );
     console.log("   👨‍💼 Admin casuali: password='Admin123!'");
-    console.log("   👨‍🎓 Studenti (role 'user'): password='password123'");
+    console.log("   👨‍🎓 Studenti (role 'user'): password='User123!'");
     console.log("\n📋 Note importanti:");
     console.log("   • I docenti sono admin con pieni privilegi");
     console.log("   • Gli studenti hanno role 'user' (non 'student')");
