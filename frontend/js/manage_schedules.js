@@ -143,7 +143,7 @@ function renderSchedules() {
       .filter((c) => c.name === courseNameFilter)
       .map((c) => String(c.id));
     filtered = filtered.filter((s) =>
-      matchingCourseIds.includes(String(s.course_id)),
+      matchingCourseIds.includes(String(s.course_id))
     );
   }
   // --- Modifica fine ---
@@ -260,7 +260,9 @@ function renderSchedules() {
                 ✏️
               </button>
               <button class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105"
-                      title="Elimina" onclick="openDeleteScheduleModal(${s.id})">
+                      title="Elimina" onclick="openDeleteScheduleModal(${
+                        s.id
+                      })">
                 🗑️
               </button>
             </div>
@@ -294,7 +296,9 @@ function openEditSchedule(id) {
   document.getElementById("edit-course-select").innerHTML = courses
     .map(
       (c) =>
-        `<option value="${c.id}"${c.id == s.course_id ? " selected" : ""}>${c.name}</option>`,
+        `<option value="${c.id}"${c.id == s.course_id ? " selected" : ""}>${
+          c.name
+        }</option>`
     )
     .join("");
 
@@ -351,7 +355,7 @@ document.getElementById("edit-schedule-form").onsubmit = async function (e) {
       String(s.course_id) === String(course_id) &&
       s.date === date &&
       s.start_time === start_time &&
-      s.id != editingScheduleId,
+      s.id != editingScheduleId
   );
 
   if (overlap) {
@@ -429,7 +433,7 @@ function deleteSchedule() {
         fetchCoursesAndSchedules();
         document.getElementById("delete-schedule-modal").style.display = "none";
         deletingScheduleId = null;
-      },
+      }
     );
   }
 }
@@ -442,7 +446,9 @@ document.getElementById("add-schedule-btn").onclick = () => {
     courses
       .map(
         (c) =>
-          `<option value="${c.id}"${c.id == filterVal ? " selected" : ""}>${c.name}</option>`,
+          `<option value="${c.id}"${c.id == filterVal ? " selected" : ""}>${
+            c.name
+          }</option>`
       )
       .join("");
   document.getElementById("add-teacher").value = "";
@@ -496,7 +502,7 @@ document.getElementById("add-schedule-form").onsubmit = async function (e) {
     (s) =>
       String(s.course_id) === String(course_id) &&
       s.date === date &&
-      s.start_time === start_time,
+      s.start_time === start_time
   );
 
   if (overlap) {
@@ -638,7 +644,7 @@ function populateFilterOptions() {
         "Domenica",
       ];
       return dayOrder.indexOf(a) - dayOrder.indexOf(b);
-    },
+    }
   );
 
   console.log("Valori disponibili per i filtri:", {
@@ -661,7 +667,7 @@ function populateFilterOptions() {
   });
   teacherChoices.passedElement.element.addEventListener(
     "change",
-    renderSchedules,
+    renderSchedules
   );
 
   roomChoices = new Choices("#filter-room", {
@@ -676,7 +682,7 @@ function populateFilterOptions() {
   });
   subjectChoices.passedElement.element.addEventListener(
     "change",
-    renderSchedules,
+    renderSchedules
   );
 
   dayChoices = new Choices("#filter-day", {
@@ -765,36 +771,48 @@ document
 // ------------------------------
 function updateScheduleStats() {
   // Total schedules
-  const totalSchedulesEl = document.getElementById('total-schedules');
+  const totalSchedulesEl = document.getElementById("total-schedules");
   if (totalSchedulesEl) {
     totalSchedulesEl.textContent = schedules.length;
   }
-  
+
   // This week schedules
   const today = new Date();
   const weekStart = new Date(today.setDate(today.getDate() - today.getDay()));
   const weekEnd = new Date(today.setDate(today.getDate() - today.getDay() + 6));
-  
-  const weekSchedules = schedules.filter(schedule => {
+
+  const weekSchedules = schedules.filter((schedule) => {
     const scheduleDate = new Date(schedule.date);
     return scheduleDate >= weekStart && scheduleDate <= weekEnd;
   }).length;
-  
-  const weekSchedulesEl = document.getElementById('week-schedules');
+
+  const weekSchedulesEl = document.getElementById("week-schedules");
   if (weekSchedulesEl) {
     weekSchedulesEl.textContent = weekSchedules;
   }
-  
+
   // Unique teachers
-  const uniqueTeachers = [...new Set(schedules.map(s => s.teacher))].length;
-  const uniqueTeachersEl = document.getElementById('unique-teachers');
+  const uniqueTeachers = [...new Set(schedules.map((s) => s.teacher))].length;
+  const uniqueTeachersEl = document.getElementById("unique-teachers");
   if (uniqueTeachersEl) {
     uniqueTeachersEl.textContent = uniqueTeachers;
   }
-  
+
+  const uniquesubject = [...new Set(schedules.map((s) => s.subject))].length;
+  const uniquesubjectsEl = document.getElementById("unique-subjects");
+  if (uniquesubjectsEl) {
+    uniquesubjectsEl.textContent = uniquesubject;
+  }
+
+  const uniqueclassroom = [...new Set(schedules.map((s) => s.room))].length;
+  const uniqueclassroomsEl = document.getElementById("unique-classrooms");
+  if (uniqueclassroomsEl) {
+    uniqueclassroomsEl.textContent = uniqueclassroom;
+  }
+
   // Filtered schedules (based on current filters)
   const filteredSchedules = getFilteredSchedules();
-  const filteredSchedulesEl = document.getElementById('filtered-schedules');
+  const filteredSchedulesEl = document.getElementById("filtered-schedules");
   if (filteredSchedulesEl) {
     filteredSchedulesEl.textContent = filteredSchedules.length;
   }
@@ -802,37 +820,37 @@ function updateScheduleStats() {
 
 function getFilteredSchedules() {
   let filtered = [...schedules];
-  
+
   // Apply course filter
-  const courseFilter = document.getElementById('filter-course')?.value;
+  const courseFilter = document.getElementById("filter-course")?.value;
   if (courseFilter) {
-    filtered = filtered.filter(s => s.course_id == courseFilter);
+    filtered = filtered.filter((s) => s.course_id == courseFilter);
   }
-  
+
   // Apply teacher filter
-  const teacherFilter = document.getElementById('filter-teacher')?.value;
+  const teacherFilter = document.getElementById("filter-teacher")?.value;
   if (teacherFilter) {
-    filtered = filtered.filter(s => s.teacher === teacherFilter);
+    filtered = filtered.filter((s) => s.teacher === teacherFilter);
   }
-  
+
   // Apply room filter
-  const roomFilter = document.getElementById('filter-room')?.value;
+  const roomFilter = document.getElementById("filter-room")?.value;
   if (roomFilter) {
-    filtered = filtered.filter(s => s.room === roomFilter);
+    filtered = filtered.filter((s) => s.room === roomFilter);
   }
-  
+
   // Apply subject filter
-  const subjectFilter = document.getElementById('filter-subject')?.value;
+  const subjectFilter = document.getElementById("filter-subject")?.value;
   if (subjectFilter) {
-    filtered = filtered.filter(s => s.subject === subjectFilter);
+    filtered = filtered.filter((s) => s.subject === subjectFilter);
   }
-  
+
   // Apply day filter
-  const dayFilter = document.getElementById('filter-day')?.value;
+  const dayFilter = document.getElementById("filter-day")?.value;
   if (dayFilter) {
-    filtered = filtered.filter(s => s.day === dayFilter);
+    filtered = filtered.filter((s) => s.day === dayFilter);
   }
-  
+
   return filtered;
 }
 
@@ -841,11 +859,11 @@ document.addEventListener("DOMContentLoaded", () => {
   setupAutoEndTime();
   setupAutoDayOfWeek();
   fetchCoursesAndSchedules();
-  
+
   // Setup refresh button
-  const refreshBtn = document.getElementById('refresh-data');
+  const refreshBtn = document.getElementById("refresh-data");
   if (refreshBtn) {
-    refreshBtn.addEventListener('click', () => {
+    refreshBtn.addEventListener("click", () => {
       fetchCoursesAndSchedules();
     });
   }
@@ -867,7 +885,7 @@ function getFilteredSchedules() {
       .filter((c) => c.name === courseNameFilter)
       .map((c) => String(c.id));
     filtered = filtered.filter((s) =>
-      matchingCourseIds.includes(String(s.course_id)),
+      matchingCourseIds.includes(String(s.course_id))
     );
   }
 
