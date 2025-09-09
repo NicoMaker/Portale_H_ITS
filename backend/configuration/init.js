@@ -13,9 +13,7 @@ function ask(question) {
   );
 }
 
-function getRandomItem(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
+const getRandomItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 function randomUsername(role) {
   const firstNames = [
@@ -362,8 +360,8 @@ async function populateDatabase() {
 
     console.log("👤 Creazione admin...");
 
-    // ADMIN principale con username "Admin" e password "Admin123"
-    const adminHash = await hashPassword("Admin123");
+    // ADMIN principale con username "Admin" e password "Admin123!"
+    const adminHash = await hashPassword("Admin123!");
     await runQuery(
       "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
       ["Admin", adminHash, "admin"]
@@ -372,7 +370,7 @@ async function populateDatabase() {
     // Admin casuali (che sono anche docenti con privilegi admin)
     for (let i = 0; i < numAdmins; i++) {
       const uname = randomUsername("admin");
-      const hash = await hashPassword("Admin123");
+      const hash = await hashPassword("Admin123!");
       await runQuery(
         "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
         [uname, hash, "admin"]
@@ -384,7 +382,7 @@ async function populateDatabase() {
     // Studenti come utenti con role 'user'
     for (let i = 0; i < numStudents; i++) {
       const uname = randomUsername("user");
-      const hash = await hashPassword("User123");
+      const hash = await hashPassword("User123!");
       await runQuery(
         "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
         [uname, hash, "user"]
@@ -531,9 +529,9 @@ async function populateDatabase() {
     console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
     console.log("\n🔑 Credenziali predefinite:");
     console.log(
-      "   👨‍💼 Admin principale: username='Admin', password='Admin123'"
+      "   👨‍💼 Admin principale: username='Admin', password='Admin123!'"
     );
-    console.log("   👨‍💼 Admin casuali: password='Admin123'");
+    console.log("   👨‍💼 Admin casuali: password='Admin123!'");
     console.log("   👨‍🎓 Studenti (role 'user'): password='password123'");
     console.log("\n📋 Note importanti:");
     console.log("   • I docenti sono admin con pieni privilegi");
