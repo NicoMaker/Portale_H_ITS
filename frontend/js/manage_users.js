@@ -1,3 +1,4 @@
+
 let courses = [];
 let users = [];
 let editingUserId = null;
@@ -923,3 +924,4 @@ function getFilteredUsers() {
 
   return filtered;
 }
+

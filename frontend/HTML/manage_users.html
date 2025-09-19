@@ -84,6 +84,19 @@
             <div>
               <p class="text-sm font-medium text-gray-600">Totale Utenti</p>
               <p id="total-users" class="text-3xl font-bold text-gray-900">-</p>
+              <!-- Added admin and user count breakdown -->
+              <div class="mt-2 space-y-1">
+                <div class="flex items-center text-xs text-gray-500">
+                  <span class="mr-1">👑</span>
+                  <span id="admin-count">-</span>
+                  <span class="ml-1">Admin</span>
+                </div>
+                <div class="flex items-center text-xs text-gray-500">
+                  <span class="mr-1">👤</span>
+                  <span id="user-count">-</span>
+                  <span class="ml-1">Utenti</span>
+                </div>
+              </div>
             </div>
             <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-3 rounded-xl">
               <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -122,7 +135,7 @@
             </div>
             <div class="bg-gradient-to-r from-orange-500 to-orange-600 p-3 rounded-xl">
               <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"></path>
               </svg>
             </div>
           </div>
