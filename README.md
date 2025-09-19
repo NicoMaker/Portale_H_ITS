@@ -65,7 +65,7 @@ Portale_H_ITS/
 │   │   ├── tailwind.js          # Configurazione Tailwind
 │   │   ├── user_dashboard.js    # Dashboard utente
 │   |   |── utils.js             # Funzioni utili
-└── gitignore                # File di configurazione Git
+└── .gitignore                # File di configurazione Git
 └── LICENSE                  # Licenza
 └── README.md               # Documentazione
 ```
