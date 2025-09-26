@@ -266,13 +266,13 @@ function renderSchedulesTable(courses, schedules) {
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="gradient-bg">
                                     <tr class="text-white">
-                                        <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">👨‍🏫 Docente</th>
-                                        <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">🏫 Aula</th>
-                                        <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">📖 Materia</th>
                                         <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">📅 Giorno</th>
                                         <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">📆 Data</th>
                                         <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">🕘 Inizio</th>
                                         <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">🕘 Fine</th>
+                                        <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">👨‍🏫 Docente</th>
+                                        <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">🏫 Aula</th>
+                                        <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">📖 Materia</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
@@ -280,13 +280,13 @@ function renderSchedulesTable(courses, schedules) {
     for (const s of filtered) {
       html += `
                             <tr class="hover:bg-blue-50 transition-all duration-200">
-                                <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-900 font-medium">${s.teacher}</td>
-                                <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-700">${s.room}</td>
-                                <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-700">${s.subject}</td>
                                 <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-700">${s.day}</td>
                                 <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-700">${formatDate(s.date)}</td>
                                 <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-700 font-mono">${s.start_time}</td>
                                 <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-700 font-mono">${s.end_time}</td>
+                                <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-900 font-medium">${s.teacher}</td>
+                                <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-700">${s.room}</td>
+                                <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-700">${s.subject}</td>
                             </tr>
                         `;
     }
