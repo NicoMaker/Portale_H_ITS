@@ -1,10 +1,13 @@
+
 let courses = [];
 let users = [];
 let editingUserId = null;
 let searchUserInput, filterCourseSelect;
-let userToDeleteId = null; 
+let userToDeleteId = null; // Variabile per tenere traccia dell'ID dell'utente da eliminare
 let filterRoleSelect;
 let filterUserDate;
+
+// Aggiungi queste variabili globali
 let userToChangeId = null;
 let userToChangeRole = null;
 
@@ -75,7 +78,11 @@ function renderUsersList() {
   const dateFilter = document.getElementById("filter-user-date").value;
   const adminCount = users.filter((u) => u.role === "admin").length;
 
+  let html = "";
+
   const filteredUsers = users
+    .slice()
+    .sort((a, b) => a.username.localeCompare(b.username))
     .filter((u) => {
       const matchName = u.username.toLowerCase().includes(search);
       const matchCourse =
@@ -87,10 +94,8 @@ function renderUsersList() {
       const matchDate =
         !dateFilter || (u.created_at && u.created_at.startsWith(dateFilter));
       return matchName && matchCourse && matchRole && matchDate;
-    })
-    .sort((a, b) => a.username.localeCompare(b.username));
+    });
 
-  let html = "";
   if (!filteredUsers.length) {
     html = `
           <div class="col-span-full flex flex-col items-center justify-center py-20 text-gray-500">
@@ -106,39 +111,125 @@ function renderUsersList() {
         `;
   } else {
     filteredUsers.forEach((u) => {
-      const assignedCourse = u.courses && u.courses[0] ? u.courses[0].name : 'Nessuno';
-      const isLastAdmin = u.role === "admin" && adminCount <= 1;
+      const gradients = [
+        "from-green-500 to-emerald-500",
+        "from-blue-500 to-cyan-500",
+        "from-purple-500 to-pink-500",
+        "from-orange-500 to-red-500",
+        "from-indigo-500 to-purple-500",
+        "from-teal-500 to-green-500",
+      ];
+      const gradient = gradients[u.id % gradients.length];
 
       html += `
-        <div class="user-card bg-white rounded-2xl shadow-lg p-6 flex flex-col relative overflow-hidden transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${u.role === 'admin' ? 'from-green-400 to-green-600' : 'from-purple-400 to-indigo-600'}"></div>
-            <div class="flex items-center mb-4">
-                <span class="text-4xl mr-3">${u.role === 'admin' ? '👑' : '👨‍🎓'}</span>
-                <div>
-                    <h4 class="text-lg font-bold text-gray-900">${u.username}</h4>
-                    <span class="text-sm font-medium ${u.role === 'admin' ? 'text-green-600' : 'text-purple-600'}">${u.role === 'admin' ? 'Amministratore' : 'Utente'}</span>
+            <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-2 transition-all duration-300 overflow-hidden border border-gray-100 pulse-on-hover user-card-hover">
+              <div class="bg-gradient-to-r ${gradient} p-6 relative overflow-hidden">
+                <div class="shimmer absolute inset-0"></div>
+                <div class="relative z-10">
+                  <div class="flex items-center justify-between mb-4">
+                    <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-3">
+                      <span class="text-3xl">${u.role === "admin" ? "👑" : "👤"}</span>
+                    </div>
+                    <div class="flex space-x-2">
+                      <button class="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-3 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105" 
+                              title="Modifica utente" onclick="openEditUser(${u.id})">
+                        <span class="text-lg">✏️</span>
+                      </button>
+                      ${
+                        adminCount > 1 || u.role !== "admin"
+                          ? `
+                      <button class="bg-white/20 hover:bg-red-500/30 backdrop-blur-sm text-white p-3 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105" 
+                              title="Elimina utente" onclick="deleteUser(${u.id})">
+                        <span class="text-lg">🗑️</span>
+                      </button>
+                      `
+                          : ""
+                      }
+                    </div>
+                  </div>
+                  <h3 class="text-2xl font-bold text-white mb-2 truncate">${u.username}</h3>
+                  <div class="bg-white/20 backdrop-blur-sm rounded-full px-4 py-1 inline-block">
+                    <span class="text-white/90 text-sm font-medium">
+                      ${u.role === "admin" ? "👑 Amministratore" : "👤 Utente"}
+                    </span>
+                  </div>
                 </div>
+              </div>
+              
+              <div class="p-8">
+                <div class="mb-6">
+                  <h4 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3 flex items-center">
+                    <span class="mr-2">📚</span>
+                    Corso Assegnato
+                  </h4>
+                  ${
+                    u.role === "user"
+                      ? `
+                    <select onchange='assignCourse(${u.id}, this.value)' 
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm transition-all duration-200 shadow-sm">
+                      <option value="">Nessun corso</option>
+                      ${courses
+                        .map((c) => {
+                          const selected =
+                            u.courses && u.courses[0] && u.courses[0].id == c.id
+                              ? "selected"
+                              : "";
+                          return `<option value="${c.id}" ${selected}>${c.name}</option>`;
+                        })
+                        .join("")}
+                    </select>
+                  `
+                      : `
+                    <p class="text-gray-500 italic">Gli amministratori non hanno corsi assegnati</p>
+                  `
+                  }
+                </div>
+                
+                <div class="flex flex-wrap gap-3">
+                  <button onclick="openEditUser(${u.id})" 
+                    class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-4 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
+                    <span>✏️</span>
+                    <span>Modifica</span>
+                  </button>
+                  
+                  ${
+                    u.role !== "admin"
+                      ? `
+                  <button onclick="showChangeRoleModal(${u.id}, 'admin')" 
+                    class="flex-1 bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-semibold py-3 px-4 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
+                    <span>👑</span>
+                    <span>Rendi Admin</span>
+                  </button>
+                  `
+                      : ""
+                  }
+                  
+                  ${
+                    u.role === "admin" && adminCount > 1
+                      ? `
+                  <button onclick="showChangeRoleModal(${u.id}, 'user')" 
+                    class="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-semibold py-3 px-4 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
+                    <span>👤</span>
+                    <span>Rendi Utente</span>
+                  </button>
+                  `
+                      : ""
+                  }
+                  
+                  ${
+                    adminCount > 1 || u.role !== "admin"
+                      ? `
+                  <button onclick="deleteUser(${u.id})" 
+                    class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold py-3 px-4 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center">
+                    <span>🗑️</span>
+                  </button>
+                  `
+                      : ""
+                  }
+                </div>
+              </div>
             </div>
-            <div class="flex-grow">
-                <p class="text-sm text-gray-600">Corso Assegnato:</p>
-                <p class="font-semibold text-gray-800">${assignedCourse}</p>
-            </div>
-            <div class="mt-4 flex flex-wrap justify-start items-center gap-2">
-                <button onclick="openEditUser(${u.id})" class="px-3 py-1 text-sm font-medium text-white bg-indigo-500 hover:bg-indigo-600 rounded-full transition-colors">
-                    Modifica
-                </button>
-                ${!isLastAdmin ? `<button onclick="deleteUser(${u.id})" class="px-3 py-1 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-full transition-colors">
-                    Elimina
-                </button>` : ''}
-                ${u.role === 'user' ? `<button onclick="showChangeRoleModal(${u.id}, 'admin')" class="px-3 py-1 text-sm font-medium text-white bg-yellow-500 hover:bg-yellow-600 rounded-full transition-colors">
-                    Rendi Admin
-                </button>` : ''}
-                ${u.role === 'admin' && !isLastAdmin ? `<button onclick="showChangeRoleModal(${u.id}, 'user')" class="px-3 py-1 text-sm font-medium text-white bg-gray-500 hover:bg-gray-600 rounded-full transition-colors">
-                    Rendi Utente
-                </button>` : ''}
-            </div>
-        </div>
-      `;
+          `;
     });
   }
 
@@ -199,6 +290,7 @@ function changeUserRole() {
     return;
   }
 
+  // Utilizza gli endpoint POST esistenti nel backend
   const apiEndpoint =
     userToChangeRole === "admin"
       ? `/api/users/${userToChangeId}/promote`
@@ -221,11 +313,12 @@ function changeUserRole() {
     })
     .catch((error) => {
       console.error("Errore:", error);
-      alert(error.message); 
+      alert(error.message); // Mostra un alert con il messaggio di errore
       hideChangeRoleModal();
     });
 }
 
+// Funzioni per il modal di conferma eliminazione
 function openDeleteUserConfirmModal(id) {
   userToDeleteId = id;
   const user = users.find((u) => u.id == id);
@@ -274,6 +367,7 @@ document.getElementById("confirm-delete-user").onclick = () => {
   }
 };
 
+// Modified deleteUser to open the custom modal
 function deleteUser(id) {
   openDeleteUserConfirmModal(id);
 }
@@ -330,6 +424,7 @@ function showMessage(elementId, message, type) {
   }
 }
 
+// Modal functions
 document.getElementById("add-user-btn").onclick = () => {
   document.getElementById("add-user-modal").style.display = "flex";
   document.getElementById("add-user-msg").classList.add("hidden");
@@ -369,6 +464,7 @@ window.onclick = (e) => {
     hideChangeRoleModal();
 };
 
+// Validazione password live
 const newPassword = document.getElementById("new-password");
 const addHint = document.getElementById("add-password-hint");
 
@@ -383,6 +479,7 @@ newPassword.addEventListener("input", () => {
   addHint.style.color = msg ? "#ef4444" : "#22c55e";
 });
 
+// Validazione password edit
 const editPassword = document.getElementById("edit_password");
 const editHint = document.getElementById("edit-user-password-hint");
 
@@ -467,12 +564,13 @@ document.getElementById("edit-user-form").onsubmit = function (e) {
     });
 };
 
+// Function to clear all filters
 function clearAllFilters() {
   searchUserInput.value = "";
   filterCourseSelect.value = "";
   filterRoleSelect.value = "";
   filterUserDate.value = "";
-  toggleFilterCourseVisibility(); 
+  toggleFilterCourseVisibility(); // Ensure course filter visibility is correct after clearing role
   renderUsersList();
 }
 
@@ -504,6 +602,7 @@ document.addEventListener("DOMContentLoaded", () => {
     clearFiltersBtn.addEventListener("click", clearAllFilters);
   }
 
+  // Aggiungi gli event listener per i bottoni del nuovo modal
   confirmChangeRoleBtn.addEventListener("click", changeUserRole);
   cancelChangeRoleBtn.addEventListener("click", hideChangeRoleModal);
   closeChangeRoleBtn.addEventListener("click", hideChangeRoleModal);
@@ -511,6 +610,7 @@ document.addEventListener("DOMContentLoaded", () => {
   toggleFilterCourseVisibility();
   fetchCourses().then(fetchUsers);
   
+  // Setup refresh button
   const refreshBtn = document.getElementById('refresh-data');
   if (refreshBtn) {
     refreshBtn.addEventListener('click', () => {
@@ -519,6 +619,132 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+// ------------------------------
+// Funzioni per statistiche
+// ------------------------------
+function updateUserStats() {
+  // Total users
+  const totalUsersEl = document.getElementById('total-users');
+  if (totalUsersEl) {
+    totalUsersEl.textContent = users.length;
+  }
+  
+  // Users by role
+  const adminCount = users.filter(u => u.role === 'admin').length;
+  const userCount = users.filter(u => u.role === 'user').length;
+  
+  const usersAdminEl = document.getElementById('users-admin');
+  if (usersAdminEl) {
+    usersAdminEl.textContent = `Admin: ${adminCount}`;
+  }
+  
+  const usersRegularEl = document.getElementById('users-regular');
+  if (usersRegularEl) {
+    usersRegularEl.textContent = `Utenti: ${userCount}`;
+  }
+  
+  // Users with course
+  const usersWithCourse = users.filter(u => u.courses && u.courses.length > 0).length;
+  const usersWithCourseEl = document.getElementById('users-with-course');
+  if (usersWithCourseEl) {
+    usersWithCourseEl.textContent = usersWithCourse;
+  }
+  
+  // Users without course
+  const usersWithoutCourse = users.filter(u => !u.courses || u.courses.length === 0).length;
+  const usersWithoutCourseEl = document.getElementById('users-without-course');
+  if (usersWithoutCourseEl) {
+    usersWithoutCourseEl.textContent = usersWithoutCourse;
+  }
+  
+  // Filtered users (based on current filters)
+  const filteredUsers = getFilteredUsers();
+  const filteredUsersEl = document.getElementById('filtered-users');
+  if (filteredUsersEl) {
+    filteredUsersEl.textContent = filteredUsers.length;
+  }
+}
+
+function getFilteredUsers() {
+  let filtered = [...users];
+  
+  // Apply role filter
+  const roleFilter = document.getElementById('filter-role')?.value;
+  if (roleFilter) {
+    filtered = filtered.filter(u => u.role === roleFilter);
+  }
+  
+  // Apply course filter
+  const courseFilter = document.getElementById('filter-course')?.value;
+  if (courseFilter) {
+    filtered = filtered.filter(u => u.courses && u.courses.some(c => c.id == courseFilter));
+  }
+  
+  // Apply search filter
+  const searchTerm = document.getElementById('search-user')?.value?.toLowerCase();
+  if (searchTerm) {
+    filtered = filtered.filter(u => u.username.toLowerCase().includes(searchTerm));
+  }
+  
+  return filtered;
+}
+
+// Initialize
+fetchCourses().then(fetchUsers);
+
+
+function updateFilterCourseSelect() {
+  const select = document.getElementById("filter-course");
+  select.innerHTML =
+    '<option value="">Tutti i corsi</option>' +
+    courses.map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
+}
+
+function getFilteredUsers() {
+  let filtered = [...users];
+
+  // Applica il filtro del ruolo
+  const roleFilter = document.getElementById("filter-role")?.value;
+  if (roleFilter) {
+    filtered = filtered.filter((u) => u.role === roleFilter);
+  }
+
+  // Applica il filtro del corso
+  const courseFilter = document.getElementById("filter-course")?.value;
+  if (courseFilter) {
+    if (courseFilter === "_no_course_") {
+      // Filtra solo gli utenti con ruolo 'user' che non hanno corsi
+      filtered = filtered.filter((u) => u.role === "user" && (!u.courses || u.courses.length === 0));
+    } else {
+      // Filtra gli utenti in base all'ID del corso
+      filtered = filtered.filter(
+        (u) => u.courses && u.courses.some((c) => c.id == courseFilter),
+      );
+    }
+  }
+
+  // Applica il filtro di ricerca
+  const searchTerm = document.getElementById("search-user").value.toLowerCase();
+  if (searchTerm) {
+    filtered = filtered.filter(
+      (u) =>
+        u.name.toLowerCase().includes(searchTerm) ||
+        u.email.toLowerCase().includes(searchTerm) ||
+        u.role.toLowerCase().includes(searchTerm) ||
+        (u.courses &&
+          u.courses.some((c) => c.name.toLowerCase().includes(searchTerm))),
+    );
+  }
+
+  // Applica il filtro per data
+  const dateFilter = document.getElementById("filter-user-date")?.value;
+  if (dateFilter) {
+    filtered = filtered.filter((u) => u.registration_date === dateFilter);
+  }
+
+  return filtered;
+}
+
 function updateUserStats() {
   const totalUsers = users.length;
   const totalUsersEl = document.getElementById("total-users");
@@ -526,6 +752,7 @@ function updateUserStats() {
     totalUsersEl.textContent = totalUsers;
   }
 
+  // Conta gli utenti per ruolo
   const admins = users.filter((u) => u.role === "admin").length;
   const adminCountEl = document.getElementById("admin-count");
   if (adminCountEl) {
@@ -538,18 +765,21 @@ function updateUserStats() {
     userCountEl.textContent = userCount;
   }
 
+  // Utenti con corso
   const usersWithCourse = users.filter(u => u.courses && u.courses.length > 0).length;
   const usersWithCourseEl = document.getElementById('users-with-course');
   if (usersWithCourseEl) {
     usersWithCourseEl.textContent = usersWithCourse;
   }
 
+  // Utenti senza corso (solo utenti normali)
   const usersWithoutCourse = users.filter(u => u.role === 'user' && (!u.courses || u.courses.length === 0)).length;
   const usersWithoutCourseEl = document.getElementById('users-without-course');
   if (usersWithoutCourseEl) {
     usersWithoutCourseEl.textContent = usersWithoutCourse;
   }
   
+  // Utenti filtrati (in base ai filtri correnti)
   const filteredUsers = getFilteredUsers();
   const filteredUsersEl = document.getElementById("filtered-users");
   if (filteredUsersEl) {
@@ -560,39 +790,138 @@ function updateUserStats() {
 function getFilteredUsers() {
   let filtered = [...users];
 
+  // Applica il filtro del ruolo
   const roleFilter = document.getElementById("filter-role")?.value;
   if (roleFilter) {
     filtered = filtered.filter((u) => u.role === roleFilter);
   }
 
+  // Applica il filtro del corso
   const courseFilter = document.getElementById("filter-course")?.value;
   if (courseFilter) {
     if (courseFilter === "_no_course_") {
+      // ✅ LOGICA CORRETTA: Filtra solo gli utenti con ruolo 'user'
+      //    che non hanno corsi (l'array `courses` è vuoto o non esiste)
       filtered = filtered.filter(
         (u) => u.role === "user" && (!u.courses || u.courses.length === 0)
       );
     } else {
+      // Filtra gli utenti in base all'ID del corso selezionato
       filtered = filtered.filter(
         (u) => u.courses && u.courses.some((c) => c.id == courseFilter)
       );
     }
   }
 
+  // Applica il filtro di ricerca
   const searchTerm = document.getElementById("search-user").value.toLowerCase();
   if (searchTerm) {
     filtered = filtered.filter(
       (u) =>
-        u.username.toLowerCase().includes(searchTerm) ||
+        u.name.toLowerCase().includes(searchTerm) ||
+        u.email.toLowerCase().includes(searchTerm) ||
+        u.role.toLowerCase().includes(searchTerm) ||
         (u.courses &&
-          u.courses.some((c) => c.name.toLowerCase().includes(searchTerm))) ||
-        u.role.toLowerCase().includes(searchTerm)
+          u.courses.some((c) => c.name.toLowerCase().includes(searchTerm)))
     );
   }
 
+  // Applica il filtro per data
   const dateFilter = document.getElementById("filter-user-date")?.value;
   if (dateFilter) {
-    filtered = filtered.filter((u) => u.created_at && u.created_at.startsWith(dateFilter));
+    filtered = filtered.filter((u) => u.registration_date === dateFilter);
   }
 
   return filtered;
 }
+
+function updateUserStats() {
+  const totalUsers = users.length;
+  const totalUsersEl = document.getElementById("total-users");
+  if (totalUsersEl) {
+    totalUsersEl.textContent = totalUsers;
+  }
+
+  // Conta gli utenti per ruolo
+  const admins = users.filter((u) => u.role === "admin").length;
+  const adminCountEl = document.getElementById("admin-count");
+  if (adminCountEl) {
+    adminCountEl.textContent = admins;
+  }
+
+  const userCount = users.filter((u) => u.role === "user").length;
+  const userCountEl = document.getElementById("user-count");
+  if (userCountEl) {
+    userCountEl.textContent = userCount;
+  }
+
+  // Utenti con corso
+  const usersWithCourse = users.filter(u => u.courses && u.courses.length > 0).length;
+  const usersWithCourseEl = document.getElementById('users-with-course');
+  if (usersWithCourseEl) {
+    usersWithCourseEl.textContent = usersWithCourse;
+  }
+
+  // ✅ LOGICA CORRETTA: Conta solo gli utenti con ruolo 'user' senza corso
+  const usersWithoutCourse = users.filter(u => u.role === 'user' && (!u.courses || u.courses.length === 0)).length;
+  const usersWithoutCourseEl = document.getElementById('users-without-course');
+  if (usersWithoutCourseEl) {
+    usersWithoutCourseEl.textContent = usersWithoutCourse;
+  }
+  
+  // Utenti filtrati (in base ai filtri correnti)
+  const filteredUsers = getFilteredUsers();
+  const filteredUsersEl = document.getElementById("filtered-users");
+  if (filteredUsersEl) {
+    filteredUsersEl.textContent = filteredUsers.length;
+  }
+}
+
+function getFilteredUsers() {
+  let filtered = [...users];
+
+  // Applica il filtro del ruolo
+  const roleFilter = document.getElementById("filter-role")?.value;
+  if (roleFilter) {
+    filtered = filtered.filter((u) => u.role === roleFilter);
+  }
+
+  // Applica il filtro del corso
+  const courseFilter = document.getElementById("filter-course")?.value;
+  if (courseFilter) {
+    if (courseFilter === "_no_course_") {
+      // ✅ LOGICA CORRETTA: Filtra solo gli utenti con ruolo 'user'
+      //    che non hanno corsi (l'array `courses` è vuoto o non esiste)
+      filtered = filtered.filter(
+        (u) => u.role === "user" && (!u.courses || u.courses.length === 0)
+      );
+    } else {
+      // Filtra gli utenti in base all'ID del corso selezionato
+      filtered = filtered.filter(
+        (u) => u.courses && u.courses.some((c) => c.id == courseFilter)
+      );
+    }
+  }
+
+  // Applica il filtro di ricerca
+  const searchTerm = document.getElementById("search-user").value.toLowerCase();
+  if (searchTerm) {
+    filtered = filtered.filter(
+      (u) =>
+        u.name.toLowerCase().includes(searchTerm) ||
+        u.email.toLowerCase().includes(searchTerm) ||
+        u.role.toLowerCase().includes(searchTerm) ||
+        (u.courses &&
+          u.courses.some((c) => c.name.toLowerCase().includes(searchTerm)))
+    );
+  }
+
+  // Applica il filtro per data
+  const dateFilter = document.getElementById("filter-user-date")?.value;
+  if (dateFilter) {
+    filtered = filtered.filter((u) => u.registration_date === dateFilter);
+  }
+
+  return filtered;
+}
+
