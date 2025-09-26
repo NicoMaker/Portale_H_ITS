@@ -5,44 +5,42 @@
     <title>Gestione Utenti</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              'primary-brand': '#4B6EEB',
-              'secondary-brand': '#6C7E9D',
-            },
-          }
-        }
-      }
-    </script>
+    <script src="js/tailwind.js"></script>
     <link rel="stylesheet" href="CSS/style.css" />
     <link rel="stylesheet" href="CSS/styleuser.css" />
-    <style>
-      .table-header {
-        position: sticky;
-        top: 0;
-        background: #f9fafb;
-        z-index: 10;
-      }
-    </style>
   </head>
-  <body class="bg-gray-100 font-sans antialiased">
-    <nav class="bg-white shadow-lg border-b border-gray-200 sticky top-0 z-50">
+
+  <body
+    class="bg-gradient-to-br from-green-50 via-blue-50 to-purple-100 min-h-screen"
+  >
+    <nav
+      class="bg-white shadow-lg border-b border-gray-200 backdrop-blur-sm bg-white/95 sticky top-0 z-50"
+    >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
           <div class="flex space-x-8">
-            <a href="/admin_dashboard.html" class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-700 hover:text-primary-brand hover:border-primary-brand border-b-2 border-transparent transition-all duration-200">
+            <a
+              href="/admin_dashboard.html"
+              class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-700 hover:text-green-600 hover:border-green-300 border-b-2 border-transparent transition-all duration-200"
+            >
               🏠 Dashboard Admin
             </a>
-            <a href="/manage_users.html" class="inline-flex items-center px-1 pt-1 text-sm font-medium text-primary-brand border-b-2 border-primary-brand transition-all duration-200">
+            <a
+              href="/manage_users.html"
+              class="inline-flex items-center px-1 pt-1 text-sm font-medium text-green-600 border-b-2 border-green-500 transition-all duration-200"
+            >
               👥 Gestione Utenti
             </a>
-            <a href="/manage_courses.html" class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-700 hover:text-primary-brand hover:border-primary-brand border-b-2 border-transparent transition-all duration-200">
+            <a
+              href="/manage_courses.html"
+              class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-700 hover:text-green-600 hover:border-green-300 border-b-2 border-transparent transition-all duration-200"
+            >
               📚 Gestione Corsi
             </a>
-            <a href="/manage_schedules.html" class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-700 hover:text-primary-brand hover:border-primary-brand border-b-2 border-transparent transition-all duration-200">
+            <a
+              href="/manage_schedules.html"
+              class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-700 hover:text-green-600 hover:border-green-300 border-b-2 border-transparent transition-all duration-200"
+            >
               📅 Gestione Orari
             </a>
           </div>
@@ -50,189 +48,568 @@
       </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div class="flex justify-between items-center mb-6">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-900">Gestione Utenti</h1>
-          <p class="mt-1 text-sm text-gray-600">Visualizza e gestisci tutti gli utenti della piattaforma</p>
-        </div>
-        <button id="add-user-btn" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-brand hover:bg-blue-700 transition-colors duration-200">
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM12 15v2m0 0v2m0-2h2m-2 0h-2m-2-5a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-          Aggiungi Utente
-        </button>
-      </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="mb-8">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1
+              class="text-4xl font-bold bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 bg-clip-text text-transparent"
+            >
+              👥 Gestione Utenti
+            </h1>
 
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div class="bg-white rounded-lg shadow p-5">
-          <h2 class="text-sm font-medium text-gray-500">Totale Utenti</h2>
-          <p id="total-users" class="mt-1 text-3xl font-bold text-gray-900">-</p>
-        </div>
-        <div class="bg-white rounded-lg shadow p-5">
-          <h2 class="text-sm font-medium text-gray-500">Amministratori</h2>
-          <p id="admin-count" class="mt-1 text-3xl font-bold text-gray-900">-</p>
-        </div>
-        <div class="bg-white rounded-lg shadow p-5">
-          <h2 class="text-sm font-medium text-gray-500">Utenti</h2>
-          <p id="user-count" class="mt-1 text-3xl font-bold text-gray-900">-</p>
-        </div>
-        <div class="bg-white rounded-lg shadow p-5">
-          <h2 class="text-sm font-medium text-gray-500">Utenti con Corso</h2>
-          <p id="users-with-course" class="mt-1 text-3xl font-bold text-gray-900">-</p>
-        </div>
-      </div>
-
-      <div class="bg-white rounded-lg shadow-xl overflow-hidden">
-        <div class="p-6">
-          <div class="flex items-center space-x-4 mb-4">
-            <h2 class="text-lg font-semibold text-gray-900">Elenco Utenti</h2>
-            <button id="refresh-data" class="text-gray-500 hover:text-primary-brand transition-colors duration-200" title="Refresh Data">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.592-5H20v5m-1.582 6H16.5a.5.5 0 00-.5.5V17m-13 0h-2.5a.5.5 0 01-.5-.5v-2m15-5.5a8.5 8.5 0 10-14.86 5.86l1.37-1.37M20 10a8.5 8.5 0 11-17 0"></path></svg>
-            </button>
+            <p class="text-gray-600 mt-2 text-lg">
+              Crea e gestisci gli utenti della tua piattaforma
+            </p>
           </div>
-          
-          <div class="flex items-center space-x-4 mb-6">
-            <div class="flex-1">
-              <label for="search-user" class="sr-only">Cerca utente</label>
-              <input type="text" id="search-user" placeholder="Cerca per nome, email o ruolo..." class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-primary-brand focus:border-primary-brand">
+          <div class="flex items-center space-x-4">
+            <div class="float-animation">
+              <button
+                id="add-user-btn"
+                class="bg-gradient-to-r from-green-500 via-blue-500 to-purple-600 hover:from-green-600 hover:via-blue-600 hover:to-purple-700 text-white font-semibold px-8 py-4 rounded-2xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300 flex items-center space-x-3 text-lg"
+              >
+                <span class="text-2xl">+</span>
+                <span>Aggiungi Utente</span>
+              </button>
             </div>
-            <div class="flex-1">
-              <label for="filter-role" class="sr-only">Filtra per Ruolo</label>
-              <select id="filter-role" class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-primary-brand focus:border-primary-brand">
-                <option value="">Tutti i Ruoli</option>
-                <option value="admin">Amministratore</option>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistiche Utenti -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+        <!-- Totale Utenti -->
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Totale Utenti</p>
+              <p id="total-users" class="text-3xl font-bold text-gray-900">-</p>
+              <!-- Added admin and user count breakdown -->
+              <div class="mt-2 space-y-1">
+                <div class="flex items-center text-xs text-gray-500">
+                  <span class="mr-1">👑</span>
+                  <span id="admin-count">-</span>
+                  <span class="ml-1">Admin</span>
+                </div>
+                <div class="flex items-center text-xs text-gray-500">
+                  <span class="mr-1">👤</span>
+                  <span id="user-count">-</span>
+                  <span class="ml-1">Utenti</span>
+                </div>
+              </div>
+            </div>
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-3 rounded-xl">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Utenti con Corso -->
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Con Corso</p>
+              <p id="users-with-course" class="text-3xl font-bold text-gray-900">-</p>
+            </div>
+            <div class="bg-gradient-to-r from-green-500 to-green-600 p-3 rounded-xl">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex items-center text-sm">
+              <span class="text-green-600 font-medium">Assegnati</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Utenti senza Corso -->
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6 di">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Senza Corso</p>
+              <p id="users-without-course" class="text-3xl font-bold text-gray-900">-</p>
+            </div>
+            <div class="bg-gradient-to-r from-orange-500 to-orange-600 p-3 rounded-xl">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex items-center text-sm">
+              <span class="text-orange-600 font-medium">Non Assegnati</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Utenti Filtati -->
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Visualizzati</p>
+              <p id="filtered-users" class="text-3xl font-bold text-gray-900">-</p>
+            </div>
+            <div class="bg-gradient-to-r from-purple-500 to-purple-600 p-3 rounded-xl">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex items-center text-sm">
+              <span class="text-purple-600 font-medium">Con Filtri</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 mb-8 border border-gray-100"
+      >
+        <div class="flex items-center space-x-4 mb-8">
+          <div
+            class="p-3 bg-gradient-to-r from-green-100 via-blue-100 to-purple-100 rounded-2xl shadow-lg"
+          >
+            <span class="text-3xl">🔍</span>
+          </div>
+          <div>
+            <h2
+              class="text-3xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent"
+            >
+              Filtra gli utenti
+            </h2>
+            <p class="text-gray-600 text-lg">
+              Utilizza i seguenti filtri per cercare utenti specifici
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="space-y-3">
+            <label
+              for="search-user"
+              class="flex items-center space-x-2 text-sm font-medium text-gray-700"
+            >
+              <span class="text-lg">👤</span>
+              <span>Nome utente</span>
+            </label>
+            <input
+              type="text"
+              id="search-user"
+              placeholder="Cerca utente per nome..."
+              class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 bg-white/90 backdrop-blur-sm text-sm transition-all duration-200 shadow-lg"
+            />
+          </div>
+
+          <div class="space-y-3">
+            <label
+              for="filter-role"
+              class="flex items-center space-x-2 text-sm font-medium text-gray-700"
+            >
+              <span class="text-lg">🛡️</span>
+              <span>Ruolo</span>
+            </label>
+            <select
+              id="filter-role"
+              class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 bg-white/90 backdrop-blur-sm text-sm transition-all duration-200 shadow-lg"
+            >
+              <option value="">Tutti gli utenti</option>
+              <option value="admin">Solo amministratori</option>
+              <option value="user">Solo utenti</option>
+            </select>
+          </div>
+
+          <div class="space-y-3 filter-group">
+            <label
+              for="filter-course"
+              class="flex items-center space-x-2 text-sm font-medium text-gray-700"
+            >
+              <span class="text-lg">📚</span>
+              <span>Corso</span>
+            </label>
+            <select
+              id="filter-course"
+              class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 bg-white/90 backdrop-blur-sm text-sm transition-all duration-200 shadow-lg"
+            >
+              <option value="">Tutti i corsi</option>
+            </select>
+          </div>
+
+          <div class="space-y-3" style="display: none">
+            <label
+              for="filter-user-date"
+              class="flex items-center space-x-2 text-sm font-medium text-gray-700"
+            >
+              <span class="text-lg">📅</span>
+              <span>Data registrazione</span>
+            </label>
+            <input
+              type="date"
+              id="filter-user-date"
+              class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 bg-white/90 backdrop-blur-sm text-sm transition-all duration-200 shadow-lg"
+            />
+          </div>
+        </div>
+        <div class="mt-6 flex justify-end">
+          <button
+            id="clear-filters-btn"
+            class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors flex items-center space-x-2"
+          >
+            <span>Azzera Filtri</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="mb-8">
+        <div class="flex items-center space-x-4 mb-8">
+          <div
+            class="p-3 bg-gradient-to-r from-green-100 via-blue-100 to-purple-100 rounded-2xl shadow-lg"
+          >
+            <span class="text-3xl">👨‍💼</span>
+          </div>
+          <div>
+            <h2
+              class="text-3xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent"
+            >
+              I Tuoi Utenti
+            </h2>
+            <p class="text-gray-600 text-lg">
+              Gestisci tutti gli utenti della tua piattaforma
+            </p>
+          </div>
+        </div>
+
+        <div
+          id="users-list"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        ></div>
+        <div
+          id="assign-msg"
+          class="mt-4 p-4 rounded-2xl text-sm font-medium hidden"
+        ></div>
+      </div>
+    </div>
+
+    <div
+      id="add-user-modal"
+      class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+      style="display: none"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden"
+      >
+        <div
+          class="flex items-center justify-between p-6 border-b border-gray-200"
+        >
+          <h3 class="text-xl font-semibold text-gray-900">
+            ➕ Aggiungi Nuovo Utente
+          </h3>
+          <button
+            id="close-add-user-modal"
+            class="text-gray-400 hover:text-gray-600 text-2xl font-bold"
+          >
+            ×
+          </button>
+        </div>
+
+        <div class="p-6 max-h-96 overflow-y-auto custom-scrollbar">
+          <form id="add-user-form" class="space-y-4">
+            <div>
+              <label
+                for="new-username"
+                class="block text-sm font-medium text-gray-700 mb-2"
+                >Nome utente</label
+              >
+              <input
+                type="text"
+                id="new-username"
+                placeholder="Es. mario.rossi"
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              />
+            </div>
+
+            <div>
+              <label
+                for="new-password"
+                class="block text-sm font-medium text-gray-700 mb-2"
+                >Password</label
+              >
+              <input
+                type="password"
+                id="new-password"
+                placeholder="Password sicura"
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              />
+              <div
+                id="add-password-hint"
+                class="mt-2 text-sm text-gray-600"
+              ></div>
+            </div>
+
+            <div>
+              <label
+                for="new-role"
+                class="block text-sm font-medium text-gray-700 mb-2"
+                >Ruolo</label
+              >
+              <select
+                id="new-role"
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              >
                 <option value="user">Utente</option>
-              </select>
-            </div>
-            <div class="flex-1">
-              <label for="filter-course" class="sr-only">Filtra per Corso</label>
-              <select id="filter-course" class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-primary-brand focus:border-primary-brand">
-                <option value="">Tutti i Corsi</option>
-              </select>
-            </div>
-          </div>
-          <div class="text-right mb-4">
-            <button id="clear-filters-btn" class="text-gray-500 hover:text-primary-brand text-sm transition-colors duration-200">
-              Azzera Filtri
-            </button>
-          </div>
-        </div>
-
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome Utente</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ruolo</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Corso Assegnato</th>
-                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Azioni</th>
-              </tr>
-            </thead>
-            <tbody id="users-list" class="bg-white divide-y divide-gray-200">
-              </tbody>
-          </table>
-          <div id="no-users-found" class="hidden text-center py-10 text-gray-500">
-            <p class="text-lg">Nessun utente trovato</p>
-            <p class="text-sm mt-2">Prova a modificare i filtri di ricerca.</p>
-          </div>
-        </div>
-      </div>
-    </main>
-
-    <div id="add-user-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
-      <div class="bg-white rounded-lg shadow-xl max-w-md w-full overflow-hidden">
-        <div class="flex justify-between items-center p-6 border-b">
-          <h3 class="text-lg font-semibold">Aggiungi Nuovo Utente</h3>
-          <button id="close-add-user-modal" class="text-gray-400 hover:text-gray-600">&times;</button>
-        </div>
-        <form id="add-user-form" class="p-6">
-          <div class="space-y-4">
-            <div>
-              <label for="new-username" class="block text-sm font-medium text-gray-700">Nome Utente</label>
-              <input type="text" id="new-username" required placeholder="Es. Mario Rossi" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-brand focus:ring focus:ring-primary-brand focus:ring-opacity-50">
-            </div>
-            <div>
-              <label for="new-password" class="block text-sm font-medium text-gray-700">Password</label>
-              <input type="password" id="new-password" required placeholder="Inserisci una password sicura" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-brand focus:ring focus:ring-primary-brand focus:ring-opacity-50">
-              <p id="add-password-hint" class="mt-2 text-sm text-gray-500">La password deve contenere almeno 8 caratteri, una lettera maiuscola, una minuscola e un numero.</p>
-            </div>
-            <div>
-              <label for="new-role" class="block text-sm font-medium text-gray-700">Ruolo</label>
-              <select id="new-role" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-brand focus:ring focus:ring-primary-brand focus:ring-opacity-50">
-                <option value="user">Utente</option>
                 <option value="admin">Amministratore</option>
               </select>
             </div>
-            <div id="new-course-group">
-              <label for="new-course" class="block text-sm font-medium text-gray-700">Corso (opzionale)</label>
-              <select id="new-course" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-brand focus:ring focus:ring-primary-brand focus:ring-opacity-50"></select>
+
+            <div>
+              <label
+                for="new-course"
+                class="block text-sm font-medium text-gray-700 mb-2"
+                id="new-course-label"
+              >
+                Corso (opzionale)
+              </label>
+              <select
+                id="new-course"
+                style="display: none"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              ></select>
             </div>
-          </div>
-          <div id="add-user-msg" class="mt-4 p-3 rounded-md text-sm hidden"></div>
-          <div class="mt-6 flex justify-end space-x-3">
-            <button type="button" id="cancel-add-user" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors">Annulla</button>
-            <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-primary-brand rounded-md hover:bg-blue-700 transition-colors">Crea Utente</button>
-          </div>
-        </form>
+
+            <div class="flex justify-end space-x-3 pt-4">
+              <button
+                type="button"
+                id="cancel-add-user"
+                class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+              >
+                Annulla
+              </button>
+              <button
+                type="submit"
+                class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                Crea Utente
+              </button>
+            </div>
+
+            <div id="add-user-msg" class="mt-4 p-3 rounded-lg text-sm"></div>
+          </form>
+        </div>
       </div>
     </div>
 
-    <div id="edit-user-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
-      <div class="bg-white rounded-lg shadow-xl max-w-md w-full overflow-hidden">
-        <div class="flex justify-between items-center p-6 border-b">
-          <h3 class="text-lg font-semibold">Modifica Utente</h3>
-          <button id="close-edit-modal" class="text-gray-400 hover:text-gray-600">&times;</button>
+    <div
+      id="edit-user-modal"
+      class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+      style="display: none"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden"
+      >
+        <div
+          class="flex items-center justify-between p-6 border-b border-gray-200"
+        >
+          <h3 class="text-xl font-semibold text-gray-900">
+            ✏️ Modifica Utente
+          </h3>
+          <button
+            id="close-edit-modal"
+            class="text-gray-400 hover:text-gray-600 text-2xl font-bold"
+          >
+            ×
+          </button>
         </div>
-        <form id="edit-user-form" class="p-6">
-          <div class="space-y-4">
+
+        <div class="p-6 max-h-96 overflow-y-auto custom-scrollbar">
+          <form id="edit-user-form" class="space-y-4">
             <div>
-              <label for="edit_username" class="block text-sm font-medium text-gray-700">Nome Utente</label>
-              <input type="text" id="edit_username" required placeholder="Es. Mario Rossi" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-brand focus:ring focus:ring-primary-brand focus:ring-opacity-50">
+              <label
+                for="edit_username"
+                class="block text-sm font-medium text-gray-700 mb-2"
+                >Nome utente</label
+              >
+              <input
+                type="text"
+                id="edit_username"
+                placeholder="Nuovo username"
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
             </div>
+
             <div>
-              <label for="edit_password" class="block text-sm font-medium text-gray-700">Nuova Password</label>
-              <input type="password" id="edit_password" placeholder="Lascia vuoto per non cambiare" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-brand focus:ring focus:ring-primary-brand focus:ring-opacity-50">
-              <p id="edit-user-password-hint" class="mt-2 text-sm text-gray-500">Lascia vuoto per mantenere la password attuale. Se la modifichi, deve contenere almeno 8 caratteri, una maiuscola, una minuscola e un numero.</p>
+              <label
+                for="edit_password"
+                class="block text-sm font-medium text-gray-700 mb-2"
+                >Nuova password</label
+              >
+              <input
+                type="password"
+                id="edit_password"
+                placeholder="Nuova password"
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+              <div
+                id="edit-user-password-hint"
+                class="mt-2 text-sm text-gray-600"
+              ></div>
             </div>
-          </div>
-          <div id="edit-user-msg" class="mt-4 p-3 rounded-md text-sm hidden"></div>
-          <div class="mt-6 flex justify-end space-x-3">
-            <button type="button" id="cancel-edit-user" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors">Annulla</button>
-            <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-primary-brand rounded-md hover:bg-blue-700 transition-colors">Salva Modifiche</button>
-          </div>
-        </form>
+
+            <div class="flex justify-end space-x-3 pt-4">
+              <button
+                type="button"
+                id="cancel-edit-user"
+                class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+              >
+                Annulla
+              </button>
+              <button
+                type="submit"
+                class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                Salva Modifiche
+              </button>
+            </div>
+
+            <div id="edit-user-msg" class="mt-4 p-3 rounded-lg text-sm"></div>
+          </form>
+        </div>
       </div>
     </div>
 
-    <div id="delete-user-confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
-      <div class="bg-white rounded-lg shadow-xl max-w-sm w-full overflow-hidden">
-        <div class="flex justify-between items-center p-6 border-b">
-          <h3 class="text-lg font-semibold">Conferma Eliminazione</h3>
-          <button id="close-delete-user-confirm-modal" class="text-gray-400 hover:text-gray-600">&times;</button>
+    <div
+      id="user-schedules-modal"
+      class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+      style="display: none"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
+      >
+        <div
+          class="flex items-center justify-between p-6 border-b border-gray-200"
+        >
+          <h3 class="text-xl font-semibold text-gray-900">
+            📅 Orari assegnati all'utente
+          </h3>
+          <button
+            id="close-schedules-modal"
+            class="text-gray-400 hover:text-gray-600 text-2xl font-bold"
+          >
+            ×
+          </button>
         </div>
-        <div class="p-6">
-          <p class="text-sm text-gray-700">Sei sicuro di voler eliminare l'utente "<strong id="delete-user-name-display"></strong>"? Questa azione non può essere annullata.</p>
-          <div id="delete-admin-warning" class="mt-3 text-sm text-red-600 font-medium hidden">
-            Attenzione: stai per eliminare l'unico amministratore rimasto. L'eliminazione non è permessa.
-          </div>
-          <div class="mt-6 flex justify-end space-x-3">
-            <button type="button" id="cancel-delete-user-modal" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors">Annulla</button>
-            <button type="button" id="confirm-delete-user" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors">Elimina</button>
-          </div>
+
+        <div class="p-6 max-h-96 overflow-y-auto custom-scrollbar">
+          <div id="user-schedules-content"></div>
         </div>
       </div>
     </div>
-    
-    <div id="change-role-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
-      <div class="bg-white rounded-lg shadow-xl max-w-sm w-full overflow-hidden">
-        <div class="flex justify-between items-center p-6 border-b">
-          <h3 id="change-role-modal-title" class="text-lg font-semibold"></h3>
-          <button id="close-change-role-modal" class="text-gray-400 hover:text-gray-600">&times;</button>
+
+    <div
+      id="delete-user-confirm-modal"
+      class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+      style="display: none"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden"
+      >
+        <div
+          class="flex items-center justify-between p-6 border-b border-gray-200"
+        >
+          <h3 class="text-xl font-semibold text-gray-900">
+            🗑️ Conferma Eliminazione Utente
+          </h3>
+          <button
+            id="close-delete-user-confirm-modal"
+            class="text-gray-400 hover:text-gray-600 text-2xl font-bold"
+          >
+            ×
+          </button>
         </div>
+
         <div class="p-6">
-          <p id="change-role-modal-text" class="text-sm text-gray-700 mb-6"></p>
+          <p class="text-gray-700 mb-6">
+            Sei sicuro di voler eliminare l'utente "<strong
+              id="delete-user-name-display"
+            ></strong
+            >"? Questa azione non può essere annullata.
+            <span
+              id="delete-admin-warning"
+              class="block mt-2 text-red-600 font-semibold"
+              style="display: none"
+            >
+              Attenzione: stai eliminando un amministratore! Assicurati che ce
+              ne sia almeno un altro.
+            </span>
+          </p>
           <div class="flex justify-end space-x-3">
-            <button type="button" id="cancel-change-role-btn" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors">Annulla</button>
-            <button type="button" id="confirm-change-role-btn" class="px-4 py-2 text-sm font-medium text-white bg-primary-brand rounded-md hover:bg-blue-700 transition-colors">Conferma</button>
+            <button
+              type="button"
+              id="cancel-delete-user-modal"
+              class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+            >
+              Annulla
+            </button>
+            <button
+              type="button"
+              id="confirm-delete-user"
+              class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Elimina
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="change-role-modal"
+      class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+      style="display: none"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden"
+      >
+        <div
+          class="flex items-center justify-between p-6 border-b border-gray-200"
+        >
+          <h3
+            id="change-role-modal-title"
+            class="text-xl font-semibold text-gray-900"
+          ></h3>
+          <button
+            id="close-change-role-modal"
+            class="text-gray-400 hover:text-gray-600 text-2xl font-bold"
+          >
+            ×
+          </button>
+        </div>
+
+        <div class="p-6">
+          <p id="change-role-modal-text" class="text-gray-700 mb-6"></p>
+          <div class="flex justify-end space-x-3">
+            <button
+              id="cancel-change-role-btn"
+              type="button"
+              class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+            >
+              Annulla
+            </button>
+            <button
+              id="confirm-change-role-btn"
+              type="button"
+              class="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+            >
+              Sì, cambia
+            </button>
           </div>
         </div>
       </div>

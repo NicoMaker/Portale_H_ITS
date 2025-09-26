@@ -1,21 +1,67 @@
+
 let courses = [];
 let users = [];
 let editingUserId = null;
-let searchUserInput, filterCourseSelect, filterRoleSelect;
-let userToDeleteId = null;
+let searchUserInput, filterCourseSelect;
+let userToDeleteId = null; // Variabile per tenere traccia dell'ID dell'utente da eliminare
+let filterRoleSelect;
+let filterUserDate;
+
+// Aggiungi queste variabili globali
 let userToChangeId = null;
 let userToChangeRole = null;
-let usersListEl, noUsersFoundEl;
 
 const fetchCourses = () =>
   fetch("/api/courses")
     .then((r) => r.json())
     .then((data) => {
       courses = data;
-      updateCourseSelects();
+      updateNewCourseSelect();
+      updateFilterCourseSelect();
     });
 
-const fetchUsers = () =>
+function updateNewCourseSelect() {
+  const select = document.getElementById("new-course");
+  const label = document.getElementById("new-course-label");
+  const role = document.getElementById("new-role").value;
+  if (role === "user") {
+    select.style.display = "";
+    label.style.display = "";
+    select.innerHTML =
+      '<option value="">Nessun corso</option>' +
+      courses.map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
+  } else {
+    select.style.display = "none";
+    label.style.display = "none";
+    select.innerHTML = "";
+  }
+}
+
+document
+  .getElementById("new-role")
+  .addEventListener("change", updateNewCourseSelect);
+
+function updateFilterCourseSelect() {
+  filterCourseSelect.innerHTML =
+    '<option value="">Tutti i corsi</option>' +
+    courses.map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
+}
+
+function toggleFilterCourseVisibility() {
+  const filterRole = document.getElementById("filter-role").value;
+  const filterCourseGroup = document
+    .getElementById("filter-course")
+    .closest(".filter-group");
+
+  if (filterRole === "admin") {
+    filterCourseGroup.style.display = "none";
+    document.getElementById("filter-course").value = "";
+  } else {
+    filterCourseGroup.style.display = "";
+  }
+}
+
+function fetchUsers() {
   fetch("/api/users")
     .then((r) => r.json())
     .then((data) => {
@@ -23,134 +69,188 @@ const fetchUsers = () =>
       renderUsersList();
       updateUserStats();
     });
-
-function updateCourseSelects() {
-  const newCourseSelect = document.getElementById("new-course");
-  const filterCourseSelect = document.getElementById("filter-course");
-
-  const courseOptions = courses.map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
-  
-  if (newCourseSelect) {
-    newCourseSelect.innerHTML = '<option value="">Nessun corso</option>' + courseOptions;
-  }
-  if (filterCourseSelect) {
-    filterCourseSelect.innerHTML = '<option value="">Tutti i corsi</option><option value="_no_course_">Senza corso</option>' + courseOptions;
-  }
-}
-
-function toggleNewCourseVisibility() {
-  const role = document.getElementById("new-role").value;
-  const courseGroup = document.getElementById("new-course-group");
-  if (role === "user") {
-    courseGroup.style.display = "";
-  } else {
-    courseGroup.style.display = "none";
-  }
 }
 
 function renderUsersList() {
   const search = searchUserInput.value.toLowerCase();
   const courseId = filterCourseSelect.value;
-  const roleFilter = filterRoleSelect.value;
+  const filterRole = document.getElementById("filter-role").value;
+  const dateFilter = document.getElementById("filter-user-date").value;
   const adminCount = users.filter((u) => u.role === "admin").length;
 
   let html = "";
-  
+
   const filteredUsers = users
     .slice()
     .sort((a, b) => a.username.localeCompare(b.username))
     .filter((u) => {
       const matchName = u.username.toLowerCase().includes(search);
-      const matchRole = !roleFilter || u.role === roleFilter;
-      
-      let matchCourse = true;
-      if (courseId) {
-        if (courseId === '_no_course_') {
-          matchCourse = u.role === 'user' && (!u.courses || u.courses.length === 0);
-        } else {
-          matchCourse = u.courses && u.courses.some(c => c.id == courseId);
-        }
-      }
-      
-      return matchName && matchRole && matchCourse;
+      const matchCourse =
+        u.role === "admin"
+          ? !courseId || courseId === ""
+          : !courseId ||
+            (u.courses && u.courses[0] && u.courses[0].id == courseId);
+      const matchRole = !filterRole || u.role === filterRole;
+      const matchDate =
+        !dateFilter || (u.created_at && u.created_at.startsWith(dateFilter));
+      return matchName && matchCourse && matchRole && matchDate;
     });
 
-  if (filteredUsers.length === 0) {
-    noUsersFoundEl.style.display = 'block';
-    usersListEl.innerHTML = '';
+  if (!filteredUsers.length) {
+    html = `
+          <div class="col-span-full flex flex-col items-center justify-center py-20 text-gray-500">
+            <div class="relative mb-8">
+              <div class="text-8xl mb-4 float-animation">👥</div>
+              <div class="absolute -top-2 -right-2 text-3xl animate-bounce">✨</div>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-700 mb-3">Nessun utente trovato</h3>
+            <p class="text-lg text-gray-500 mb-6 text-center max-w-md">
+              Modifica i filtri per visualizzare altri utenti o crea il primo utente
+            </p>
+          </div>
+        `;
   } else {
-    noUsersFoundEl.style.display = 'none';
     filteredUsers.forEach((u) => {
-      const assignedCourse = u.courses && u.courses.length > 0 ? u.courses[0].name : 'Nessun corso';
-      
+      const gradients = [
+        "from-green-500 to-emerald-500",
+        "from-blue-500 to-cyan-500",
+        "from-purple-500 to-pink-500",
+        "from-orange-500 to-red-500",
+        "from-indigo-500 to-purple-500",
+        "from-teal-500 to-green-500",
+      ];
+      const gradient = gradients[u.id % gradients.length];
+
       html += `
-        <tr class="hover:bg-gray-50 transition-colors duration-200">
-          <td class="px-6 py-4 whitespace-nowrap">
-            <div class="flex items-center">
-              <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center text-xl rounded-full bg-gray-200">${u.role === 'admin' ? '👑' : '👤'}</div>
-              <div class="ml-4">
-                <div class="text-sm font-medium text-gray-900">${u.username}</div>
+            <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-2 transition-all duration-300 overflow-hidden border border-gray-100 pulse-on-hover user-card-hover">
+              <div class="bg-gradient-to-r ${gradient} p-6 relative overflow-hidden">
+                <div class="shimmer absolute inset-0"></div>
+                <div class="relative z-10">
+                  <div class="flex items-center justify-between mb-4">
+                    <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-3">
+                      <span class="text-3xl">${u.role === "admin" ? "👑" : "👤"}</span>
+                    </div>
+                    <div class="flex space-x-2">
+                      <button class="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-3 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105" 
+                              title="Modifica utente" onclick="openEditUser(${u.id})">
+                        <span class="text-lg">✏️</span>
+                      </button>
+                      ${
+                        adminCount > 1 || u.role !== "admin"
+                          ? `
+                      <button class="bg-white/20 hover:bg-red-500/30 backdrop-blur-sm text-white p-3 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105" 
+                              title="Elimina utente" onclick="deleteUser(${u.id})">
+                        <span class="text-lg">🗑️</span>
+                      </button>
+                      `
+                          : ""
+                      }
+                    </div>
+                  </div>
+                  <h3 class="text-2xl font-bold text-white mb-2 truncate">${u.username}</h3>
+                  <div class="bg-white/20 backdrop-blur-sm rounded-full px-4 py-1 inline-block">
+                    <span class="text-white/90 text-sm font-medium">
+                      ${u.role === "admin" ? "👑 Amministratore" : "👤 Utente"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="p-8">
+                <div class="mb-6">
+                  <h4 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3 flex items-center">
+                    <span class="mr-2">📚</span>
+                    Corso Assegnato
+                  </h4>
+                  ${
+                    u.role === "user"
+                      ? `
+                    <select onchange='assignCourse(${u.id}, this.value)' 
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm transition-all duration-200 shadow-sm">
+                      <option value="">Nessun corso</option>
+                      ${courses
+                        .map((c) => {
+                          const selected =
+                            u.courses && u.courses[0] && u.courses[0].id == c.id
+                              ? "selected"
+                              : "";
+                          return `<option value="${c.id}" ${selected}>${c.name}</option>`;
+                        })
+                        .join("")}
+                    </select>
+                  `
+                      : `
+                    <p class="text-gray-500 italic">Gli amministratori non hanno corsi assegnati</p>
+                  `
+                  }
+                </div>
+                
+                <div class="flex flex-wrap gap-3">
+                  <button onclick="openEditUser(${u.id})" 
+                    class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-4 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
+                    <span>✏️</span>
+                    <span>Modifica</span>
+                  </button>
+                  
+                  ${
+                    u.role !== "admin"
+                      ? `
+                  <button onclick="showChangeRoleModal(${u.id}, 'admin')" 
+                    class="flex-1 bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-semibold py-3 px-4 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
+                    <span>👑</span>
+                    <span>Rendi Admin</span>
+                  </button>
+                  `
+                      : ""
+                  }
+                  
+                  ${
+                    u.role === "admin" && adminCount > 1
+                      ? `
+                  <button onclick="showChangeRoleModal(${u.id}, 'user')" 
+                    class="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-semibold py-3 px-4 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
+                    <span>👤</span>
+                    <span>Rendi Utente</span>
+                  </button>
+                  `
+                      : ""
+                  }
+                  
+                  ${
+                    adminCount > 1 || u.role !== "admin"
+                      ? `
+                  <button onclick="deleteUser(${u.id})" 
+                    class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold py-3 px-4 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center">
+                    <span>🗑️</span>
+                  </button>
+                  `
+                      : ""
+                  }
+                </div>
               </div>
             </div>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${u.role === 'admin' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}">
-              ${u.role === 'admin' ? 'Amministratore' : 'Utente'}
-            </span>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-            ${u.role === 'user' ? `<select onchange='assignCourse(${u.id}, this.value)' class="block w-full text-sm border-gray-300 rounded-md">${courses.map(c => `<option value="${c.id}" ${u.courses && u.courses[0] && u.courses[0].id == c.id ? 'selected' : ''}>${c.name}</option>`).join('')}<option value="">Nessun corso</option></select>` : 'N/A'}
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-            <div class="flex justify-end space-x-2">
-              <button onclick="openEditUser(${u.id})" class="text-indigo-600 hover:text-indigo-900 transition-colors" title="Modifica"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"></path></svg></button>
-              ${u.role !== 'admin' ? `<button onclick="showChangeRoleModal(${u.id}, 'admin')" class="text-yellow-600 hover:text-yellow-900 transition-colors" title="Rendi Admin"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path><path fill-rule="evenodd" d="M.458 10C1.732 5.093 6.002 2 10 2s8.268 3.093 9.542 8c-1.274 4.907-5.544 8-9.542 8S1.732 14.907.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"></path></svg></button>` : ''}
-              ${u.role === 'admin' && adminCount > 1 ? `<button onclick="showChangeRoleModal(${u.id}, 'user')" class="text-gray-600 hover:text-gray-900 transition-colors" title="Rendi Utente"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zm3.881 12.007a2 2 0 01-1.34-2.858C14.154 13.922 12.016 13 10 13c-2.015 0-4.154.922-5.54 2.149a2 2 0 01-1.34 2.858C2.502 18.91 4.549 20 7 20h6c2.451 0 4.498-1.09 5.881-2.993z"></path></svg></button>` : ''}
-              ${adminCount > 1 || u.role !== 'admin' ? `<button onclick="deleteUser(${u.id})" class="text-red-600 hover:text-red-900 transition-colors" title="Elimina"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 112 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd"></path></svg></button>` : ''}
-            </div>
-          </td>
-        </tr>
-      `;
+          `;
     });
-    usersListEl.innerHTML = html;
   }
+
+  document.getElementById("users-list").innerHTML = html;
+  updateUserStats();
 }
 
-function assignCourse(id, courseId) {
-  fetch(`/api/users/${id}/assign_course`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ course_id: courseId }),
-  })
-  .then((r) => r.text())
-  .then((msg) => {
-    if (msg === "OK") {
-      fetchUsers();
-    } else {
-      console.error("Failed to assign course:", msg);
-    }
-  })
-  .catch((err) => {
-    console.error("Error during course assignment:", err);
-  });
-}
+const promote = (id) =>
+  fetch(`/api/users/${id}/promote`, { method: "POST" }).then(fetchUsers);
 
-function openEditUser(id) {
-  editingUserId = id;
-  const user = users.find((u) => u.id === id);
-  if (user) {
-    document.getElementById("edit_username").value = user.username;
-    document.getElementById("edit_password").value = "";
-    document.getElementById("edit-user-password-hint").textContent = "Lascia vuoto per mantenere la password attuale. Se la modifichi, deve contenere almeno 8 caratteri, una maiuscola, una minuscola e un numero.";
-    document.getElementById("edit-user-msg").classList.add("hidden");
-    document.getElementById("edit-user-modal").style.display = "flex";
-  }
-}
+const demote = (id) =>
+  fetch(`/api/users/${id}/demote`, { method: "POST" }).then(fetchUsers);
 
+// Funzioni per il modal di conferma del cambio ruolo
 function showChangeRoleModal(userId, newRole) {
   const user = users.find((u) => u.id === userId);
-  if (!user) return;
-  
+  if (!user) {
+    console.error("Utente non trovato per ID:", userId);
+    return;
+  }
+
   userToChangeId = user.id;
   userToChangeRole = newRole;
 
@@ -158,29 +258,47 @@ function showChangeRoleModal(userId, newRole) {
   const title = document.getElementById("change-role-modal-title");
   const text = document.getElementById("change-role-modal-text");
   const confirmBtn = document.getElementById("confirm-change-role-btn");
-  
+  const cancelBtn = document.getElementById("cancel-change-role-btn");
+
   title.textContent = `Cambia ruolo per ${user.username}?`;
-  text.textContent = `Sei sicuro di voler cambiare il ruolo di ${user.username} da "${user.role}" a "${newRole}"?`;
-  confirmBtn.textContent = `Sì, Rendi ${newRole}`;
-  confirmBtn.className = `px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-    newRole === 'admin' ? 'text-white bg-green-600 hover:bg-green-700' : 'text-gray-700 bg-gray-200 hover:bg-gray-300'
-  }`;
-  
+  text.textContent = `Sei sicuro di voler cambiare il ruolo di ${user.username} da ${user.role} a ${userToChangeRole}?`;
+  confirmBtn.textContent = `Sì, rendi ${userToChangeRole}`;
+  cancelBtn.textContent = "Annulla";
+
+  if (userToChangeRole === "admin") {
+    confirmBtn.className =
+      "px-6 py-2 bg-green-500 text-gray-900 rounded-lg hover:bg-green-600 transition-colors";
+  } else {
+    confirmBtn.className =
+      "px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors";
+  }
+
   modal.style.display = "flex";
 }
 
 function hideChangeRoleModal() {
-  document.getElementById("change-role-modal").style.display = "none";
+  const modal = document.getElementById("change-role-modal");
+  modal.style.display = "none";
   userToChangeId = null;
   userToChangeRole = null;
 }
 
+// Funzione modificata per il cambio di ruolo
 function changeUserRole() {
-  if (!userToChangeId || !userToChangeRole) return;
+  if (!userToChangeId || !userToChangeRole) {
+    console.error("ID utente o ruolo non definiti.");
+    return;
+  }
 
-  const apiEndpoint = userToChangeRole === "admin" ? `/api/users/${userToChangeId}/promote` : `/api/users/${userToChangeId}/demote`;
+  // Utilizza gli endpoint POST esistenti nel backend
+  const apiEndpoint =
+    userToChangeRole === "admin"
+      ? `/api/users/${userToChangeId}/promote`
+      : `/api/users/${userToChangeId}/demote`;
 
-  fetch(apiEndpoint, { method: "POST" })
+  fetch(apiEndpoint, {
+    method: "POST",
+  })
     .then((response) => {
       if (!response.ok) {
         return response.text().then((text) => {
@@ -195,68 +313,264 @@ function changeUserRole() {
     })
     .catch((error) => {
       console.error("Errore:", error);
-      alert(error.message);
+      alert(error.message); // Mostra un alert con il messaggio di errore
       hideChangeRoleModal();
     });
 }
 
-function deleteUser(id) {
+// Funzioni per il modal di conferma eliminazione
+function openDeleteUserConfirmModal(id) {
   userToDeleteId = id;
   const user = users.find((u) => u.id == id);
-  const adminCount = users.filter((u) => u.role === "admin").length;
-
   if (user) {
-    document.getElementById("delete-user-name-display").textContent = user.username;
-    if (user.role === 'admin' && adminCount <= 1) {
+    document.getElementById("delete-user-name-display").textContent =
+      user.username;
+    const adminCount = users.filter((u) => u.role === "admin").length;
+    if (user.role === "admin" && adminCount <= 1) {
       document.getElementById("delete-admin-warning").style.display = "block";
       document.getElementById("confirm-delete-user").disabled = true;
-      document.getElementById("confirm-delete-user").classList.add("opacity-50", "cursor-not-allowed");
+      document
+        .getElementById("confirm-delete-user")
+        .classList.add("opacity-50", "cursor-not-allowed");
     } else {
       document.getElementById("delete-admin-warning").style.display = "none";
       document.getElementById("confirm-delete-user").disabled = false;
-      document.getElementById("confirm-delete-user").classList.remove("opacity-50", "cursor-not-allowed");
+      document
+        .getElementById("confirm-delete-user")
+        .classList.remove("opacity-50", "cursor-not-allowed");
     }
   }
   document.getElementById("delete-user-confirm-modal").style.display = "flex";
+}
+
+document.getElementById("close-delete-user-confirm-modal").onclick = () => {
+  document.getElementById("delete-user-confirm-modal").style.display = "none";
+};
+
+document.getElementById("cancel-delete-user-modal").onclick = () => {
+  document.getElementById("delete-user-confirm-modal").style.display = "none";
+};
+
+document.getElementById("confirm-delete-user").onclick = () => {
+  if (userToDeleteId) {
+    fetch(`/api/users/${userToDeleteId}`, { method: "DELETE" })
+      .then(() => {
+        fetchUsers();
+        document.getElementById("delete-user-confirm-modal").style.display =
+          "none";
+      })
+      .catch((err) => {
+        console.error("Errore durante l'eliminazione:", err);
+        document.getElementById("delete-user-confirm-modal").style.display =
+          "none";
+      });
+  }
+};
+
+// Modified deleteUser to open the custom modal
+function deleteUser(id) {
+  openDeleteUserConfirmModal(id);
+}
+
+function assignCourse(id, courseId) {
+  fetch(`/api/users/${id}/assign_course`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ course_id: courseId }),
+  })
+    .then((r) => r.text())
+    .then((msg) => {
+      if (msg === "OK") {
+        fetchUsers();
+        const el = document.getElementById("assign-msg");
+        el.textContent = "Corso assegnato con successo!";
+        el.className = `mt-4 p-4 rounded-2xl text-sm font-medium bg-green-100 text-green-800`;
+        el.classList.remove("hidden");
+        setTimeout(() => {
+          el.classList.add("hidden");
+        }, 3000);
+      } else {
+        const el = document.getElementById("assign-msg");
+        el.textContent = msg;
+        el.className = `mt-4 p-4 rounded-2xl text-sm font-medium bg-red-100 text-red-800`;
+        el.classList.remove("hidden");
+        setTimeout(() => {
+          el.classList.add("hidden");
+        }, 3000);
+      }
+    });
+}
+
+function openEditUser(id) {
+  editingUserId = id;
+  const user = users.find((u) => u.id === id);
+  document.getElementById("edit_username").value = user.username;
+  document.getElementById("edit_password").value = "";
+  document.getElementById("edit-user-password-hint").textContent = "";
+  document.getElementById("edit-user-msg").classList.add("hidden");
+  document.getElementById("edit-user-modal").style.display = "flex";
 }
 
 function showMessage(elementId, message, type) {
   const el = document.getElementById(elementId);
   if (el) {
     el.textContent = message;
-    el.className = `mt-4 p-3 rounded-md text-sm ${type === "success" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`;
+    el.className = `mt-4 p-4 rounded-2xl text-sm font-medium ${type === "success" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`;
     el.classList.remove("hidden");
+
     setTimeout(() => {
       el.classList.add("hidden");
     }, 3000);
   }
 }
 
-function validatePassword(password) {
-  let msg = [];
-  if (password.length < 8) msg.push("Min 8 caratteri.");
-  if (!/[A-Z]/.test(password)) msg.push("Almeno una maiuscola.");
-  if (!/[a-z]/.test(password)) msg.push("Almeno una minuscola.");
-  if (!/[0-9]/.test(password)) msg.push("Almeno un numero.");
-  return msg.join(' ');
-}
+// Modal functions
+document.getElementById("add-user-btn").onclick = () => {
+  document.getElementById("add-user-modal").style.display = "flex";
+  document.getElementById("add-user-msg").classList.add("hidden");
+  updateNewCourseSelect();
+};
 
-function updateUserStats() {
-  const totalUsers = users.length;
-  const admins = users.filter((u) => u.role === "admin").length;
-  const regularUsers = users.filter((u) => u.role === "user").length;
-  const usersWithCourse = users.filter(u => u.courses && u.courses.length > 0).length;
+document.getElementById("close-add-user-modal").onclick = () => {
+  document.getElementById("add-user-modal").style.display = "none";
+};
 
-  document.getElementById("total-users").textContent = totalUsers;
-  document.getElementById("admin-count").textContent = admins;
-  document.getElementById("user-count").textContent = regularUsers;
-  document.getElementById("users-with-course").textContent = usersWithCourse;
-}
+document.getElementById("cancel-add-user").onclick = function () {
+  document.getElementById("add-user-modal").style.display = "none";
+};
 
+document.getElementById("close-edit-modal").onclick = () => {
+  document.getElementById("edit-user-modal").style.display = "none";
+};
+
+document.getElementById("cancel-edit-user").onclick = function () {
+  document.getElementById("edit-user-modal").style.display = "none";
+};
+
+document.getElementById("close-schedules-modal").onclick = () => {
+  document.getElementById("user-schedules-modal").style.display = "none";
+};
+
+window.onclick = (e) => {
+  if (e.target === document.getElementById("edit-user-modal"))
+    document.getElementById("edit-user-modal").style.display = "none";
+  if (e.target === document.getElementById("user-schedules-modal"))
+    document.getElementById("user-schedules-modal").style.display = "none";
+  if (e.target === document.getElementById("add-user-modal"))
+    document.getElementById("add-user-modal").style.display = "none";
+  if (e.target === document.getElementById("delete-user-confirm-modal"))
+    document.getElementById("delete-user-confirm-modal").style.display = "none";
+  if (e.target === document.getElementById("change-role-modal"))
+    hideChangeRoleModal();
+};
+
+// Validazione password live
+const newPassword = document.getElementById("new-password");
+const addHint = document.getElementById("add-password-hint");
+
+newPassword.addEventListener("input", () => {
+  const val = newPassword.value;
+  let msg = "";
+  if (val.length < 8) msg += "Min 8 caratteri. ";
+  if (!/[A-Z]/.test(val)) msg += "Almeno una maiuscola. ";
+  if (!/[a-z]/.test(val)) msg += "Almeno una minuscola. ";
+  if (!/[0-9]/.test(val)) msg += "Almeno un numero. ";
+  addHint.textContent = msg;
+  addHint.style.color = msg ? "#ef4444" : "#22c55e";
+});
+
+// Validazione password edit
+const editPassword = document.getElementById("edit_password");
+const editHint = document.getElementById("edit-user-password-hint");
+
+editPassword.addEventListener("input", () => {
+  const val = editPassword.value;
+  let msg = "";
+  if (val.length < 8) msg += "Min 8 caratteri. ";
+  if (!/[A-Z]/.test(val)) msg += "Almeno una maiuscola. ";
+  if (!/[a-z]/.test(val)) msg += "Almeno una minuscola. ";
+  if (!/[0-9]/.test(val)) msg += "Almeno un numero. ";
+  editHint.textContent = msg;
+  editHint.style.color = msg ? "#ef4444" : "#22c55e";
+});
+
+document.getElementById("add-user-form").onsubmit = function (e) {
+  e.preventDefault();
+
+  if (addHint.textContent) {
+    addHint.style.color = "#ef4444";
+    showMessage("add-user-msg", "Correggi gli errori nella password", "error");
+    return false;
+  }
+
+  fetch("/api/users", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      username: document.getElementById("new-username").value,
+      password: newPassword.value,
+      role: document.getElementById("new-role").value,
+      course_id: document.getElementById("new-course").value,
+    }),
+  })
+    .then((r) => r.text())
+    .then((msg) => {
+      if (msg === "OK") {
+        showMessage("add-user-msg", "Utente creato con successo!", "success");
+        this.reset();
+        updateNewCourseSelect();
+        fetchUsers();
+        setTimeout(() => {
+          document.getElementById("add-user-modal").style.display = "none";
+        }, 1500);
+      } else {
+        showMessage("add-user-msg", msg, "error");
+      }
+    });
+};
+
+document.getElementById("edit-user-form").onsubmit = function (e) {
+  e.preventDefault();
+
+  if (editHint.textContent) {
+    editHint.style.color = "#ef4444";
+    showMessage("edit-user-msg", "Correggi gli errori nella password", "error");
+    return false;
+  }
+
+  fetch(`/api/users/${editingUserId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      username: document.getElementById("edit_username").value,
+      password: document.getElementById("edit_password").value,
+    }),
+  })
+    .then((r) => r.text())
+    .then((msg) => {
+      if (msg === "OK") {
+        showMessage(
+          "edit-user-msg",
+          "Utente aggiornato con successo!",
+          "success",
+        );
+        fetchUsers();
+        setTimeout(() => {
+          document.getElementById("edit-user-modal").style.display = "none";
+        }, 1500);
+      } else {
+        showMessage("edit-user-msg", msg, "error");
+      }
+    });
+};
+
+// Function to clear all filters
 function clearAllFilters() {
   searchUserInput.value = "";
   filterCourseSelect.value = "";
   filterRoleSelect.value = "";
+  filterUserDate.value = "";
+  toggleFilterCourseVisibility(); // Ensure course filter visibility is correct after clearing role
   renderUsersList();
 }
 
@@ -264,117 +578,350 @@ document.addEventListener("DOMContentLoaded", () => {
   searchUserInput = document.getElementById("search-user");
   filterCourseSelect = document.getElementById("filter-course");
   filterRoleSelect = document.getElementById("filter-role");
-  usersListEl = document.getElementById("users-list");
-  noUsersFoundEl = document.getElementById("no-users-found");
+  filterUserDate = document.getElementById("filter-user-date");
+  const clearFiltersBtn = document.getElementById("clear-filters-btn");
+  const confirmChangeRoleBtn = document.getElementById(
+    "confirm-change-role-btn",
+  );
+  const cancelChangeRoleBtn = document.getElementById("cancel-change-role-btn");
+  const closeChangeRoleBtn = document.getElementById("close-change-role-modal");
 
-  // Event Listeners for Filters
-  searchUserInput?.addEventListener("input", renderUsersList);
-  filterCourseSelect?.addEventListener("change", renderUsersList);
-  filterRoleSelect?.addEventListener("change", renderUsersList);
-  document.getElementById("clear-filters-btn")?.addEventListener("click", clearAllFilters);
-  document.getElementById('refresh-data')?.addEventListener('click', fetchUsers);
+  if (searchUserInput && filterCourseSelect) {
+    searchUserInput.addEventListener("input", renderUsersList);
+    filterCourseSelect.addEventListener("change", renderUsersList);
+    if (filterRoleSelect)
+      filterRoleSelect.addEventListener("change", () => {
+        toggleFilterCourseVisibility();
+        renderUsersList();
+      });
+    if (filterUserDate)
+      filterUserDate.addEventListener("input", renderUsersList);
+  }
 
-  // Add User Modal
-  document.getElementById("add-user-btn")?.addEventListener("click", () => {
-    document.getElementById("add-user-modal").style.display = "flex";
-    document.getElementById("add-user-form").reset();
-    document.getElementById("add-user-msg").classList.add("hidden");
-    document.getElementById("add-password-hint").textContent = '';
-    toggleNewCourseVisibility();
-  });
-  document.getElementById("close-add-user-modal")?.addEventListener("click", () => document.getElementById("add-user-modal").style.display = "none");
-  document.getElementById("cancel-add-user")?.addEventListener("click", () => document.getElementById("add-user-modal").style.display = "none");
-  document.getElementById("new-role")?.addEventListener("change", toggleNewCourseVisibility);
+  if (clearFiltersBtn) {
+    clearFiltersBtn.addEventListener("click", clearAllFilters);
+  }
 
-  // Edit User Modal
-  document.getElementById("close-edit-modal")?.addEventListener("click", () => document.getElementById("edit-user-modal").style.display = "none");
-  document.getElementById("cancel-edit-user")?.addEventListener("click", () => document.getElementById("edit-user-modal").style.display = "none");
+  // Aggiungi gli event listener per i bottoni del nuovo modal
+  confirmChangeRoleBtn.addEventListener("click", changeUserRole);
+  cancelChangeRoleBtn.addEventListener("click", hideChangeRoleModal);
+  closeChangeRoleBtn.addEventListener("click", hideChangeRoleModal);
 
-  // Delete User Modal
-  document.getElementById("close-delete-user-confirm-modal")?.addEventListener("click", () => document.getElementById("delete-user-confirm-modal").style.display = "none");
-  document.getElementById("cancel-delete-user-modal")?.addEventListener("click", () => document.getElementById("delete-user-confirm-modal").style.display = "none");
-  document.getElementById("confirm-delete-user")?.addEventListener("click", () => {
-    if (userToDeleteId) {
-      fetch(`/api/users/${userToDeleteId}`, { method: "DELETE" })
-        .then(() => {
-          fetchUsers();
-          document.getElementById("delete-user-confirm-modal").style.display = "none";
-        })
-        .catch((err) => console.error("Errore durante l'eliminazione:", err));
-    }
-  });
-
-  // Change Role Modal
-  document.getElementById("confirm-change-role-btn")?.addEventListener("click", changeUserRole);
-  document.getElementById("cancel-change-role-btn")?.addEventListener("click", hideChangeRoleModal);
-  document.getElementById("close-change-role-modal")?.addEventListener("click", hideChangeRoleModal);
-
-  // Form Submissions
-  document.getElementById("add-user-form")?.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const password = document.getElementById("new-password").value;
-    const passwordHint = validatePassword(password);
-    if (passwordHint) {
-      showMessage("add-user-msg", "Correggi gli errori nella password.", "error");
-      document.getElementById("add-password-hint").textContent = passwordHint;
-      return;
-    }
-
-    const data = {
-      username: document.getElementById("new-username").value,
-      password: password,
-      role: document.getElementById("new-role").value,
-      course_id: document.getElementById("new-course").value,
-    };
-    
-    fetch("/api/users", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    })
-    .then((r) => r.text())
-    .then((msg) => {
-      if (msg === "OK") {
-        showMessage("add-user-msg", "Utente creato con successo!", "success");
-        e.target.reset();
-        fetchUsers();
-        setTimeout(() => document.getElementById("add-user-modal").style.display = "none", 1500);
-      } else {
-        showMessage("add-user-msg", msg, "error");
-      }
-    });
-  });
-
-  document.getElementById("edit-user-form")?.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const password = document.getElementById("edit_password").value;
-    if (password && validatePassword(password)) {
-      showMessage("edit-user-msg", "Correggi gli errori nella password.", "error");
-      return;
-    }
-    
-    const data = {
-      username: document.getElementById("edit_username").value,
-      password: password || undefined,
-    };
-
-    fetch(`/api/users/${editingUserId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    })
-    .then((r) => r.text())
-    .then((msg) => {
-      if (msg === "OK") {
-        showMessage("edit-user-msg", "Utente aggiornato con successo!", "success");
-        fetchUsers();
-        setTimeout(() => document.getElementById("edit-user-modal").style.display = "none", 1500);
-      } else {
-        showMessage("edit-user-msg", msg, "error");
-      }
-    });
-  });
-
-  // Initial Data Fetch
+  toggleFilterCourseVisibility();
   fetchCourses().then(fetchUsers);
+  
+  // Setup refresh button
+  const refreshBtn = document.getElementById('refresh-data');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', () => {
+      fetchCourses().then(fetchUsers);
+    });
+  }
 });
+
+// ------------------------------
+// Funzioni per statistiche
+// ------------------------------
+function updateUserStats() {
+  // Total users
+  const totalUsersEl = document.getElementById('total-users');
+  if (totalUsersEl) {
+    totalUsersEl.textContent = users.length;
+  }
+  
+  // Users by role
+  const adminCount = users.filter(u => u.role === 'admin').length;
+  const userCount = users.filter(u => u.role === 'user').length;
+  
+  const usersAdminEl = document.getElementById('users-admin');
+  if (usersAdminEl) {
+    usersAdminEl.textContent = `Admin: ${adminCount}`;
+  }
+  
+  const usersRegularEl = document.getElementById('users-regular');
+  if (usersRegularEl) {
+    usersRegularEl.textContent = `Utenti: ${userCount}`;
+  }
+  
+  // Users with course
+  const usersWithCourse = users.filter(u => u.courses && u.courses.length > 0).length;
+  const usersWithCourseEl = document.getElementById('users-with-course');
+  if (usersWithCourseEl) {
+    usersWithCourseEl.textContent = usersWithCourse;
+  }
+  
+  // Users without course
+  const usersWithoutCourse = users.filter(u => !u.courses || u.courses.length === 0).length;
+  const usersWithoutCourseEl = document.getElementById('users-without-course');
+  if (usersWithoutCourseEl) {
+    usersWithoutCourseEl.textContent = usersWithoutCourse;
+  }
+  
+  // Filtered users (based on current filters)
+  const filteredUsers = getFilteredUsers();
+  const filteredUsersEl = document.getElementById('filtered-users');
+  if (filteredUsersEl) {
+    filteredUsersEl.textContent = filteredUsers.length;
+  }
+}
+
+function getFilteredUsers() {
+  let filtered = [...users];
+  
+  // Apply role filter
+  const roleFilter = document.getElementById('filter-role')?.value;
+  if (roleFilter) {
+    filtered = filtered.filter(u => u.role === roleFilter);
+  }
+  
+  // Apply course filter
+  const courseFilter = document.getElementById('filter-course')?.value;
+  if (courseFilter) {
+    filtered = filtered.filter(u => u.courses && u.courses.some(c => c.id == courseFilter));
+  }
+  
+  // Apply search filter
+  const searchTerm = document.getElementById('search-user')?.value?.toLowerCase();
+  if (searchTerm) {
+    filtered = filtered.filter(u => u.username.toLowerCase().includes(searchTerm));
+  }
+  
+  return filtered;
+}
+
+// Initialize
+fetchCourses().then(fetchUsers);
+
+
+function updateFilterCourseSelect() {
+  const select = document.getElementById("filter-course");
+  select.innerHTML =
+    '<option value="">Tutti i corsi</option>' +
+    courses.map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
+}
+
+function getFilteredUsers() {
+  let filtered = [...users];
+
+  // Applica il filtro del ruolo
+  const roleFilter = document.getElementById("filter-role")?.value;
+  if (roleFilter) {
+    filtered = filtered.filter((u) => u.role === roleFilter);
+  }
+
+  // Applica il filtro del corso
+  const courseFilter = document.getElementById("filter-course")?.value;
+  if (courseFilter) {
+    if (courseFilter === "_no_course_") {
+      // Filtra solo gli utenti con ruolo 'user' che non hanno corsi
+      filtered = filtered.filter((u) => u.role === "user" && (!u.courses || u.courses.length === 0));
+    } else {
+      // Filtra gli utenti in base all'ID del corso
+      filtered = filtered.filter(
+        (u) => u.courses && u.courses.some((c) => c.id == courseFilter),
+      );
+    }
+  }
+
+  // Applica il filtro di ricerca
+  const searchTerm = document.getElementById("search-user").value.toLowerCase();
+  if (searchTerm) {
+    filtered = filtered.filter(
+      (u) =>
+        u.name.toLowerCase().includes(searchTerm) ||
+        u.email.toLowerCase().includes(searchTerm) ||
+        u.role.toLowerCase().includes(searchTerm) ||
+        (u.courses &&
+          u.courses.some((c) => c.name.toLowerCase().includes(searchTerm))),
+    );
+  }
+
+  // Applica il filtro per data
+  const dateFilter = document.getElementById("filter-user-date")?.value;
+  if (dateFilter) {
+    filtered = filtered.filter((u) => u.registration_date === dateFilter);
+  }
+
+  return filtered;
+}
+
+function updateUserStats() {
+  const totalUsers = users.length;
+  const totalUsersEl = document.getElementById("total-users");
+  if (totalUsersEl) {
+    totalUsersEl.textContent = totalUsers;
+  }
+
+  // Conta gli utenti per ruolo
+  const admins = users.filter((u) => u.role === "admin").length;
+  const adminCountEl = document.getElementById("admin-count");
+  if (adminCountEl) {
+    adminCountEl.textContent = admins;
+  }
+
+  const userCount = users.filter((u) => u.role === "user").length;
+  const userCountEl = document.getElementById("user-count");
+  if (userCountEl) {
+    userCountEl.textContent = userCount;
+  }
+
+  // Utenti con corso
+  const usersWithCourse = users.filter(u => u.courses && u.courses.length > 0).length;
+  const usersWithCourseEl = document.getElementById('users-with-course');
+  if (usersWithCourseEl) {
+    usersWithCourseEl.textContent = usersWithCourse;
+  }
+
+  // Utenti senza corso (solo utenti normali)
+  const usersWithoutCourse = users.filter(u => u.role === 'user' && (!u.courses || u.courses.length === 0)).length;
+  const usersWithoutCourseEl = document.getElementById('users-without-course');
+  if (usersWithoutCourseEl) {
+    usersWithoutCourseEl.textContent = usersWithoutCourse;
+  }
+  
+  // Utenti filtrati (in base ai filtri correnti)
+  const filteredUsers = getFilteredUsers();
+  const filteredUsersEl = document.getElementById("filtered-users");
+  if (filteredUsersEl) {
+    filteredUsersEl.textContent = filteredUsers.length;
+  }
+}
+
+function getFilteredUsers() {
+  let filtered = [...users];
+
+  // Applica il filtro del ruolo
+  const roleFilter = document.getElementById("filter-role")?.value;
+  if (roleFilter) {
+    filtered = filtered.filter((u) => u.role === roleFilter);
+  }
+
+  // Applica il filtro del corso
+  const courseFilter = document.getElementById("filter-course")?.value;
+  if (courseFilter) {
+    if (courseFilter === "_no_course_") {
+      // ✅ LOGICA CORRETTA: Filtra solo gli utenti con ruolo 'user'
+      //    che non hanno corsi (l'array `courses` è vuoto o non esiste)
+      filtered = filtered.filter(
+        (u) => u.role === "user" && (!u.courses || u.courses.length === 0)
+      );
+    } else {
+      // Filtra gli utenti in base all'ID del corso selezionato
+      filtered = filtered.filter(
+        (u) => u.courses && u.courses.some((c) => c.id == courseFilter)
+      );
+    }
+  }
+
+  // Applica il filtro di ricerca
+  const searchTerm = document.getElementById("search-user").value.toLowerCase();
+  if (searchTerm) {
+    filtered = filtered.filter(
+      (u) =>
+        u.name.toLowerCase().includes(searchTerm) ||
+        u.email.toLowerCase().includes(searchTerm) ||
+        u.role.toLowerCase().includes(searchTerm) ||
+        (u.courses &&
+          u.courses.some((c) => c.name.toLowerCase().includes(searchTerm)))
+    );
+  }
+
+  // Applica il filtro per data
+  const dateFilter = document.getElementById("filter-user-date")?.value;
+  if (dateFilter) {
+    filtered = filtered.filter((u) => u.registration_date === dateFilter);
+  }
+
+  return filtered;
+}
+
+function updateUserStats() {
+  const totalUsers = users.length;
+  const totalUsersEl = document.getElementById("total-users");
+  if (totalUsersEl) {
+    totalUsersEl.textContent = totalUsers;
+  }
+
+  // Conta gli utenti per ruolo
+  const admins = users.filter((u) => u.role === "admin").length;
+  const adminCountEl = document.getElementById("admin-count");
+  if (adminCountEl) {
+    adminCountEl.textContent = admins;
+  }
+
+  const userCount = users.filter((u) => u.role === "user").length;
+  const userCountEl = document.getElementById("user-count");
+  if (userCountEl) {
+    userCountEl.textContent = userCount;
+  }
+
+  // Utenti con corso
+  const usersWithCourse = users.filter(u => u.courses && u.courses.length > 0).length;
+  const usersWithCourseEl = document.getElementById('users-with-course');
+  if (usersWithCourseEl) {
+    usersWithCourseEl.textContent = usersWithCourse;
+  }
+
+  // ✅ LOGICA CORRETTA: Conta solo gli utenti con ruolo 'user' senza corso
+  const usersWithoutCourse = users.filter(u => u.role === 'user' && (!u.courses || u.courses.length === 0)).length;
+  const usersWithoutCourseEl = document.getElementById('users-without-course');
+  if (usersWithoutCourseEl) {
+    usersWithoutCourseEl.textContent = usersWithoutCourse;
+  }
+  
+  // Utenti filtrati (in base ai filtri correnti)
+  const filteredUsers = getFilteredUsers();
+  const filteredUsersEl = document.getElementById("filtered-users");
+  if (filteredUsersEl) {
+    filteredUsersEl.textContent = filteredUsers.length;
+  }
+}
+
+function getFilteredUsers() {
+  let filtered = [...users];
+
+  // Applica il filtro del ruolo
+  const roleFilter = document.getElementById("filter-role")?.value;
+  if (roleFilter) {
+    filtered = filtered.filter((u) => u.role === roleFilter);
+  }
+
+  // Applica il filtro del corso
+  const courseFilter = document.getElementById("filter-course")?.value;
+  if (courseFilter) {
+    if (courseFilter === "_no_course_") {
+      // ✅ LOGICA CORRETTA: Filtra solo gli utenti con ruolo 'user'
+      //    che non hanno corsi (l'array `courses` è vuoto o non esiste)
+      filtered = filtered.filter(
+        (u) => u.role === "user" && (!u.courses || u.courses.length === 0)
+      );
+    } else {
+      // Filtra gli utenti in base all'ID del corso selezionato
+      filtered = filtered.filter(
+        (u) => u.courses && u.courses.some((c) => c.id == courseFilter)
+      );
+    }
+  }
+
+  // Applica il filtro di ricerca
+  const searchTerm = document.getElementById("search-user").value.toLowerCase();
+  if (searchTerm) {
+    filtered = filtered.filter(
+      (u) =>
+        u.name.toLowerCase().includes(searchTerm) ||
+        u.email.toLowerCase().includes(searchTerm) ||
+        u.role.toLowerCase().includes(searchTerm) ||
+        (u.courses &&
+          u.courses.some((c) => c.name.toLowerCase().includes(searchTerm)))
+    );
+  }
+
+  // Applica il filtro per data
+  const dateFilter = document.getElementById("filter-user-date")?.value;
+  if (dateFilter) {
+    filtered = filtered.filter((u) => u.registration_date === dateFilter);
+  }
+
+  return filtered;
+}
+

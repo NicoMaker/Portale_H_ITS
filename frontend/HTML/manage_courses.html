@@ -5,44 +5,41 @@
     <title>Gestione Corsi</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              'primary-brand': '#4B6EEB',
-              'secondary-brand': '#6C7E9D',
-            },
-          }
-        }
-      }
-    </script>
+    <script src="js/tailwind.js"></script>
     <link rel="stylesheet" href="CSS/style.css" />
-    <link rel="stylesheet" href="CSS/styleuser.css" />
-    <style>
-      .table-header {
-        position: sticky;
-        top: 0;
-        background: #f9fafb;
-        z-index: 10;
-      }
-    </style>
   </head>
-  <body class="bg-gray-100 font-sans antialiased">
-    <nav class="bg-white shadow-lg border-b border-gray-200 sticky top-0 z-50">
+
+  <body
+    class="bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 min-h-screen"
+  >
+    <nav
+      class="bg-white shadow-lg border-b border-gray-200 backdrop-blur-sm bg-white/95 sticky top-0 z-50"
+    >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
           <div class="flex space-x-8">
-            <a href="/admin_dashboard.html" class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-700 hover:text-primary-brand hover:border-primary-brand border-b-2 border-transparent transition-all duration-200">
+            <a
+              href="/admin_dashboard.html"
+              class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-700 hover:text-blue-600 hover:border-blue-300 border-b-2 border-transparent transition-all duration-200"
+            >
               🏠 Dashboard Admin
             </a>
-            <a href="/manage_users.html" class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-700 hover:text-primary-brand hover:border-primary-brand border-b-2 border-transparent transition-all duration-200">
+            <a
+              href="/manage_users.html"
+              class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-700 hover:text-blue-600 hover:border-blue-300 border-b-2 border-transparent transition-all duration-200"
+            >
               👥 Gestione Utenti
             </a>
-            <a href="/manage_courses.html" class="inline-flex items-center px-1 pt-1 text-sm font-medium text-primary-brand border-b-2 border-primary-brand transition-all duration-200">
+            <a
+              href="/manage_courses.html"
+              class="inline-flex items-center px-1 pt-1 text-sm font-medium text-blue-600 border-b-2 border-blue-500 transition-all duration-200"
+            >
               📚 Gestione Corsi
             </a>
-            <a href="/manage_schedules.html" class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-700 hover:text-primary-brand hover:border-primary-brand border-b-2 border-transparent transition-all duration-200">
+            <a
+              href="/manage_schedules.html"
+              class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-700 hover:text-blue-600 hover:border-blue-300 border-b-2 border-transparent transition-all duration-200"
+            >
               📅 Gestione Orari
             </a>
           </div>
@@ -50,149 +47,342 @@
       </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div class="flex justify-between items-center mb-6">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-900">Gestione Corsi</h1>
-          <p class="mt-1 text-sm text-gray-600">Visualizza e gestisci tutti i corsi disponibili sulla piattaforma</p>
-        </div>
-        <button id="add-course-btn" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-brand hover:bg-blue-700 transition-colors duration-200">
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-          Aggiungi Corso
-        </button>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div class="bg-white rounded-lg shadow p-5">
-          <h2 class="text-sm font-medium text-gray-500">Totale Corsi</h2>
-          <p id="total-courses" class="mt-1 text-3xl font-bold text-gray-900">-</p>
-        </div>
-        <div class="bg-white rounded-lg shadow p-5">
-          <h2 class="text-sm font-medium text-gray-500">Corsi con Utenti</h2>
-          <p id="courses-with-users" class="mt-1 text-3xl font-bold text-gray-900">-</p>
-        </div>
-        <div class="bg-white rounded-lg shadow p-5">
-          <h2 class="text-sm font-medium text-gray-500">Corsi Senza Utenti</h2>
-          <p id="courses-without-users" class="mt-1 text-3xl font-bold text-gray-900">-</p>
-        </div>
-      </div>
-
-      <div class="bg-white rounded-lg shadow-xl overflow-hidden">
-        <div class="p-6">
-          <div class="flex items-center space-x-4 mb-4">
-            <h2 class="text-lg font-semibold text-gray-900">Elenco Corsi</h2>
-            <button id="refresh-data" class="text-gray-500 hover:text-primary-brand transition-colors duration-200" title="Refresh Data">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.592-5H20v5m-1.582 6H16.5a.5.5 0 00-.5.5V17m-13 0h-2.5a.5.5 0 01-.5-.5v-2m15-5.5a8.5 8.5 0 10-14.86 5.86l1.37-1.37M20 10a8.5 8.5 0 11-17 0"></path></svg>
-            </button>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="mb-8">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1
+              class="text-4xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent gradient-animate"
+            >
+              📚 Gestione Corsi
+            </h1>
+            <p class="text-gray-600 mt-2 text-lg">
+              Crea e gestisci i corsi della tua istituzione
+            </p>
           </div>
-
-          <div class="flex items-center space-x-4 mb-6">
-            <div class="flex-1">
-              <label for="search-course" class="sr-only">Cerca corso</label>
-              <input type="text" id="search-course" placeholder="Cerca per nome o descrizione..." class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-primary-brand focus:border-primary-brand">
-            </div>
-            <div class="flex-1">
-              <label for="filter-users" class="sr-only">Filtra per utenti</label>
-              <select id="filter-users" class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-primary-brand focus:border-primary-brand">
-                <option value="">Tutti i Corsi</option>
-                <option value="with-users">Con Utenti</option>
-                <option value="without-users">Senza Utenti</option>
-              </select>
+          <div class="flex items-center space-x-4">
+            <div class="float-animation">
+              <button
+                id="add-course-btn"
+                class="bg-gradient-to-r from-purple-500 via-blue-500 to-indigo-600 hover:from-purple-600 hover:via-blue-600 hover:to-indigo-700 text-white font-semibold px-8 py-4 rounded-2xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300 flex items-center space-x-3 text-lg"
+              >
+                <span class="text-2xl">+</span>
+                <span>Aggiungi Corso</span>
+              </button>
             </div>
           </div>
-          <div class="text-right mb-4">
-            <button id="clear-filters-btn" class="text-gray-500 hover:text-primary-brand text-sm transition-colors duration-200">
-              Azzera Filtri
-            </button>
-          </div>
-        </div>
-
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome Corso</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrizione</th>
-                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Azioni</th>
-              </tr>
-            </thead>
-            <tbody id="courses-list" class="bg-white divide-y divide-gray-200">
-              </tbody>
-          </table>
-          <div id="no-courses-found" class="hidden text-center py-10 text-gray-500">
-            <p class="text-lg">Nessun corso trovato</p>
-            <p class="text-sm mt-2">Prova a modificare i filtri di ricerca.</p>
-          </div>
         </div>
       </div>
-    </main>
 
-    <div id="add-course-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
-      <div class="bg-white rounded-lg shadow-xl max-w-md w-full overflow-hidden">
-        <div class="flex justify-between items-center p-6 border-b">
-          <h3 class="text-lg font-semibold">Aggiungi Nuovo Corso</h3>
-          <button id="close-add-course-modal" class="text-gray-400 hover:text-gray-600">&times;</button>
-        </div>
-        <form id="add-course-form" class="p-6">
-          <div class="space-y-4">
+      <!-- Statistiche Corsi -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+        <!-- Totale Corsi -->
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6">
+          <div class="flex items-center justify-between">
             <div>
-              <label for="new-course-name" class="block text-sm font-medium text-gray-700">Nome Corso</label>
-              <input type="text" id="new-course-name" required placeholder="Es. Programmazione Avanzata" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-brand focus:ring focus:ring-primary-brand focus:ring-opacity-50">
+              <p class="text-sm font-medium text-gray-600">Totale Corsi</p>
+              <p id="total-courses" class="text-3xl font-bold text-gray-900">-</p>
             </div>
+            <div class="bg-gradient-to-r from-purple-500 to-purple-600 p-3 rounded-xl">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex items-center text-sm">
+              <span class="text-purple-600 font-medium">Corsi Attivi</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Corsi con Utenti -->
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6">
+          <div class="flex items-center justify-between">
             <div>
-              <label for="new-course-description" class="block text-sm font-medium text-gray-700">Descrizione</label>
-              <textarea id="new-course-description" rows="4" placeholder="Descrivi brevemente il corso..." class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-brand focus:ring focus:ring-primary-brand focus:ring-opacity-50"></textarea>
+              <p class="text-sm font-medium text-gray-600">Con Utenti</p>
+              <p id="courses-with-users" class="text-3xl font-bold text-gray-900">-</p>
+            </div>
+            <div class="bg-gradient-to-r from-green-500 to-green-600 p-3 rounded-xl">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"></path>
+              </svg>
             </div>
           </div>
-          <div id="add-course-msg" class="mt-4 p-3 rounded-md text-sm hidden"></div>
-          <div class="mt-6 flex justify-end space-x-3">
-            <button type="button" id="cancel-add-course" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors">Annulla</button>
-            <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-primary-brand rounded-md hover:bg-blue-700 transition-colors">Crea Corso</button>
+          <div class="mt-4">
+            <div class="flex items-center text-sm">
+              <span class="text-green-600 font-medium">Assegnati</span>
+            </div>
           </div>
-        </form>
+        </div>
+
+        <!-- Corsi senza Utenti -->
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Senza Utenti</p>
+              <p id="courses-without-users" class="text-3xl font-bold text-gray-900">-</p>
+            </div>
+            <div class="bg-gradient-to-r from-orange-500 to-orange-600 p-3 rounded-xl">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex items-center text-sm">
+              <span class="text-orange-600 font-medium">Non Assegnati</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Corsi Filtati -->
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Visualizzati</p>
+              <p id="filtered-courses" class="text-3xl font-bold text-gray-900">-</p>
+            </div>
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-3 rounded-xl">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex items-center text-sm">
+              <span class="text-blue-600 font-medium">Con Filtri</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-8">
+        <div class="flex items-center space-x-4 mb-8">
+          <div
+            class="p-3 bg-gradient-to-r from-purple-100 via-blue-100 to-indigo-100 rounded-2xl shadow-lg"
+          >
+            <span class="text-3xl">🎓</span>
+          </div>
+          <div>
+            <h2
+              class="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent"
+            >
+              I Tuoi Corsi
+            </h2>
+            <p class="text-gray-600 text-lg">
+              Gestisci tutti i corsi della tua istituzione
+            </p>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <input
+            type="text"
+            id="search-course"
+            placeholder="Cerca un corso..."
+            class="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 bg-white/90 backdrop-blur-sm text-lg transition-all duration-200 shadow-lg"
+          />
+        </div>
+
+        <br />
+
+        <div
+          id="courses-list"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        ></div>
       </div>
     </div>
 
-    <div id="edit-course-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
-      <div class="bg-white rounded-lg shadow-xl max-w-md w-full overflow-hidden">
-        <div class="flex justify-between items-center p-6 border-b">
-          <h3 class="text-lg font-semibold">Modifica Corso</h3>
-          <button id="close-edit-course-modal" class="text-gray-400 hover:text-gray-600">&times;</button>
+    <div
+      id="add-course-modal"
+      class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+      style="display: none"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden"
+      >
+        <div
+          class="flex items-center justify-between p-6 border-b border-gray-200"
+        >
+          <h3 class="text-xl font-semibold text-gray-900">
+            ➕ Aggiungi Nuovo Corso
+          </h3>
+          <button
+            id="close-add-course-modal"
+            class="text-gray-400 hover:text-gray-600 text-2xl font-bold"
+          >
+            ×
+          </button>
         </div>
-        <form id="edit-course-form" class="p-6">
-          <div class="space-y-4">
+
+        <div class="p-6 max-h-96 overflow-y-auto custom-scrollbar">
+          <form id="add-course-form" class="space-y-4">
             <div>
-              <label for="edit-course-name" class="block text-sm font-medium text-gray-700">Nome Corso</label>
-              <input type="text" id="edit-course-name" required placeholder="Es. Programmazione Avanzata" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-brand focus:ring focus:ring-primary-brand focus:ring-opacity-50">
+              <label
+                for="course-name"
+                class="block text-sm font-medium text-gray-700 mb-2"
+                >Nome del corso</label
+              >
+              <input
+                type="text"
+                id="course-name"
+                placeholder="Es. Matematica Avanzata"
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
             </div>
+
             <div>
-              <label for="edit-course-description" class="block text-sm font-medium text-gray-700">Descrizione</label>
-              <textarea id="edit-course-description" rows="4" placeholder="Descrivi brevemente il corso..." class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-brand focus:ring focus:ring-primary-brand focus:ring-opacity-50"></textarea>
+              <label
+                for="course-desc"
+                class="block text-sm font-medium text-gray-700 mb-2"
+                >Descrizione (opzionale)</label
+              >
+              <textarea
+                id="course-desc"
+                rows="4"
+                placeholder="Descrivi brevemente il corso..."
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+              ></textarea>
             </div>
-          </div>
-          <div id="edit-course-msg" class="mt-4 p-3 rounded-md text-sm hidden"></div>
-          <div class="mt-6 flex justify-end space-x-3">
-            <button type="button" id="cancel-edit-course" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors">Annulla</button>
-            <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-primary-brand rounded-md hover:bg-blue-700 transition-colors">Salva Modifiche</button>
-          </div>
-        </form>
+
+            <div class="flex justify-end space-x-3 pt-4">
+              <button
+                type="button"
+                id="cancel-add-course"
+                class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+              >
+                Annulla
+              </button>
+              <button
+                type="submit"
+                class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                Crea Corso
+              </button>
+            </div>
+
+            <div id="course-msg" class="mt-4 p-3 rounded-lg text-sm"></div>
+          </form>
+        </div>
       </div>
     </div>
 
-    <div id="delete-course-confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
-      <div class="bg-white rounded-lg shadow-xl max-w-sm w-full overflow-hidden">
-        <div class="flex justify-between items-center p-6 border-b">
-          <h3 class="text-lg font-semibold">Conferma Eliminazione</h3>
-          <button id="close-delete-course-confirm-modal" class="text-gray-400 hover:text-gray-600">&times;</button>
+    <div
+      id="edit-course-modal"
+      class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+      style="display: none"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden"
+      >
+        <div
+          class="flex items-center justify-between p-6 border-b border-gray-200"
+        >
+          <h3 class="text-xl font-semibold text-gray-900">✏️ Modifica Corso</h3>
+          <button
+            id="close-edit-course-modal"
+            class="text-gray-400 hover:text-gray-600 text-2xl font-bold"
+          >
+            ×
+          </button>
+        </div>
+
+        <div class="p-6 max-h-96 overflow-y-auto custom-scrollbar">
+          <form id="edit-course-form" class="space-y-4">
+            <div>
+              <label
+                for="edit-course-name"
+                class="block text-sm font-medium text-gray-700 mb-2"
+                >Nome del corso</label
+              >
+              <input
+                type="text"
+                id="edit-course-name"
+                placeholder="Nome corso"
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            <div>
+              <label
+                for="edit-course-desc"
+                class="block text-sm font-medium text-gray-700 mb-2"
+                >Descrizione</label
+              >
+              <textarea
+                id="edit-course-desc"
+                rows="4"
+                placeholder="Descrizione del corso..."
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+              ></textarea>
+            </div>
+
+            <div class="flex justify-end space-x-3 pt-4">
+              <button
+                type="button"
+                id="cancel-edit-course"
+                class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+              >
+                Annulla
+              </button>
+              <button
+                type="submit"
+                class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                Salva Modifiche
+              </button>
+            </div>
+
+            <div id="edit-course-msg" class="mt-4 p-3 rounded-lg text-sm"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="delete-confirm-modal"
+      class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+      style="display: none"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden"
+      >
+        <div
+          class="flex items-center justify-between p-6 border-b border-gray-200"
+        >
+          <h3 class="text-xl font-semibold text-gray-900">
+            🗑️ Conferma Eliminazione
+          </h3>
+          <button
+            id="close-delete-confirm-modal"
+            class="text-gray-400 hover:text-gray-600 text-2xl font-bold"
+          >
+            ×
+          </button>
         </div>
         <div class="p-6">
-          <p class="text-sm text-gray-700">Sei sicuro di voler eliminare il corso "<strong id="delete-course-name-display"></strong>"? Questa azione non può essere annullata.</p>
-          <div id="course-with-users-warning" class="mt-3 text-sm text-red-600 font-medium hidden">
-            Attenzione: questo corso ha utenti associati. La loro associazione verrà rimossa.
-          </div>
-          <div class="mt-6 flex justify-end space-x-3">
-            <button type="button" id="cancel-delete-course" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors">Annulla</button>
-            <button type="button" id="confirm-delete-course" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors">Elimina</button>
+          <p class="text-gray-700 mb-6">
+            Sei sicuro di voler eliminare il corso "<strong
+              id="delete-course-name-display"
+            ></strong
+            >"? Questa azione non può essere annullata.
+          </p>
+          <div class="flex justify-end space-x-3">
+            <button
+              id="cancel-delete-course"
+              class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+            >
+              Annulla
+            </button>
+            <button
+              id="confirm-delete-course"
+              class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Elimina
+            </button>
           </div>
         </div>
       </div>
