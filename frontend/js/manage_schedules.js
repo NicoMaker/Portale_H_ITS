@@ -701,17 +701,6 @@ function updateScheduleStats() {
   updateRefreshButtonText(filteredCount, total);
 }
 
-function updateRefreshButtonText(filteredCount, totalCount) {
-  const refreshButton = document.getElementById("refresh-data");
-  if (refreshButton) {
-    if (filteredCount < totalCount) {
-      refreshButton.textContent = `Visualizzando ${filteredCount} di ${totalCount}`;
-    } else {
-      refreshButton.textContent = `Tutti gli orari visualizzati`;
-    }
-  }
-}
-
 function populateFilterOptions() {
   const uniqueTeachers = [
     ...new Set(schedules.map((s) => s.teacher).filter((t) => !!t)),
