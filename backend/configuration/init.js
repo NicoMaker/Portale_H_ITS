@@ -15,6 +15,21 @@ function ask(question) {
 
 const getRandomItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
+// Funzione per mescolare un array (algoritmo Fisher-Yates)
+function shuffle(array) {
+  let currentIndex = array.length;
+  let randomIndex;
+  while (currentIndex !== 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex],
+      array[currentIndex],
+    ];
+  }
+  return array;
+}
+
 function randomUsername(role) {
   const firstNames = [
     "Mario",
@@ -147,7 +162,7 @@ function randomCourseName() {
   return `${getRandomItem(topics)} ${getRandomItem(levels)} ${randomNum}`;
 }
 
-function randomSchedule(course_id) {
+function getRandomTimeAndLocation() {
   const teachers = [
     "Prof. Smith",
     "Prof. Johnson",
@@ -212,37 +227,6 @@ function randomSchedule(course_id) {
     "Aula F601",
     "Aula F602",
   ];
-  const subjects = [
-    "Programmazione",
-    "Algoritmi e Strutture Dati",
-    "Database",
-    "Machine Learning",
-    "Sicurezza Informatica",
-    "Frontend Development",
-    "Backend Development",
-    "Gestione Progetti",
-    "Cloud Computing",
-    "DevOps",
-    "Data Analysis",
-    "Computer Graphics",
-    "Networking",
-    "Software Engineering",
-    "AI Ethics",
-    "Cybersecurity",
-    "Web Design",
-    "Mobile Programming",
-    "Game Design",
-    "Computer Vision",
-    "NLP",
-    "Blockchain",
-    "IoT",
-    "Robotica",
-    "Big Data",
-    "UX Design",
-    "System Administration",
-    "Software Testing",
-    "Quantum Computing",
-  ];
   const days = [
     "Lunedì",
     "Martedì",
@@ -271,10 +255,8 @@ function randomSchedule(course_id) {
   const day = Math.floor(Math.random() * daysInMonth) + 1;
 
   return {
-    course_id,
     teacher: getRandomItem(teachers),
     room: getRandomItem(rooms),
-    subject: getRandomItem(subjects),
     start_time: `${String(startHour).padStart(2, "0")}:00`,
     end_time: `${String(endHour).padStart(2, "0")}:00`,
     day: getRandomItem(days),
@@ -460,25 +442,62 @@ async function populateDatabase() {
 
     console.log("🕒 Creazione orari per TUTTI i corsi...");
 
-    // Orari per ogni corso
+    // Lista di materie (ora centralizzata)
+    const subjects = [
+      "Programmazione",
+      "Algoritmi e Strutture Dati",
+      "Database",
+      "Machine Learning",
+      "Sicurezza Informatica",
+      "Frontend Development",
+      "Backend Development",
+      "Gestione Progetti",
+      "Cloud Computing",
+      "DevOps",
+      "Data Analysis",
+      "Computer Graphics",
+      "Networking",
+      "Software Engineering",
+      "AI Ethics",
+      "Cybersecurity",
+      "Web Design",
+      "Mobile Programming",
+      "Game Design",
+      "Computer Vision",
+      "NLP",
+      "Blockchain",
+      "IoT",
+      "Robotica",
+      "Big Data",
+      "UX Design",
+      "System Administration",
+      "Software Testing",
+      "Quantum Computing",
+    ];
+    // Mescola le materie per una distribuzione casuale ma unica
+    const shuffledSubjects = shuffle([...subjects]);
+    const totalSubjects = shuffledSubjects.length;
+
     const allCourses = await getAllQuery("SELECT id FROM courses");
     let totalSchedulesCreated = 0;
 
     for (const course of allCourses) {
       for (let j = 0; j < schedulesPerCourse; j++) {
-        const schedule = randomSchedule(course.id);
+        const timeAndLocation = getRandomTimeAndLocation();
+        const subject = shuffledSubjects[totalSchedulesCreated % totalSubjects];
+        
         await runQuery(
           `INSERT INTO schedules (course_id, teacher, room, subject, start_time, end_time, day, date)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
           [
-            schedule.course_id,
-            schedule.teacher,
-            schedule.room,
-            schedule.subject,
-            schedule.start_time,
-            schedule.end_time,
-            schedule.day,
-            schedule.date,
+            course.id,
+            timeAndLocation.teacher,
+            timeAndLocation.room,
+            subject,
+            timeAndLocation.start_time,
+            timeAndLocation.end_time,
+            timeAndLocation.day,
+            timeAndLocation.date,
           ]
         );
         totalSchedulesCreated++;
