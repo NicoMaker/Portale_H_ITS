@@ -1,4 +1,3 @@
-
 let courses = [];
 let users = [];
 let editingUserId = null;
@@ -42,8 +41,10 @@ document
   .addEventListener("change", updateNewCourseSelect);
 
 function updateFilterCourseSelect() {
-  filterCourseSelect.innerHTML =
+  const select = document.getElementById("filter-course");
+  select.innerHTML =
     '<option value="">Tutti i corsi</option>' +
+    '<option value="_no_course_">Senza corso</option>' + // Aggiunto filtro per utenti senza corso
     courses.map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
 }
 
@@ -72,12 +73,12 @@ function fetchUsers() {
 }
 
 function renderUsersList() {
+  const tableBody = document.getElementById("users-table-body");
   const search = searchUserInput.value.toLowerCase();
   const courseId = filterCourseSelect.value;
   const filterRole = document.getElementById("filter-role").value;
   const dateFilter = document.getElementById("filter-user-date").value;
   const adminCount = users.filter((u) => u.role === "admin").length;
-
   let html = "";
 
   const filteredUsers = users
@@ -85,11 +86,14 @@ function renderUsersList() {
     .sort((a, b) => a.username.localeCompare(b.username))
     .filter((u) => {
       const matchName = u.username.toLowerCase().includes(search);
-      const matchCourse =
-        u.role === "admin"
-          ? !courseId || courseId === ""
-          : !courseId ||
-            (u.courses && u.courses[0] && u.courses[0].id == courseId);
+      let matchCourse = true;
+      if (courseId) {
+        if (courseId === '_no_course_') {
+          matchCourse = u.role === 'user' && (!u.courses || u.courses.length === 0);
+        } else {
+          matchCourse = u.courses && u.courses.some(c => c.id == courseId);
+        }
+      }
       const matchRole = !filterRole || u.role === filterRole;
       const matchDate =
         !dateFilter || (u.created_at && u.created_at.startsWith(dateFilter));
@@ -98,142 +102,87 @@ function renderUsersList() {
 
   if (!filteredUsers.length) {
     html = `
-          <div class="col-span-full flex flex-col items-center justify-center py-20 text-gray-500">
-            <div class="relative mb-8">
-              <div class="text-8xl mb-4 float-animation">👥</div>
-              <div class="absolute -top-2 -right-2 text-3xl animate-bounce">✨</div>
-            </div>
-            <h3 class="text-2xl font-bold text-gray-700 mb-3">Nessun utente trovato</h3>
-            <p class="text-lg text-gray-500 mb-6 text-center max-w-md">
-              Modifica i filtri per visualizzare altri utenti o crea il primo utente
-            </p>
+      <tr>
+        <td colspan="4" class="px-6 py-12 text-center text-gray-500">
+          <div class="relative mb-6">
+            <div class="text-6xl mb-2 float-animation">👥</div>
+            <div class="absolute -top-1 -right-1 text-xl animate-bounce">✨</div>
           </div>
-        `;
+          <h3 class="text-xl font-bold text-gray-700 mb-2">Nessun utente trovato</h3>
+          <p class="text-sm text-gray-500">Nessun utente corrisponde ai tuoi filtri.</p>
+        </td>
+      </tr>
+    `;
   } else {
     filteredUsers.forEach((u) => {
-      const gradients = [
-        "from-green-500 to-emerald-500",
-        "from-blue-500 to-cyan-500",
-        "from-purple-500 to-pink-500",
-        "from-orange-500 to-red-500",
-        "from-indigo-500 to-purple-500",
-        "from-teal-500 to-green-500",
-      ];
-      const gradient = gradients[u.id % gradients.length];
+      const roleText = u.role === "admin" ? "👑 Amministratore" : "👤 Utente";
+      const userCourses = u.courses && u.courses.length > 0 ? u.courses.map(c => c.name).join(", ") : "<span class='italic text-gray-400'>Nessun corso</span>";
 
       html += `
-            <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-2 transition-all duration-300 overflow-hidden border border-gray-100 pulse-on-hover user-card-hover">
-              <div class="bg-gradient-to-r ${gradient} p-6 relative overflow-hidden">
-                <div class="shimmer absolute inset-0"></div>
-                <div class="relative z-10">
-                  <div class="flex items-center justify-between mb-4">
-                    <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-3">
-                      <span class="text-3xl">${u.role === "admin" ? "👑" : "👤"}</span>
-                    </div>
-                    <div class="flex space-x-2">
-                      <button class="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-3 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105" 
-                              title="Modifica utente" onclick="openEditUser(${u.id})">
-                        <span class="text-lg">✏️</span>
-                      </button>
-                      ${
-                        adminCount > 1 || u.role !== "admin"
-                          ? `
-                      <button class="bg-white/20 hover:bg-red-500/30 backdrop-blur-sm text-white p-3 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105" 
-                              title="Elimina utente" onclick="deleteUser(${u.id})">
-                        <span class="text-lg">🗑️</span>
-                      </button>
-                      `
-                          : ""
-                      }
-                    </div>
-                  </div>
-                  <h3 class="text-2xl font-bold text-white mb-2 truncate">${u.username}</h3>
-                  <div class="bg-white/20 backdrop-blur-sm rounded-full px-4 py-1 inline-block">
-                    <span class="text-white/90 text-sm font-medium">
-                      ${u.role === "admin" ? "👑 Amministratore" : "👤 Utente"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="p-8">
-                <div class="mb-6">
-                  <h4 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3 flex items-center">
-                    <span class="mr-2">📚</span>
-                    Corso Assegnato
-                  </h4>
-                  ${
-                    u.role === "user"
-                      ? `
-                    <select onchange='assignCourse(${u.id}, this.value)' 
-                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm transition-all duration-200 shadow-sm">
-                      <option value="">Nessun corso</option>
-                      ${courses
-                        .map((c) => {
-                          const selected =
-                            u.courses && u.courses[0] && u.courses[0].id == c.id
-                              ? "selected"
-                              : "";
-                          return `<option value="${c.id}" ${selected}>${c.name}</option>`;
-                        })
-                        .join("")}
-                    </select>
-                  `
-                      : `
-                    <p class="text-gray-500 italic">Gli amministratori non hanno corsi assegnati</p>
-                  `
-                  }
-                </div>
-                
-                <div class="flex flex-wrap gap-3">
-                  <button onclick="openEditUser(${u.id})" 
-                    class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-4 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
-                    <span>✏️</span>
-                    <span>Modifica</span>
-                  </button>
-                  
-                  ${
-                    u.role !== "admin"
-                      ? `
-                  <button onclick="showChangeRoleModal(${u.id}, 'admin')" 
-                    class="flex-1 bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-semibold py-3 px-4 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
-                    <span>👑</span>
-                    <span>Rendi Admin</span>
-                  </button>
-                  `
-                      : ""
-                  }
-                  
-                  ${
-                    u.role === "admin" && adminCount > 1
-                      ? `
-                  <button onclick="showChangeRoleModal(${u.id}, 'user')" 
-                    class="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-semibold py-3 px-4 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
-                    <span>👤</span>
-                    <span>Rendi Utente</span>
-                  </button>
-                  `
-                      : ""
-                  }
-                  
-                  ${
-                    adminCount > 1 || u.role !== "admin"
-                      ? `
-                  <button onclick="deleteUser(${u.id})" 
-                    class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold py-3 px-4 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center">
-                    <span>🗑️</span>
-                  </button>
-                  `
-                      : ""
-                  }
-                </div>
+        <tr class="hover:bg-gray-100 transition-colors cursor-pointer">
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex items-center">
+              <div>
+                <div class="text-sm font-semibold text-gray-900">${u.username}</div>
               </div>
             </div>
-          `;
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${u.role === "admin" ? "bg-purple-100 text-purple-800" : "bg-blue-100 text-blue-800"}">
+              ${roleText}
+            </span>
+          </td>
+          <td class="px-6 py-4">
+            <div class="text-sm text-gray-600">
+              ${u.role === "user" ? `
+                <select onchange='assignCourse(${u.id}, this.value)' 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm transition-all duration-200 shadow-sm">
+                  <option value="">Nessun corso</option>
+                  ${courses.map(c => {
+                    const selected = u.courses && u.courses[0] && u.courses[0].id == c.id ? "selected" : "";
+                    return `<option value="${c.id}" ${selected}>${c.name}</option>`;
+                  }).join('')}
+                </select>
+              ` : `<span class='italic text-gray-400'>Non applicabile</span>`}
+            </div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+            <div class="flex space-x-3 items-center">
+              <button onclick="openEditUser(${u.id})"
+                      class="text-blue-600 hover:text-blue-900 transition-colors transform hover:scale-110"
+                      title="Modifica">
+                ✏️
+              </button>
+              ${u.role !== "admin" ? `
+              <button onclick="showChangeRoleModal(${u.id}, 'admin')"
+                      class="text-green-600 hover:text-green-900 transition-colors transform hover:scale-110"
+                      title="Rendi Amministratore">
+                👑
+              </button>
+              ` : `
+              <button onclick="showChangeRoleModal(${u.id}, 'user')"
+                      class="text-gray-600 hover:text-gray-900 transition-colors transform hover:scale-110"
+                      title="Rendi Utente"
+                      ${adminCount <= 1 ? 'disabled' : ''}>
+                👤
+              </button>
+              `}
+              <button onclick="deleteUser(${u.id})"
+                      class="text-red-600 hover:text-red-900 transition-colors transform hover:scale-110"
+                      title="Elimina"
+                      ${u.role === "admin" && adminCount <= 1 ? 'disabled' : ''}>
+                🗑️
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
     });
   }
 
-  document.getElementById("users-list").innerHTML = html;
+  if (tableBody) {
+    tableBody.innerHTML = html;
+  }
   updateUserStats();
 }
 
@@ -623,129 +572,6 @@ document.addEventListener("DOMContentLoaded", () => {
 // Funzioni per statistiche
 // ------------------------------
 function updateUserStats() {
-  // Total users
-  const totalUsersEl = document.getElementById('total-users');
-  if (totalUsersEl) {
-    totalUsersEl.textContent = users.length;
-  }
-  
-  // Users by role
-  const adminCount = users.filter(u => u.role === 'admin').length;
-  const userCount = users.filter(u => u.role === 'user').length;
-  
-  const usersAdminEl = document.getElementById('users-admin');
-  if (usersAdminEl) {
-    usersAdminEl.textContent = `Admin: ${adminCount}`;
-  }
-  
-  const usersRegularEl = document.getElementById('users-regular');
-  if (usersRegularEl) {
-    usersRegularEl.textContent = `Utenti: ${userCount}`;
-  }
-  
-  // Users with course
-  const usersWithCourse = users.filter(u => u.courses && u.courses.length > 0).length;
-  const usersWithCourseEl = document.getElementById('users-with-course');
-  if (usersWithCourseEl) {
-    usersWithCourseEl.textContent = usersWithCourse;
-  }
-  
-  // Users without course
-  const usersWithoutCourse = users.filter(u => !u.courses || u.courses.length === 0).length;
-  const usersWithoutCourseEl = document.getElementById('users-without-course');
-  if (usersWithoutCourseEl) {
-    usersWithoutCourseEl.textContent = usersWithoutCourse;
-  }
-  
-  // Filtered users (based on current filters)
-  const filteredUsers = getFilteredUsers();
-  const filteredUsersEl = document.getElementById('filtered-users');
-  if (filteredUsersEl) {
-    filteredUsersEl.textContent = filteredUsers.length;
-  }
-}
-
-function getFilteredUsers() {
-  let filtered = [...users];
-  
-  // Apply role filter
-  const roleFilter = document.getElementById('filter-role')?.value;
-  if (roleFilter) {
-    filtered = filtered.filter(u => u.role === roleFilter);
-  }
-  
-  // Apply course filter
-  const courseFilter = document.getElementById('filter-course')?.value;
-  if (courseFilter) {
-    filtered = filtered.filter(u => u.courses && u.courses.some(c => c.id == courseFilter));
-  }
-  
-  // Apply search filter
-  const searchTerm = document.getElementById('search-user')?.value?.toLowerCase();
-  if (searchTerm) {
-    filtered = filtered.filter(u => u.username.toLowerCase().includes(searchTerm));
-  }
-  
-  return filtered;
-}
-
-// Initialize
-fetchCourses().then(fetchUsers);
-
-
-function updateFilterCourseSelect() {
-  const select = document.getElementById("filter-course");
-  select.innerHTML =
-    '<option value="">Tutti i corsi</option>' +
-    courses.map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
-}
-
-function getFilteredUsers() {
-  let filtered = [...users];
-
-  // Applica il filtro del ruolo
-  const roleFilter = document.getElementById("filter-role")?.value;
-  if (roleFilter) {
-    filtered = filtered.filter((u) => u.role === roleFilter);
-  }
-
-  // Applica il filtro del corso
-  const courseFilter = document.getElementById("filter-course")?.value;
-  if (courseFilter) {
-    if (courseFilter === "_no_course_") {
-      // Filtra solo gli utenti con ruolo 'user' che non hanno corsi
-      filtered = filtered.filter((u) => u.role === "user" && (!u.courses || u.courses.length === 0));
-    } else {
-      // Filtra gli utenti in base all'ID del corso
-      filtered = filtered.filter(
-        (u) => u.courses && u.courses.some((c) => c.id == courseFilter),
-      );
-    }
-  }
-
-  // Applica il filtro di ricerca
-  const searchTerm = document.getElementById("search-user").value.toLowerCase();
-  if (searchTerm) {
-    filtered = filtered.filter(
-      (u) =>
-        u.name.toLowerCase().includes(searchTerm) ||
-        u.email.toLowerCase().includes(searchTerm) ||
-        u.role.toLowerCase().includes(searchTerm) ||
-        (u.courses &&
-          u.courses.some((c) => c.name.toLowerCase().includes(searchTerm))),
-    );
-  }
-
-  // Applica il filtro per data
-  const dateFilter = document.getElementById("filter-user-date")?.value;
-  if (dateFilter) {
-    filtered = filtered.filter((u) => u.registration_date === dateFilter);
-  }
-
-  return filtered;
-}
-
-function updateUserStats() {
   const totalUsers = users.length;
   const totalUsersEl = document.getElementById("total-users");
   if (totalUsersEl) {
@@ -800,13 +626,10 @@ function getFilteredUsers() {
   const courseFilter = document.getElementById("filter-course")?.value;
   if (courseFilter) {
     if (courseFilter === "_no_course_") {
-      // ✅ LOGICA CORRETTA: Filtra solo gli utenti con ruolo 'user'
-      //    che non hanno corsi (l'array `courses` è vuoto o non esiste)
       filtered = filtered.filter(
         (u) => u.role === "user" && (!u.courses || u.courses.length === 0)
       );
     } else {
-      // Filtra gli utenti in base all'ID del corso selezionato
       filtered = filtered.filter(
         (u) => u.courses && u.courses.some((c) => c.id == courseFilter)
       );
@@ -818,104 +641,13 @@ function getFilteredUsers() {
   if (searchTerm) {
     filtered = filtered.filter(
       (u) =>
-        u.name.toLowerCase().includes(searchTerm) ||
-        u.email.toLowerCase().includes(searchTerm) ||
+        u.username.toLowerCase().includes(searchTerm) ||
         u.role.toLowerCase().includes(searchTerm) ||
         (u.courses &&
           u.courses.some((c) => c.name.toLowerCase().includes(searchTerm)))
     );
-  }
-
-  // Applica il filtro per data
-  const dateFilter = document.getElementById("filter-user-date")?.value;
-  if (dateFilter) {
-    filtered = filtered.filter((u) => u.registration_date === dateFilter);
-  }
-
-  return filtered;
-}
-
-function updateUserStats() {
-  const totalUsers = users.length;
-  const totalUsersEl = document.getElementById("total-users");
-  if (totalUsersEl) {
-    totalUsersEl.textContent = totalUsers;
-  }
-
-  // Conta gli utenti per ruolo
-  const admins = users.filter((u) => u.role === "admin").length;
-  const adminCountEl = document.getElementById("admin-count");
-  if (adminCountEl) {
-    adminCountEl.textContent = admins;
-  }
-
-  const userCount = users.filter((u) => u.role === "user").length;
-  const userCountEl = document.getElementById("user-count");
-  if (userCountEl) {
-    userCountEl.textContent = userCount;
-  }
-
-  // Utenti con corso
-  const usersWithCourse = users.filter(u => u.courses && u.courses.length > 0).length;
-  const usersWithCourseEl = document.getElementById('users-with-course');
-  if (usersWithCourseEl) {
-    usersWithCourseEl.textContent = usersWithCourse;
-  }
-
-  // ✅ LOGICA CORRETTA: Conta solo gli utenti con ruolo 'user' senza corso
-  const usersWithoutCourse = users.filter(u => u.role === 'user' && (!u.courses || u.courses.length === 0)).length;
-  const usersWithoutCourseEl = document.getElementById('users-without-course');
-  if (usersWithoutCourseEl) {
-    usersWithoutCourseEl.textContent = usersWithoutCourse;
   }
   
-  // Utenti filtrati (in base ai filtri correnti)
-  const filteredUsers = getFilteredUsers();
-  const filteredUsersEl = document.getElementById("filtered-users");
-  if (filteredUsersEl) {
-    filteredUsersEl.textContent = filteredUsers.length;
-  }
-}
-
-function getFilteredUsers() {
-  let filtered = [...users];
-
-  // Applica il filtro del ruolo
-  const roleFilter = document.getElementById("filter-role")?.value;
-  if (roleFilter) {
-    filtered = filtered.filter((u) => u.role === roleFilter);
-  }
-
-  // Applica il filtro del corso
-  const courseFilter = document.getElementById("filter-course")?.value;
-  if (courseFilter) {
-    if (courseFilter === "_no_course_") {
-      // ✅ LOGICA CORRETTA: Filtra solo gli utenti con ruolo 'user'
-      //    che non hanno corsi (l'array `courses` è vuoto o non esiste)
-      filtered = filtered.filter(
-        (u) => u.role === "user" && (!u.courses || u.courses.length === 0)
-      );
-    } else {
-      // Filtra gli utenti in base all'ID del corso selezionato
-      filtered = filtered.filter(
-        (u) => u.courses && u.courses.some((c) => c.id == courseFilter)
-      );
-    }
-  }
-
-  // Applica il filtro di ricerca
-  const searchTerm = document.getElementById("search-user").value.toLowerCase();
-  if (searchTerm) {
-    filtered = filtered.filter(
-      (u) =>
-        u.name.toLowerCase().includes(searchTerm) ||
-        u.email.toLowerCase().includes(searchTerm) ||
-        u.role.toLowerCase().includes(searchTerm) ||
-        (u.courses &&
-          u.courses.some((c) => c.name.toLowerCase().includes(searchTerm)))
-    );
-  }
-
   // Applica il filtro per data
   const dateFilter = document.getElementById("filter-user-date")?.value;
   if (dateFilter) {
@@ -925,3 +657,5 @@ function getFilteredUsers() {
   return filtered;
 }
 
+// Initialize
+fetchCourses().then(fetchUsers);

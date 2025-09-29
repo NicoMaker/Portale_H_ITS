@@ -76,15 +76,12 @@
         </div>
       </div>
 
-      <!-- Statistiche Utenti -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-        <!-- Totale Utenti -->
         <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-gray-600">Totale Utenti</p>
               <p id="total-users" class="text-3xl font-bold text-gray-900">-</p>
-              <!-- Added admin and user count breakdown -->
               <div class="mt-2 space-y-1">
                 <div class="flex items-center text-xs text-gray-500">
                   <span class="mr-1">👑</span>
@@ -106,7 +103,6 @@
           </div>
         </div>
 
-        <!-- Utenti con Corso -->
         <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6">
           <div class="flex items-center justify-between">
             <div>
@@ -126,7 +122,6 @@
           </div>
         </div>
 
-        <!-- Utenti senza Corso -->
         <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6 di">
           <div class="flex items-center justify-between">
             <div>
@@ -146,7 +141,6 @@
           </div>
         </div>
 
-        <!-- Utenti Filtati -->
         <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6">
           <div class="flex items-center justify-between">
             <div>
@@ -264,7 +258,9 @@
         </div>
       </div>
 
-      <div class="mb-8">
+      <div
+        class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 mb-8 border border-gray-100"
+      >
         <div class="flex items-center space-x-4 mb-8">
           <div
             class="p-3 bg-gradient-to-r from-green-100 via-blue-100 to-purple-100 rounded-2xl shadow-lg"
@@ -282,11 +278,40 @@
             </p>
           </div>
         </div>
-
-        <div
-          id="users-list"
-          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-        ></div>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider rounded-tl-xl"
+                >
+                  Nome Utente
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider"
+                >
+                  Ruolo
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider"
+                >
+                  Corso Assegnato
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider rounded-tr-xl"
+                >
+                  Azioni
+                </th>
+              </tr>
+            </thead>
+            <tbody id="users-table-body" class="bg-white divide-y divide-gray-200">
+              </tbody>
+          </table>
+        </div>
         <div
           id="assign-msg"
           class="mt-4 p-4 rounded-2xl text-sm font-medium hidden"
