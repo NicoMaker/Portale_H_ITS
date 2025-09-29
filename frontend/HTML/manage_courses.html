@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="it">
   <head>
     <meta charset="UTF-8" />
@@ -74,18 +74,35 @@
         </div>
       </div>
 
-      <!-- Statistiche Corsi -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-        <!-- Totale Corsi -->
-        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6">
+        <div
+          class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6"
+        >
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-gray-600">Totale Corsi</p>
-              <p id="total-courses" class="text-3xl font-bold text-gray-900">-</p>
+              <p
+                id="total-courses"
+                class="text-3xl font-bold text-gray-900"
+              >
+                -
+              </p>
             </div>
-            <div class="bg-gradient-to-r from-purple-500 to-purple-600 p-3 rounded-xl">
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+            <div
+              class="bg-gradient-to-r from-purple-500 to-purple-600 p-3 rounded-xl"
+            >
+              <svg
+                class="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                ></path>
               </svg>
             </div>
           </div>
@@ -96,16 +113,34 @@
           </div>
         </div>
 
-        <!-- Corsi con Utenti -->
-        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6">
+        <div
+          class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6"
+        >
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-gray-600">Con Utenti</p>
-              <p id="courses-with-users" class="text-3xl font-bold text-gray-900">-</p>
+              <p
+                id="courses-with-users"
+                class="text-3xl font-bold text-gray-900"
+              >
+                -
+              </p>
             </div>
-            <div class="bg-gradient-to-r from-green-500 to-green-600 p-3 rounded-xl">
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"></path>
+            <div
+              class="bg-gradient-to-r from-green-500 to-green-600 p-3 rounded-xl"
+            >
+              <svg
+                class="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 20v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M7 11a4 4 0 100-8 4 4 0 000 8zm14 2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zm0 0c0 1.5.5 2.5 1.5 3.5m-1.5-3.5a2.5 2.5 0 10-5 0 2.5 2.5 0 005 0z"
+                ></path>
               </svg>
             </div>
           </div>
@@ -116,16 +151,34 @@
           </div>
         </div>
 
-        <!-- Corsi senza Utenti -->
-        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6">
+        <div
+          class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6"
+        >
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-gray-600">Senza Utenti</p>
-              <p id="courses-without-users" class="text-3xl font-bold text-gray-900">-</p>
+              <p
+                id="courses-without-users"
+                class="text-3xl font-bold text-gray-900"
+              >
+                -
+              </p>
             </div>
-            <div class="bg-gradient-to-r from-orange-500 to-orange-600 p-3 rounded-xl">
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            <div
+              class="bg-gradient-to-r from-orange-500 to-orange-600 p-3 rounded-xl"
+            >
+              <svg
+                class="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                ></path>
               </svg>
             </div>
           </div>
@@ -136,16 +189,34 @@
           </div>
         </div>
 
-        <!-- Corsi Filtati -->
-        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6">
+        <div
+          class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6"
+        >
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-gray-600">Visualizzati</p>
-              <p id="filtered-courses" class="text-3xl font-bold text-gray-900">-</p>
+              <p
+                id="filtered-courses"
+                class="text-3xl font-bold text-gray-900"
+              >
+                -
+              </p>
             </div>
-            <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-3 rounded-xl">
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"></path>
+            <div
+              class="bg-gradient-to-r from-blue-500 to-blue-600 p-3 rounded-xl"
+            >
+              <svg
+                class="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"
+                ></path>
               </svg>
             </div>
           </div>
@@ -176,21 +247,57 @@
           </div>
         </div>
 
-        <div class="mb-4">
-          <input
-            type="text"
-            id="search-course"
-            placeholder="Cerca un corso..."
-            class="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 bg-white/90 backdrop-blur-sm text-lg transition-all duration-200 shadow-lg"
-          />
+        <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mb-4">
+          <div class="w-full md:w-1/4">
+            <select id="user-filter" 
+                    class="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 bg-white/90 backdrop-blur-sm text-lg transition-all duration-200 shadow-lg">
+              <option value="all">Tutti i Corsi</option>
+              <option value="with_users">Con Utenti</option>
+              <option value="without_users">Senza Utenti</option>
+            </select>
+          </div>
+          <div class="w-full md:w-3/4">
+            <input
+              type="text"
+              id="search-course"
+              placeholder="Cerca un corso..."
+              class="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 bg-white/90 backdrop-blur-sm text-lg transition-all duration-200 shadow-lg"
+            />
+          </div>
         </div>
 
         <br />
 
         <div
-          id="courses-list"
-          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-        ></div>
+          class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden border border-gray-200"
+        >
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Nome
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Descrizione
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Azioni
+                </th>
+              </tr>
+            </thead>
+            <tbody
+              id="courses-table-body"
+              class="bg-white divide-y divide-gray-200"
+            >
+              </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
