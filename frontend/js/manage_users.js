@@ -23,12 +23,21 @@ function updateNewCourseSelect() {
   const select = document.getElementById("new-course");
   const label = document.getElementById("new-course-label");
   const role = document.getElementById("new-role").value;
+
   if (role === "user") {
     select.style.display = "";
     label.style.display = "";
+
+    // Ordina i corsi alfabeticamente per nome
+    const sortedCourses = [...courses].sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+
     select.innerHTML =
       '<option value="">Nessun corso</option>' +
-      courses.map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
+      sortedCourses
+        .map((c) => `<option value="${c.id}">${c.name}</option>`)
+        .join("");
   } else {
     select.style.display = "none";
     label.style.display = "none";
@@ -42,10 +51,18 @@ document
 
 function updateFilterCourseSelect() {
   const select = document.getElementById("filter-course");
+
+  // Ordina i corsi alfabeticamente per nome
+  const sortedCourses = [...courses].sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
+
   select.innerHTML =
     '<option value="">Tutti i corsi</option>' +
     '<option value="_no_course_">Senza corso</option>' + // Aggiunto filtro per utenti senza corso
-    courses.map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
+    sortedCourses
+      .map((c) => `<option value="${c.id}">${c.name}</option>`)
+      .join("");
 }
 
 function toggleFilterCourseVisibility() {
@@ -88,10 +105,11 @@ function renderUsersList() {
       const matchName = u.username.toLowerCase().includes(search);
       let matchCourse = true;
       if (courseId) {
-        if (courseId === '_no_course_') {
-          matchCourse = u.role === 'user' && (!u.courses || u.courses.length === 0);
+        if (courseId === "_no_course_") {
+          matchCourse =
+            u.role === "user" && (!u.courses || u.courses.length === 0);
         } else {
-          matchCourse = u.courses && u.courses.some(c => c.id == courseId);
+          matchCourse = u.courses && u.courses.some((c) => c.id == courseId);
         }
       }
       const matchRole = !filterRole || u.role === filterRole;
@@ -116,7 +134,15 @@ function renderUsersList() {
   } else {
     filteredUsers.forEach((u) => {
       const roleText = u.role === "admin" ? "👑 Amministratore" : "👤 Utente";
-      const userCourses = u.courses && u.courses.length > 0 ? u.courses.map(c => c.name).join(", ") : "<span class='italic text-gray-400'>Nessun corso</span>";
+      const userCourses =
+        u.courses && u.courses.length > 0
+          ? u.courses.map((c) => c.name).join(", ")
+          : "<span class='italic text-gray-400'>Nessun corso</span>";
+
+      // Ordina i corsi alfabeticamente per la select
+      const sortedCourses = [...courses].sort((a, b) =>
+        a.name.localeCompare(b.name)
+      );
 
       html += `
         <tr class="hover:bg-gray-100 transition-colors cursor-pointer">
@@ -128,22 +154,35 @@ function renderUsersList() {
             </div>
           </td>
           <td class="px-6 py-4 whitespace-nowrap">
-            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${u.role === "admin" ? "bg-purple-100 text-purple-800" : "bg-blue-100 text-blue-800"}">
+            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+              u.role === "admin"
+                ? "bg-purple-100 text-purple-800"
+                : "bg-blue-100 text-blue-800"
+            }">
               ${roleText}
             </span>
           </td>
           <td class="px-6 py-4">
             <div class="text-sm text-gray-600">
-              ${u.role === "user" ? `
+              ${
+                u.role === "user"
+                  ? `
                 <select onchange='assignCourse(${u.id}, this.value)' 
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm transition-all duration-200 shadow-sm">
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm transition-all duration-200 shadow-sm">
                   <option value="">Nessun corso</option>
-                  ${courses.map(c => {
-                    const selected = u.courses && u.courses[0] && u.courses[0].id == c.id ? "selected" : "";
-                    return `<option value="${c.id}" ${selected}>${c.name}</option>`;
-                  }).join('')}
+                  ${sortedCourses
+                    .map((c) => {
+                      const selected =
+                        u.courses && u.courses[0] && u.courses[0].id == c.id
+                          ? "selected"
+                          : "";
+                      return `<option value="${c.id}" ${selected}>${c.name}</option>`;
+                    })
+                    .join("")}
                 </select>
-              ` : `<span class='italic text-gray-400'>Non applicabile</span>`}
+              `
+                  : `<span class='italic text-gray-400'>Non applicabile</span>`
+              }
             </div>
           </td>
           <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -153,24 +192,28 @@ function renderUsersList() {
                       title="Modifica">
                 ✏️
               </button>
-              ${u.role !== "admin" ? `
+              ${
+                u.role !== "admin"
+                  ? `
               <button onclick="showChangeRoleModal(${u.id}, 'admin')"
                       class="text-green-600 hover:text-green-900 transition-colors transform hover:scale-110"
                       title="Rendi Amministratore">
                 👑
               </button>
-              ` : `
+              `
+                  : `
               <button onclick="showChangeRoleModal(${u.id}, 'user')"
                       class="text-gray-600 hover:text-gray-900 transition-colors transform hover:scale-110"
                       title="Rendi Utente"
-                      ${adminCount <= 1 ? 'disabled' : ''}>
+                      ${adminCount <= 1 ? "disabled" : ""}>
                 👤
               </button>
-              `}
+              `
+              }
               <button onclick="deleteUser(${u.id})"
                       class="text-red-600 hover:text-red-900 transition-colors transform hover:scale-110"
                       title="Elimina"
-                      ${u.role === "admin" && adminCount <= 1 ? 'disabled' : ''}>
+                      ${u.role === "admin" && adminCount <= 1 ? "disabled" : ""}>
                 🗑️
               </button>
             </div>
@@ -364,7 +407,11 @@ function showMessage(elementId, message, type) {
   const el = document.getElementById(elementId);
   if (el) {
     el.textContent = message;
-    el.className = `mt-4 p-4 rounded-2xl text-sm font-medium ${type === "success" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`;
+    el.className = `mt-4 p-4 rounded-2xl text-sm font-medium ${
+      type === "success"
+        ? "bg-green-100 text-green-800"
+        : "bg-red-100 text-red-800"
+    }`;
     el.classList.remove("hidden");
 
     setTimeout(() => {
@@ -543,8 +590,7 @@ document.addEventListener("DOMContentLoaded", () => {
         toggleFilterCourseVisibility();
         renderUsersList();
       });
-    if (filterUserDate)
-      filterUserDate.addEventListener("input", renderUsersList);
+    if (filterUserDate) filterUserDate.addEventListener("input", renderUsersList);
   }
 
   if (clearFiltersBtn) {
@@ -558,11 +604,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   toggleFilterCourseVisibility();
   fetchCourses().then(fetchUsers);
-  
+
   // Setup refresh button
-  const refreshBtn = document.getElementById('refresh-data');
+  const refreshBtn = document.getElementById("refresh-data");
   if (refreshBtn) {
-    refreshBtn.addEventListener('click', () => {
+    refreshBtn.addEventListener("click", () => {
       fetchCourses().then(fetchUsers);
     });
   }
@@ -592,19 +638,23 @@ function updateUserStats() {
   }
 
   // Utenti con corso
-  const usersWithCourse = users.filter(u => u.courses && u.courses.length > 0).length;
-  const usersWithCourseEl = document.getElementById('users-with-course');
+  const usersWithCourse = users.filter(
+    (u) => u.courses && u.courses.length > 0,
+  ).length;
+  const usersWithCourseEl = document.getElementById("users-with-course");
   if (usersWithCourseEl) {
     usersWithCourseEl.textContent = usersWithCourse;
   }
 
   // Utenti senza corso (solo utenti normali)
-  const usersWithoutCourse = users.filter(u => u.role === 'user' && (!u.courses || u.courses.length === 0)).length;
-  const usersWithoutCourseEl = document.getElementById('users-without-course');
+  const usersWithoutCourse = users.filter(
+    (u) => u.role === "user" && (!u.courses || u.courses.length === 0),
+  ).length;
+  const usersWithoutCourseEl = document.getElementById("users-without-course");
   if (usersWithoutCourseEl) {
     usersWithoutCourseEl.textContent = usersWithoutCourse;
   }
-  
+
   // Utenti filtrati (in base ai filtri correnti)
   const filteredUsers = getFilteredUsers();
   const filteredUsersEl = document.getElementById("filtered-users");
@@ -627,11 +677,11 @@ function getFilteredUsers() {
   if (courseFilter) {
     if (courseFilter === "_no_course_") {
       filtered = filtered.filter(
-        (u) => u.role === "user" && (!u.courses || u.courses.length === 0)
+        (u) => u.role === "user" && (!u.courses || u.courses.length === 0),
       );
     } else {
       filtered = filtered.filter(
-        (u) => u.courses && u.courses.some((c) => c.id == courseFilter)
+        (u) => u.courses && u.courses.some((c) => c.id == courseFilter),
       );
     }
   }
@@ -644,10 +694,10 @@ function getFilteredUsers() {
         u.username.toLowerCase().includes(searchTerm) ||
         u.role.toLowerCase().includes(searchTerm) ||
         (u.courses &&
-          u.courses.some((c) => c.name.toLowerCase().includes(searchTerm)))
+          u.courses.some((c) => c.name.toLowerCase().includes(searchTerm))),
     );
   }
-  
+
   // Applica il filtro per data
   const dateFilter = document.getElementById("filter-user-date")?.value;
   if (dateFilter) {
