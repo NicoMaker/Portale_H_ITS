@@ -97,8 +97,6 @@ function fetchCoursesAndSchedules() {
     courses = allCourses;
     schedules = allSchedules;
 
-    // --- Modifica inizio ---
-    // Crea un elenco di nomi di corsi unici per il menu a tendina
     const uniqueCourseNames = [...new Set(courses.map((c) => c.name))].sort();
 
     const select = document.getElementById("filter-course");
@@ -107,7 +105,6 @@ function fetchCoursesAndSchedules() {
       uniqueCourseNames
         .map((name) => `<option value="${name}">${name}</option>`)
         .join("");
-    // --- Modifica fine ---
 
     populateFilterOptions();
     renderSchedules();
@@ -136,8 +133,6 @@ function renderSchedules() {
 
   let filtered = schedules;
 
-  // --- Modifica inizio ---
-  // Filtra per nome del corso, non per ID, in modo da catturare tutti i corsi con quel nome
   if (courseNameFilter) {
     const matchingCourseIds = courses
       .filter((c) => c.name === courseNameFilter)
@@ -146,7 +141,6 @@ function renderSchedules() {
       matchingCourseIds.includes(String(s.course_id))
     );
   }
-  // --- Modifica fine ---
 
   if (teacherFilter.length) {
     filtered = filtered.filter((s) => teacherFilter.includes(s.teacher));
@@ -188,13 +182,7 @@ function renderSchedules() {
                 📚 Corso
               </th>
               <th class="px-4 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">
-                👨‍🏫 Docente
-              </th>
-              <th class="px-4 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">
-                🏫 Aula
-              </th>
-              <th class="px-4 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">
-                📖 Materia
+                🕐 Orario
               </th>
               <th class="px-4 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">
                 📅 Giorno
@@ -203,10 +191,13 @@ function renderSchedules() {
                 📆 Data
               </th>
               <th class="px-4 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">
-                🕐 Inizio
+                👨‍🏫 Docente
               </th>
               <th class="px-4 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">
-                🕐 Fine
+                🏫 Aula
+              </th>
+              <th class="px-4 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">
+                📖 Materia
               </th>
               <th class="px-4 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
                 ⚙️ Azioni
@@ -224,6 +215,25 @@ function renderSchedules() {
               ${course ? course.name : "-"}
             </span>
           </td>
+          <td class="px-4 py-4 text-sm border-r border-gray-100">
+            <div class="flex items-center gap-2">
+              <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">
+                ${s.start_time}
+              </span>
+              <span class="text-gray-400">→</span>
+              <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-bold">
+                ${s.end_time}
+              </span>
+            </div>
+          </td>
+          <td class="px-4 py-4 text-sm text-gray-800 font-semibold border-r border-gray-100">
+            ${s.day || "-"}
+          </td>
+          <td class="px-4 py-4 text-sm border-r border-gray-100">
+            <span class="bg-yellow-50 text-yellow-800 px-2 py-1 rounded text-xs font-mono">
+              ${formatDate(s.date)}
+            </span>
+          </td>
           <td class="px-4 py-4 text-sm text-gray-800 font-medium border-r border-gray-100">
             ${s.teacher || "-"}
           </td>
@@ -234,24 +244,6 @@ function renderSchedules() {
           </td>
           <td class="px-4 py-4 text-sm text-gray-700 italic border-r border-gray-100">
             ${s.subject || "-"}
-          </td>
-          <td class="px-4 py-4 text-sm text-gray-800 font-semibold border-r border-gray-100">
-            ${s.day || "-"}
-          </td>
-          <td class="px-4 py-4 text-sm border-r border-gray-100">
-            <span class="bg-yellow-50 text-yellow-800 px-2 py-1 rounded text-xs font-mono">
-              ${formatDate(s.date)}
-            </span>
-          </td>
-          <td class="px-4 py-4 text-sm border-r border-gray-100">
-            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">
-              ${s.start_time}
-            </span>
-          </td>
-          <td class="px-4 py-4 text-sm border-r border-gray-100">
-            <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-bold">
-              ${s.end_time}
-            </span>
           </td>
           <td class="px-4 py-4 text-center">
             <div class="flex justify-center space-x-2">
@@ -819,57 +811,6 @@ function updateScheduleStats() {
 }
 
 function getFilteredSchedules() {
-  let filtered = [...schedules];
-
-  // Apply course filter
-  const courseFilter = document.getElementById("filter-course")?.value;
-  if (courseFilter) {
-    filtered = filtered.filter((s) => s.course_id == courseFilter);
-  }
-
-  // Apply teacher filter
-  const teacherFilter = document.getElementById("filter-teacher")?.value;
-  if (teacherFilter) {
-    filtered = filtered.filter((s) => s.teacher === teacherFilter);
-  }
-
-  // Apply room filter
-  const roomFilter = document.getElementById("filter-room")?.value;
-  if (roomFilter) {
-    filtered = filtered.filter((s) => s.room === roomFilter);
-  }
-
-  // Apply subject filter
-  const subjectFilter = document.getElementById("filter-subject")?.value;
-  if (subjectFilter) {
-    filtered = filtered.filter((s) => s.subject === subjectFilter);
-  }
-
-  // Apply day filter
-  const dayFilter = document.getElementById("filter-day")?.value;
-  if (dayFilter) {
-    filtered = filtered.filter((s) => s.day === dayFilter);
-  }
-
-  return filtered;
-}
-
-// Inizializza l'applicazione al caricamento della pagina
-document.addEventListener("DOMContentLoaded", () => {
-  setupAutoEndTime();
-  setupAutoDayOfWeek();
-  fetchCoursesAndSchedules();
-
-  // Setup refresh button
-  const refreshBtn = document.getElementById("refresh-data");
-  if (refreshBtn) {
-    refreshBtn.addEventListener("click", () => {
-      fetchCoursesAndSchedules();
-    });
-  }
-});
-
-function getFilteredSchedules() {
   const courseNameFilter = document.getElementById("filter-course").value;
   const teacherFilter = teacherChoices ? teacherChoices.getValue(true) : [];
   const roomFilter = roomChoices ? roomChoices.getValue(true) : [];
@@ -908,3 +849,18 @@ function getFilteredSchedules() {
 
   return filtered;
 }
+
+// Inizializza l'applicazione al caricamento della pagina
+document.addEventListener("DOMContentLoaded", () => {
+  setupAutoEndTime();
+  setupAutoDayOfWeek();
+  fetchCoursesAndSchedules();
+
+  // Setup refresh button
+  const refreshBtn = document.getElementById("refresh-data");
+  if (refreshBtn) {
+    refreshBtn.addEventListener("click", () => {
+      fetchCoursesAndSchedules();
+    });
+  }
+});

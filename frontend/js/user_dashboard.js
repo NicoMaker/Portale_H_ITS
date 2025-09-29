@@ -25,7 +25,7 @@ document.getElementById("edit-profile-form").appendChild(usernameHidden);
 const newPassword = document.getElementById("new_password");
 const editHint = document.getElementById("edit-password-hint");
 const editMsg = document.getElementById("edit-profile-msg");
-const filterDateExactU = document.getElementById("filter-date-exact-u"); // Added reference
+const filterDateExactU = document.getElementById("filter-date-exact-u");
 
 let allCourses = [];
 let allSchedules = [];
@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
     searchEnabled: false,
     shouldSort: false,
     placeholder: true,
-    position: "top", // *** Qui facciamo aprire il filtro Giorno verso l’alto ***
+    position: "top",
   });
 
   // Carica dati dalle API
@@ -82,10 +82,8 @@ document.addEventListener("DOMContentLoaded", () => {
       renderCoursesBadges(allCourses);
       renderSchedulesTable(allCourses, allSchedules);
       
-      // Update stats
       updateUserStats();
 
-      // Aggiungi event listener per i filtri (usa istanze Choices già create)
       [teacherChoices, roomChoices, subjectChoices, dayChoices].forEach(
         (choiceInstance) => {
           choiceInstance.passedElement.element.addEventListener(
@@ -97,21 +95,17 @@ document.addEventListener("DOMContentLoaded", () => {
         },
       );
 
-      // Listener per input data esatta
       filterDateExactU.addEventListener("change", () => {
         renderSchedulesTable(allCourses, allSchedules);
       });
 
-      // Listener for reset filters button
       document
         .getElementById("reset-filters-btn-u")
         .addEventListener("click", resetFilters);
         
-      // Setup refresh button
       const refreshBtn = document.getElementById('refresh-data');
       if (refreshBtn) {
         refreshBtn.addEventListener('click', () => {
-          // Reload data
           fetch("/user/courses")
             .then((r) => r.json())
             .then((courses) => {
@@ -155,8 +149,7 @@ function populateFilterOptions() {
     ...new Set(arr.map((i) => i[key]).filter(Boolean)),
   ];
 
-  // Insegnanti
-  teacherChoices.clearChoices(); // Clear existing choices before setting new ones
+  teacherChoices.clearChoices();
   teacherChoices.setChoices(
     unique(allSchedules, "teacher").map((v) => ({ value: v, label: v })),
     "value",
@@ -164,8 +157,7 @@ function populateFilterOptions() {
     false,
   );
 
-  // Aule
-  roomChoices.clearChoices(); // Clear existing choices before setting new ones
+  roomChoices.clearChoices();
   roomChoices.setChoices(
     unique(allSchedules, "room").map((v) => ({ value: v, label: v })),
     "value",
@@ -173,8 +165,7 @@ function populateFilterOptions() {
     false,
   );
 
-  // Materie
-  subjectChoices.clearChoices(); // Clear existing choices before setting new ones
+  subjectChoices.clearChoices();
   subjectChoices.setChoices(
     unique(allSchedules, "subject").map((v) => ({ value: v, label: v })),
     "value",
@@ -182,7 +173,6 @@ function populateFilterOptions() {
     false,
   );
 
-  // Giorni
   const giorniPresentiSet = new Set(
     allSchedules.map((s) => normalize(s.day)).filter(Boolean),
   );
@@ -190,7 +180,7 @@ function populateFilterOptions() {
     giorniPresentiSet.has(normalize(g)),
   );
 
-  dayChoices.clearChoices(); // Clear existing choices before setting new ones
+  dayChoices.clearChoices();
   dayChoices.setChoices(
     giorniOrdinati.map((d) => ({ value: d, label: d })),
     "value",
@@ -212,10 +202,10 @@ function renderCoursesBadges(courses) {
   container.innerHTML = courses
     .map(
       (c) => `
-                        <span class="inline-flex items-center px-3 md:px-4 py-2 rounded-full text-xs md:text-sm font-medium bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 hover:from-blue-200 hover:to-purple-200 transition-all duration-200 transform hover:scale-105">
-                            📚 corso: ${c.name}
-                        </span>
-                    `,
+        <span class="inline-flex items-center px-3 md:px-4 py-2 rounded-full text-xs md:text-sm font-medium bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 hover:from-blue-200 hover:to-purple-200 transition-all duration-200 transform hover:scale-105">
+          📚 corso: ${c.name}
+        </span>
+      `,
     )
     .join("");
 }
@@ -228,14 +218,12 @@ function renderSchedulesTable(courses, schedules) {
     courses.some((c) => c.id == s.course_id),
   );
 
-  // Prendi valori selezionati dai filtri
   const teacherFilter = teacherChoices.getValue(true);
   const roomFilter = roomChoices.getValue(true);
   const subjectFilter = subjectChoices.getValue(true);
   const dayFilter = dayChoices.getValue(true);
   const dateExact = filterDateExactU.value;
 
-  // Applica filtri
   if (teacherFilter.length)
     filtered = filtered.filter((s) => teacherFilter.includes(s.teacher));
   if (roomFilter.length)
@@ -262,33 +250,37 @@ function renderSchedulesTable(courses, schedules) {
       '<div class="text-center py-12 text-gray-500"><div class="text-4xl md:text-6xl mb-4">📅</div><p class="text-lg md:text-xl">Nessun orario trovato per questi filtri.</p></div>';
   } else {
     html = `
-                        <div class="modern-table mobile-table">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="gradient-bg">
-                                    <tr class="text-white">
-                                        <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">👨‍🏫 Docente</th>
-                                        <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">🏫 Aula</th>
-                                        <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">📖 Materia</th>
-                                        <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">📅 Giorno</th>
-                                        <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">📆 Data</th>
-                                        <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">🕘 Inizio</th>
-                                        <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">🕘 Fine</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                    `;
+      <div class="modern-table mobile-table">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="gradient-bg">
+            <tr class="text-white">
+              <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">🕐 Orario</th>
+              <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">📅 Giorno</th>
+              <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">📆 Data</th>
+              <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">👨‍🏫 Docente</th>
+              <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">🏫 Aula</th>
+              <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">📖 Materia</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+    `;
     for (const s of filtered) {
       html += `
-                            <tr class="hover:bg-blue-50 transition-all duration-200">
-                                <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-900 font-medium">${s.teacher}</td>
-                                <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-700">${s.room}</td>
-                                <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-700">${s.subject}</td>
-                                <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-700">${s.day}</td>
-                                <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-700">${formatDate(s.date)}</td>
-                                <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-700 font-mono">${s.start_time}</td>
-                                <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-700 font-mono">${s.end_time}</td>
-                            </tr>
-                        `;
+        <tr class="hover:bg-blue-50 transition-all duration-200">
+          <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-900">
+            <div class="flex items-center gap-2">
+              <span class="bg-green-100 text-green-800 px-2 md:px-3 py-1 rounded-full text-xs font-bold font-mono">${s.start_time}</span>
+              <span class="text-gray-400">→</span>
+              <span class="bg-red-100 text-red-800 px-2 md:px-3 py-1 rounded-full text-xs font-bold font-mono">${s.end_time}</span>
+            </div>
+          </td>
+          <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-700">${s.day}</td>
+          <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-700">${formatDate(s.date)}</td>
+          <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-900 font-medium">${s.teacher}</td>
+          <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-700">${s.room}</td>
+          <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-700">${s.subject}</td>
+        </tr>
+      `;
     }
     html += "</tbody></table></div>";
   }
@@ -304,12 +296,10 @@ function resetFilters() {
   roomChoices.clearStore();
   subjectChoices.clearStore();
   dayChoices.clearStore();
-  filterDateExactU.value = ""; // Clear the exact date input
+  filterDateExactU.value = "";
 
-  // Re-populate the filter options after clearing the Choices.js instances
-  populateFilterOptions(); // This will ensure all original options are back in the dropdowns
-
-  renderSchedulesTable(allCourses, allSchedules); // Re-render table with no filters
+  populateFilterOptions();
+  renderSchedulesTable(allCourses, allSchedules);
 }
 
 // ------------------------------
@@ -337,7 +327,6 @@ function closeModal() {
   editMsg.textContent = "";
 }
 
-// Event listeners for modal
 document
   .getElementById("edit-profile-btn")
   .addEventListener("click", openModal);
@@ -416,13 +405,11 @@ document
 // Funzioni per statistiche
 // ------------------------------
 function updateUserStats() {
-  // Total lessons
   const totalLessonsEl = document.getElementById('total-lessons');
   if (totalLessonsEl) {
     totalLessonsEl.textContent = allSchedules.length;
   }
 
-  // This week lessons
   const today = new Date();
   const weekStart = new Date(today.setDate(today.getDate() - today.getDay()));
   const weekEnd = new Date(today.setDate(today.getDate() - today.getDay() + 6));
@@ -437,7 +424,6 @@ function updateUserStats() {
     weekLessonsEl.textContent = weekLessons;
   }
 
-  // Next lesson
   const now = new Date();
   const upcomingLessons = allSchedules
     .filter(schedule => new Date(schedule.date) >= now)
@@ -455,7 +441,6 @@ function updateUserStats() {
     }
   }
 
-  // Filtered lessons (based on current filters)
   const filteredLessons = getFilteredUserSchedules();
   const filteredLessonsEl = document.getElementById('filtered-lessons');
   if (filteredLessonsEl) {
@@ -466,31 +451,26 @@ function updateUserStats() {
 function getFilteredUserSchedules() {
   let filtered = [...allSchedules];
   
-  // Apply teacher filter
   const teacherFilter = teacherChoices ? teacherChoices.getValue(true) : [];
   if (teacherFilter.length > 0) {
     filtered = filtered.filter(schedule => teacherFilter.includes(schedule.teacher));
   }
   
-  // Apply room filter
   const roomFilter = roomChoices ? roomChoices.getValue(true) : [];
   if (roomFilter.length > 0) {
     filtered = filtered.filter(schedule => roomFilter.includes(schedule.room));
   }
   
-  // Apply subject filter
   const subjectFilter = subjectChoices ? subjectChoices.getValue(true) : [];
   if (subjectFilter.length > 0) {
     filtered = filtered.filter(schedule => subjectFilter.includes(schedule.subject));
   }
   
-  // Apply day filter
   const dayFilter = dayChoices ? dayChoices.getValue(true) : [];
   if (dayFilter.length > 0) {
     filtered = filtered.filter(schedule => dayFilter.includes(schedule.day));
   }
   
-  // Apply date filter
   const dateFilter = document.getElementById('filter-date-exact-u')?.value;
   if (dateFilter) {
     filtered = filtered.filter(schedule => schedule.date === dateFilter);
