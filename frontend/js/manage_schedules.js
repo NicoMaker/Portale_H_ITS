@@ -283,9 +283,12 @@ function clearFilters() {
 function openEditSchedule(id) {
   editingScheduleId = id;
   const s = schedules.find((x) => x.id == id);
-  const course = courses.find((c) => c.id == s.course_id);
+  // Ordina i corsi alfabeticamente
+  const sortedCourses = [...courses].sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
 
-  document.getElementById("edit-course-select").innerHTML = courses
+  document.getElementById("edit-course-select").innerHTML = sortedCourses
     .map(
       (c) =>
         `<option value="${c.id}"${c.id == s.course_id ? " selected" : ""}>${
@@ -433,15 +436,17 @@ function deleteSchedule() {
 // Apre il modal di aggiunta
 document.getElementById("add-schedule-btn").onclick = () => {
   const filterVal = document.getElementById("filter-course").value;
+  const sortedCourses = [...courses].sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
+
   document.getElementById("add-course-select").innerHTML =
     `<option value="" disabled selected>Seleziona un corso</option>` +
-    courses
-      .map(
-        (c) =>
-          `<option value="${c.id}"${c.id == filterVal ? " selected" : ""}>${
-            c.name
-          }</option>`
-      )
+    sortedCourses
+      .map((c) => {
+        const isSelected = filterVal && c.name === filterVal ? " selected" : "";
+        return `<option value="${c.id}"${isSelected}>${c.name}</option>`;
+      })
       .join("");
   document.getElementById("add-teacher").value = "";
   document.getElementById("add-room").value = "";
