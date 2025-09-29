@@ -318,7 +318,12 @@ async function populateDatabase() {
     initDb();
 
     // Parametri da tastiera con validazione
-    let numAdmins, numStudents, numCourses, schedulesPerCourse;
+    let numAdmins,
+      numStudentsEnrolled,
+      numStudentsUnenrolled,
+      numCoursesWithStudents,
+      numCoursesWithoutStudents,
+      schedulesPerCourse;
 
     do {
       numAdmins = parseInt(
@@ -329,18 +334,32 @@ async function populateDatabase() {
     } while (isNaN(numAdmins) || numAdmins < 0 || numAdmins > 100);
 
     do {
-      numStudents = parseInt(
-        await ask("Quanti studenti (Users) vuoi generare? (1-1000): ")
+      numStudentsEnrolled = parseInt(
+        await ask(
+          "Quanti studenti vuoi iscrivere a un corso? (0-1000): "
+        )
       );
-    } while (isNaN(numStudents) || numStudents < 1 || numStudents > 1000);
+    } while (isNaN(numStudentsEnrolled) || numStudentsEnrolled < 0 || numStudentsEnrolled > 1000);
 
     do {
-      numCourses = parseInt(await ask("Quanti corsi vuoi generare? (1-500): "));
-    } while (isNaN(numCourses) || numCourses < 1 || numCourses > 500);
+      numStudentsUnenrolled = parseInt(
+        await ask(
+          "Quanti studenti vuoi che NON siano iscritti a un corso? (0-1000): "
+        )
+      );
+    } while (isNaN(numStudentsUnenrolled) || numStudentsUnenrolled < 0 || numStudentsUnenrolled > 1000);
+
+    do {
+      numCoursesWithStudents = parseInt(await ask("Quanti corsi vuoi che abbiano studenti iscritti? (0-500): "));
+    } while (isNaN(numCoursesWithStudents) || numCoursesWithStudents < 0 || numCoursesWithStudents > 500);
+
+    do {
+      numCoursesWithoutStudents = parseInt(await ask("Quanti corsi vuoi che NON abbiano studenti iscritti? (0-500): "));
+    } while (isNaN(numCoursesWithoutStudents) || numCoursesWithoutStudents < 0 || numCoursesWithoutStudents > 500);
 
     do {
       schedulesPerCourse = parseInt(
-        await ask("Quanti orari per corso? (1-200): ")
+        await ask("Quanti orari per corso (anche quelli senza studenti)? (1-200): ")
       );
     } while (
       isNaN(schedulesPerCourse) ||
@@ -377,10 +396,22 @@ async function populateDatabase() {
       );
     }
 
-    console.log("👨‍🎓 Creazione studenti (come utenti con role 'user')...");
+    console.log("👨‍🎓 Creazione studenti...");
 
-    // Studenti come utenti con role 'user'
-    for (let i = 0; i < numStudents; i++) {
+    // Studenti iscritti
+    const studentsEnrolledIds = [];
+    for (let i = 0; i < numStudentsEnrolled; i++) {
+      const uname = randomUsername("user");
+      const hash = await hashPassword("User123!");
+      const result = await runQuery(
+        "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
+        [uname, hash, "user"]
+      );
+      studentsEnrolledIds.push(result.lastID);
+    }
+
+    // Studenti non iscritti
+    for (let i = 0; i < numStudentsUnenrolled; i++) {
       const uname = randomUsername("user");
       const hash = await hashPassword("User123!");
       await runQuery(
@@ -391,58 +422,49 @@ async function populateDatabase() {
 
     console.log("📚 Creazione corsi...");
 
-    // Corsi
-    for (let i = 0; i < numCourses; i++) {
+    // Corsi con studenti
+    const coursesWithStudentsIds = [];
+    for (let i = 0; i < numCoursesWithStudents; i++) {
+      const result = await runQuery("INSERT INTO courses (name, description) VALUES (?, ?)", [
+        randomCourseName(),
+        "Descrizione del corso generato automaticamente per il sistema di gestione accademico. Include teoria e pratica.",
+      ]);
+      coursesWithStudentsIds.push(result.lastID);
+    }
+
+    // Corsi senza studenti
+    for (let i = 0; i < numCoursesWithoutStudents; i++) {
       await runQuery("INSERT INTO courses (name, description) VALUES (?, ?)", [
         randomCourseName(),
         "Descrizione del corso generato automaticamente per il sistema di gestione accademico. Include teoria e pratica.",
       ]);
     }
 
-    console.log(
-      "🔗 Assegnazione studenti ai corsi (MAX 1 corso per studente)..."
-    );
+    console.log("🔗 Assegnazione studenti ai corsi (MAX 1 corso per studente)...");
 
-    // Relazioni studente-corso - DISTRIBUZIONE EQUA
-    const students = await getAllQuery(
-      "SELECT id FROM users WHERE role = 'user'"
-    );
-    const courses = await getAllQuery("SELECT id FROM courses");
-
-    if (courses.length === 0) {
-      console.log("⚠️  Nessun corso disponibile per assegnazione!");
-    } else {
-      // Distribuzione equa: assegna gli studenti ciclicamente ai corsi
-      for (let i = 0; i < students.length; i++) {
-        const courseIndex = i % courses.length; // Distribuzione ciclica
-        const selectedCourse = courses[courseIndex];
+    // Relazioni studente-corso - DISTRIBUZIONE EQUA solo tra studenti e corsi designati
+    if (studentsEnrolledIds.length > 0 && coursesWithStudentsIds.length > 0) {
+      for (let i = 0; i < studentsEnrolledIds.length; i++) {
+        const courseIndex = i % coursesWithStudentsIds.length; // Distribuzione ciclica
+        const selectedCourseId = coursesWithStudentsIds[courseIndex];
 
         await runQuery(
           "INSERT INTO user_courses (user_id, course_id) VALUES (?, ?)",
-          [students[i].id, selectedCourse.id]
+          [studentsEnrolledIds[i], selectedCourseId]
         );
       }
-
-      // Statistiche distribuzione
-      const studentsPerCourse = Math.ceil(students.length / courses.length);
-      const fullCourses = students.length % courses.length || courses.length;
-
-      console.log(
-        `   📊 Distribuzione: ~${studentsPerCourse} studenti per corso`
-      );
-      console.log(
-        `   📊 Corsi con studenti: ${Math.min(
-          students.length,
-          courses.length
-        )}/${courses.length}`
-      );
+      console.log("   ✅ Studenti iscritti ai corsi designati.");
+    } else {
+      console.log("   ⚠️  Nessun studente o corso designato per l'iscrizione. Nessuna iscrizione creata.");
     }
 
-    console.log("🕒 Creazione orari (da 1 a molti orari per corso)...");
+    console.log("🕒 Creazione orari per TUTTI i corsi...");
 
-    // Orari per ogni corso - ora anche solo 1 se voluto
+    // Orari per ogni corso
+    const allCourses = await getAllQuery("SELECT id FROM courses");
     let totalSchedulesCreated = 0;
-    for (const course of courses) {
+
+    for (const course of allCourses) {
       for (let j = 0; j < schedulesPerCourse; j++) {
         const schedule = randomSchedule(course.id);
         await runQuery(
@@ -460,8 +482,6 @@ async function populateDatabase() {
           ]
         );
         totalSchedulesCreated++;
-
-        // Progress indicator per grandi quantità
         if (totalSchedulesCreated % 500 === 0) {
           console.log(`   📅 Creati ${totalSchedulesCreated} orari...`);
         }
@@ -505,7 +525,19 @@ async function populateDatabase() {
       `   • Admin/Docenti: ${adminsCount[0].count} (incluso Admin principale)`
     );
     console.log(`   • Studenti (role 'user'): ${studentsCount[0].count}`);
+    console.log(
+      `     - Iscritti a un corso: ${numStudentsEnrolled}`
+    );
+    console.log(
+      `     - Non iscritti a un corso: ${numStudentsUnenrolled}`
+    );
     console.log(`📚 Corsi: ${totalCourses[0].count}`);
+    console.log(
+      `   - Con studenti: ${numCoursesWithStudents}`
+    );
+    console.log(
+      `   - Senza studenti: ${numCoursesWithoutStudents}`
+    );
     console.log(
       `🔗 Iscrizioni totali: ${totalEnrollments[0].count} (MAX 1 corso per studente)`
     );
@@ -536,7 +568,7 @@ async function populateDatabase() {
     console.log("\n📋 Note importanti:");
     console.log("   • I docenti sono admin con pieni privilegi");
     console.log("   • Gli studenti hanno role 'user' (non 'student')");
-    console.log("   • Ogni studente è iscritto a MASSIMO 1 corso");
+    console.log("   • Ogni studente iscritto è assegnato a MASSIMO 1 corso");
     console.log("   • Orari distribuiti su 5 mesi (Agosto-Dicembre 2025)");
     console.log("   • Orari dalle 8:00 alle 20:00, incluso sabato");
     console.log("\n🎯 Database pronto per l'uso!");
