@@ -16,5 +16,8 @@
     "nodemon": "^3.1.10",
     "parser": "^0.1.4",
     "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2"
   }
 }
