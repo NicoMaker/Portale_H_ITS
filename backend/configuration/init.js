@@ -36,6 +36,26 @@ function cleanString(str) {
   return str.replace(/[\u200B-\u200D\uFEFF]/g, '').trim(); 
 }
 
+// Funzione per verificare se una data è un giorno festivo
+function isHoliday(dateString) {
+  const holidays = [
+    "2025-01-01", // Capodanno
+    "2025-01-06", // Epifania
+    "2025-04-20", // Pasqua (domenica, ma incluso per completezza)
+    "2025-04-21", // Pasquetta
+    "2025-04-25", // Festa della Liberazione
+    "2025-05-01", // Festa dei Lavoratori
+    "2025-06-02", // Festa della Repubblica
+    "2025-08-15", // Ferragosto
+    "2025-11-01", // Ognissanti
+    "2025-12-08", // Immacolata Concezione
+    "2025-12-25", // Natale
+    "2025-12-26", // Santo Stefano
+    "2025-12-31", // San Silvestro
+  ];
+  return holidays.includes(dateString);
+}
+
 function randomUsername(role) {
   const firstNames = [
     "Mario", "Giulia", "Luca", "Sara", "Marco", "Elena", "Francesco", "Chiara",
@@ -81,14 +101,28 @@ function getRandomTimeAndLocation() {
   const startHour = 8 + Math.floor(Math.random() * 10);
   const duration = [1, 2, 3][Math.floor(Math.random() * 3)];
   const endHour = Math.min(startHour + duration, 20);
-  const month = Math.floor(Math.random() * 5) + 8;
   const year = 2025;
-  const daysInMonth = new Date(year, month, 0).getDate();
-  const dayOfMonth = Math.floor(Math.random() * daysInMonth) + 1;
-  const fullDate = new Date(year, month - 1, dayOfMonth);
-  const dayOfWeekIndex = fullDate.getDay();
-  const dayOfWeekName = days[dayOfWeekIndex];
-  const formattedDate = `${year}-${String(month).padStart(2, "0")}-${String(dayOfMonth).padStart(2, "0")}`;
+  
+  let fullDate, dayOfWeekIndex, dayOfWeekName, formattedDate;
+  let isValidDate = false;
+
+  // Genera una data casuale finché non ne trova una valida (non festiva e non nel weekend)
+  while (!isValidDate) {
+    const month = Math.floor(Math.random() * 5) + 8; // Mesi: 8 (Agosto) a 12 (Dicembre)
+    const daysInMonth = new Date(year, month, 0).getDate();
+    const dayOfMonth = Math.floor(Math.random() * daysInMonth) + 1;
+    
+    fullDate = new Date(year, month - 1, dayOfMonth);
+    dayOfWeekIndex = fullDate.getDay();
+    dayOfWeekName = days[dayOfWeekIndex];
+    formattedDate = `${year}-${String(month).padStart(2, "0")}-${String(dayOfMonth).padStart(2, "0")}`;
+
+    // Controlla se il giorno non è sabato (6), domenica (0) e non è un giorno festivo
+    if (dayOfWeekIndex !== 0 && dayOfWeekIndex !== 6 && !isHoliday(formattedDate)) {
+      isValidDate = true;
+    }
+  }
+
   return {
     teacher: getRandomItem(teachers),
     room: getRandomItem(rooms),
@@ -249,7 +283,6 @@ async function populateDatabase() {
     const studentsCount = await getAllQuery("SELECT COUNT(*) as count FROM users WHERE role = 'user'");
     const adminsCount = await getAllQuery("SELECT COUNT(*) as count FROM users WHERE role = 'admin'");
     
-    // Riscritto la query di distribuzione studenti
     const distributionCheck = await getAllQuery(`
       SELECT 
         c.name as course_name,
@@ -291,7 +324,7 @@ async function populateDatabase() {
     console.log("   • Gli studenti hanno role 'user' (non 'student')");
     console.log("   • Ogni studente iscritto è assegnato a MASSIMO 1 corso");
     console.log("   • Orari distribuiti su 5 mesi (Agosto-Dicembre 2025)");
-    console.log("   • Orari dalle 8:00 alle 20:00, incluso sabato");
+    console.log("   • Ora, gli orari sono solo nei giorni lavorativi (lunedì-venerdì) e non in giorni festivi.");
     console.log("\n🎯 Database pronto per l'uso!");
   } catch (error) {
     console.error("❌ Errore critico durante il popolamento del database:", error.message);
