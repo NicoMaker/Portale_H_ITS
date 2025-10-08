@@ -33,7 +33,7 @@ Portale_H_ITS/
 |   |   |── 📁 db/
 |   |   |   ├── database.db       # Database SQLite
 │   |   ├── db.js                # Configurazione database
-│   |   ├── auth.js              # Configurazione autenticazione
+│   |   ├── auth.js              # Configurazione autenticazione bcypto per la criptazione/decriptazione password
 │   |   ├── init.js              # creazione file fasulli dei dati 
 │   ├── 📁 node_modules/          # Dipendenze npm
 │   ├── 📁 routes/
