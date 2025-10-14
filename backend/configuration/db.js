@@ -71,7 +71,7 @@ function initDb() {
         }
         if (row.count === 0) {
           const defaultAdminUser = "Admin";
-          const defaultAdminPassword = "Admin123";
+          const defaultAdminPassword = "Admin123!";
           bcrypt.hash(defaultAdminPassword, 10, (hashErr, hashedPassword) => {
             if (hashErr) {
               console.error(
