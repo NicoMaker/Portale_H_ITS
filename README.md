@@ -32,6 +32,9 @@ Portale_H_ITS/
 │   ├── 📁 configuration/       # Configurazioni
 |   |   |── 📁 db/
 |   |   |   ├── database.db       # Database SQLite
+|   |   |── 📁 Schema/
+|   |   |   ├── Schema.mmd       # Schema database Mermaid
+|   |   |   └── Schema.png       # Schema database Immagine
 │   |   ├── db.js                # Configurazione database
 │   |   ├── auth.js              # Configurazione autenticazione bcypto per la criptazione/decriptazione password
 │   |   ├── init.js              # creazione file fasulli dei dati 
