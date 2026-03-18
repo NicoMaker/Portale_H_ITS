@@ -37,7 +37,7 @@ Portale_H_ITS/
 |   |   |   └── Schema.png       # Schema database Immagine
 │   |   ├── db.js                # Configurazione database
 │   |   ├── auth.js              # Configurazione autenticazione bcypto per la criptazione/decriptazione password
-│   |   ├── init.js              # creazione file fasulli dei dati 
+│   |   ├── init.js              # creazione file fasulli dei dati
 │   ├── 📁 node_modules/          # Dipendenze npm
 │   ├── 📁 routes/
 │   │   ├── authRoutes.js         # Autenticazione
@@ -175,7 +175,7 @@ Portale_H_ITS/
    # Modalità produzione
    npm start
 
-   # Modalità Creazione dati 
+   # Modalità Creazione dati
 
    npm run dati
 

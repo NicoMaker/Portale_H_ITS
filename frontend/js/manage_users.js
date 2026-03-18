@@ -30,7 +30,7 @@ function updateNewCourseSelect() {
 
     // Ordina i corsi alfabeticamente per nome
     const sortedCourses = [...courses].sort((a, b) =>
-      a.name.localeCompare(b.name)
+      a.name.localeCompare(b.name),
     );
 
     select.innerHTML =
@@ -54,7 +54,7 @@ function updateFilterCourseSelect() {
 
   // Ordina i corsi alfabeticamente per nome
   const sortedCourses = [...courses].sort((a, b) =>
-    a.name.localeCompare(b.name)
+    a.name.localeCompare(b.name),
   );
 
   select.innerHTML =
@@ -141,7 +141,7 @@ function renderUsersList() {
 
       // Ordina i corsi alfabeticamente per la select
       const sortedCourses = [...courses].sort((a, b) =>
-        a.name.localeCompare(b.name)
+        a.name.localeCompare(b.name),
       );
 
       html += `
@@ -590,7 +590,8 @@ document.addEventListener("DOMContentLoaded", () => {
         toggleFilterCourseVisibility();
         renderUsersList();
       });
-    if (filterUserDate) filterUserDate.addEventListener("input", renderUsersList);
+    if (filterUserDate)
+      filterUserDate.addEventListener("input", renderUsersList);
   }
 
   if (clearFiltersBtn) {

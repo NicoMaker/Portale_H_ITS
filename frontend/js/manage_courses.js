@@ -100,7 +100,8 @@ function openEditCourse(id) {
   const course = allCourses.find((c) => c.id == id);
   if (course) {
     document.getElementById("edit-course-name").value = course.name;
-    document.getElementById("edit-course-desc").value = course.description || "";
+    document.getElementById("edit-course-desc").value =
+      course.description || "";
   }
   document.getElementById("edit-course-msg").classList.add("hidden");
   document.getElementById("edit-course-modal").style.display = "flex";
@@ -156,7 +157,8 @@ function deleteCourse(id) {
   courseToDeleteId = id;
   const course = allCourses.find((c) => c.id == id);
   if (course) {
-    document.getElementById("delete-course-name-display").textContent = course.name;
+    document.getElementById("delete-course-name-display").textContent =
+      course.name;
   }
   document.getElementById("delete-confirm-modal").style.display = "flex";
 }
@@ -186,8 +188,12 @@ document.getElementById("confirm-delete-course").onclick = () => {
 // Initial setup on page load
 document.addEventListener("DOMContentLoaded", () => {
   fetchCourses();
-  document.getElementById("search-course")?.addEventListener("input", renderCoursesList);
-  document.getElementById("user-filter")?.addEventListener("change", renderCoursesList);
+  document
+    .getElementById("search-course")
+    ?.addEventListener("input", renderCoursesList);
+  document
+    .getElementById("user-filter")
+    ?.addEventListener("change", renderCoursesList);
 });
 
 // Update stats function
@@ -197,11 +203,10 @@ function updateCourseStats() {
     totalCoursesEl.textContent = allCourses.length;
   }
 
-  const coursesWithUsers = allCourses.filter(
-    (course) =>
-      users.some(
-        (user) => user.courses && user.courses.some((uc) => uc.id === course.id)
-      )
+  const coursesWithUsers = allCourses.filter((course) =>
+    users.some(
+      (user) => user.courses && user.courses.some((uc) => uc.id === course.id),
+    ),
   ).length;
 
   const coursesWithUsersEl = document.getElementById("courses-with-users");
@@ -210,18 +215,21 @@ function updateCourseStats() {
   }
 
   const coursesWithoutUsers = allCourses.length - coursesWithUsers;
-  const coursesWithoutUsersEl = document.getElementById("courses-without-users");
+  const coursesWithoutUsersEl = document.getElementById(
+    "courses-without-users",
+  );
   if (coursesWithoutUsersEl) {
     coursesWithoutUsersEl.textContent = coursesWithoutUsers;
   }
 
   // Get the current search query and user filter
-  const searchQuery = document.getElementById("search-course")?.value?.toLowerCase() || "";
+  const searchQuery =
+    document.getElementById("search-course")?.value?.toLowerCase() || "";
   const userFilter = document.getElementById("user-filter")?.value || "all";
 
   // Filter courses based on BOTH the search query and the user filter
   const coursesWithUsersIds = new Set(
-    users.flatMap((user) => user.courses.map((c) => c.id))
+    users.flatMap((user) => user.courses.map((c) => c.id)),
   );
 
   const filteredCourses = allCourses
@@ -239,7 +247,8 @@ function updateCourseStats() {
       // Then, filter by search query
       return (
         course.name.toLowerCase().includes(searchQuery) ||
-        (course.description && course.description.toLowerCase().includes(searchQuery))
+        (course.description &&
+          course.description.toLowerCase().includes(searchQuery))
       );
     });
 
@@ -252,12 +261,13 @@ function updateCourseStats() {
 // Function to render the table rows with a modern look
 function renderCoursesList() {
   const tableBody = document.getElementById("courses-table-body");
-  const searchQuery = document.getElementById("search-course")?.value?.toLowerCase() || "";
+  const searchQuery =
+    document.getElementById("search-course")?.value?.toLowerCase() || "";
   const userFilter = document.getElementById("user-filter")?.value || "all";
   let html = "";
 
   const coursesWithUsersIds = new Set(
-    users.flatMap((user) => user.courses.map((c) => c.id))
+    users.flatMap((user) => user.courses.map((c) => c.id)),
   );
 
   let filteredCourses = allCourses
@@ -275,7 +285,8 @@ function renderCoursesList() {
       // Then, filter by search query
       return (
         course.name.toLowerCase().includes(searchQuery) ||
-        (course.description && course.description.toLowerCase().includes(searchQuery))
+        (course.description &&
+          course.description.toLowerCase().includes(searchQuery))
       );
     })
     .sort((a, b) => a.name.localeCompare(b.name));

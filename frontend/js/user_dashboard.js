@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
       populateFilterOptions();
       renderCoursesBadges(allCourses);
       renderSchedulesTable(allCourses, allSchedules);
-      
+
       updateUserStats();
 
       [teacherChoices, roomChoices, subjectChoices, dayChoices].forEach(
@@ -102,10 +102,10 @@ document.addEventListener("DOMContentLoaded", () => {
       document
         .getElementById("reset-filters-btn-u")
         .addEventListener("click", resetFilters);
-        
-      const refreshBtn = document.getElementById('refresh-data');
+
+      const refreshBtn = document.getElementById("refresh-data");
       if (refreshBtn) {
-        refreshBtn.addEventListener('click', () => {
+        refreshBtn.addEventListener("click", () => {
           fetch("/user/courses")
             .then((r) => r.json())
             .then((courses) => {
@@ -405,7 +405,7 @@ document
 // Funzioni per statistiche
 // ------------------------------
 function updateUserStats() {
-  const totalLessonsEl = document.getElementById('total-lessons');
+  const totalLessonsEl = document.getElementById("total-lessons");
   if (totalLessonsEl) {
     totalLessonsEl.textContent = allSchedules.length;
   }
@@ -413,36 +413,36 @@ function updateUserStats() {
   const today = new Date();
   const weekStart = new Date(today.setDate(today.getDate() - today.getDay()));
   const weekEnd = new Date(today.setDate(today.getDate() - today.getDay() + 6));
-  
-  const weekLessons = allSchedules.filter(schedule => {
+
+  const weekLessons = allSchedules.filter((schedule) => {
     const scheduleDate = new Date(schedule.date);
     return scheduleDate >= weekStart && scheduleDate <= weekEnd;
   }).length;
-  
-  const weekLessonsEl = document.getElementById('week-lessons');
+
+  const weekLessonsEl = document.getElementById("week-lessons");
   if (weekLessonsEl) {
     weekLessonsEl.textContent = weekLessons;
   }
 
   const now = new Date();
   const upcomingLessons = allSchedules
-    .filter(schedule => new Date(schedule.date) >= now)
+    .filter((schedule) => new Date(schedule.date) >= now)
     .sort((a, b) => new Date(a.date) - new Date(b.date));
-  
-  const nextLessonEl = document.getElementById('next-lesson');
+
+  const nextLessonEl = document.getElementById("next-lesson");
   if (nextLessonEl) {
     if (upcomingLessons.length > 0) {
       const nextLesson = upcomingLessons[0];
       const nextDate = new Date(nextLesson.date);
       const timeStr = nextLesson.start_time;
-      nextLessonEl.textContent = `${nextDate.toLocaleDateString('it-IT')} alle ${timeStr}`;
+      nextLessonEl.textContent = `${nextDate.toLocaleDateString("it-IT")} alle ${timeStr}`;
     } else {
-      nextLessonEl.textContent = 'Nessuna lezione programmata';
+      nextLessonEl.textContent = "Nessuna lezione programmata";
     }
   }
 
   const filteredLessons = getFilteredUserSchedules();
-  const filteredLessonsEl = document.getElementById('filtered-lessons');
+  const filteredLessonsEl = document.getElementById("filtered-lessons");
   if (filteredLessonsEl) {
     filteredLessonsEl.textContent = filteredLessons.length;
   }
@@ -450,31 +450,37 @@ function updateUserStats() {
 
 function getFilteredUserSchedules() {
   let filtered = [...allSchedules];
-  
+
   const teacherFilter = teacherChoices ? teacherChoices.getValue(true) : [];
   if (teacherFilter.length > 0) {
-    filtered = filtered.filter(schedule => teacherFilter.includes(schedule.teacher));
+    filtered = filtered.filter((schedule) =>
+      teacherFilter.includes(schedule.teacher),
+    );
   }
-  
+
   const roomFilter = roomChoices ? roomChoices.getValue(true) : [];
   if (roomFilter.length > 0) {
-    filtered = filtered.filter(schedule => roomFilter.includes(schedule.room));
+    filtered = filtered.filter((schedule) =>
+      roomFilter.includes(schedule.room),
+    );
   }
-  
+
   const subjectFilter = subjectChoices ? subjectChoices.getValue(true) : [];
   if (subjectFilter.length > 0) {
-    filtered = filtered.filter(schedule => subjectFilter.includes(schedule.subject));
+    filtered = filtered.filter((schedule) =>
+      subjectFilter.includes(schedule.subject),
+    );
   }
-  
+
   const dayFilter = dayChoices ? dayChoices.getValue(true) : [];
   if (dayFilter.length > 0) {
-    filtered = filtered.filter(schedule => dayFilter.includes(schedule.day));
+    filtered = filtered.filter((schedule) => dayFilter.includes(schedule.day));
   }
-  
-  const dateFilter = document.getElementById('filter-date-exact-u')?.value;
+
+  const dateFilter = document.getElementById("filter-date-exact-u")?.value;
   if (dateFilter) {
-    filtered = filtered.filter(schedule => schedule.date === dateFilter);
+    filtered = filtered.filter((schedule) => schedule.date === dateFilter);
   }
-  
+
   return filtered;
 }

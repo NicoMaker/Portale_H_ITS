@@ -138,7 +138,7 @@ function renderSchedules() {
       .filter((c) => c.name === courseNameFilter)
       .map((c) => String(c.id));
     filtered = filtered.filter((s) =>
-      matchingCourseIds.includes(String(s.course_id))
+      matchingCourseIds.includes(String(s.course_id)),
     );
   }
 
@@ -285,7 +285,7 @@ function openEditSchedule(id) {
   const s = schedules.find((x) => x.id == id);
   // Ordina i corsi alfabeticamente
   const sortedCourses = [...courses].sort((a, b) =>
-    a.name.localeCompare(b.name)
+    a.name.localeCompare(b.name),
   );
 
   document.getElementById("edit-course-select").innerHTML = sortedCourses
@@ -293,7 +293,7 @@ function openEditSchedule(id) {
       (c) =>
         `<option value="${c.id}"${c.id == s.course_id ? " selected" : ""}>${
           c.name
-        }</option>`
+        }</option>`,
     )
     .join("");
 
@@ -350,7 +350,7 @@ document.getElementById("edit-schedule-form").onsubmit = async function (e) {
       String(s.course_id) === String(course_id) &&
       s.date === date &&
       s.start_time === start_time &&
-      s.id != editingScheduleId
+      s.id != editingScheduleId,
   );
 
   if (overlap) {
@@ -428,7 +428,7 @@ function deleteSchedule() {
         fetchCoursesAndSchedules();
         document.getElementById("delete-schedule-modal").style.display = "none";
         deletingScheduleId = null;
-      }
+      },
     );
   }
 }
@@ -437,7 +437,7 @@ function deleteSchedule() {
 document.getElementById("add-schedule-btn").onclick = () => {
   const filterVal = document.getElementById("filter-course").value;
   const sortedCourses = [...courses].sort((a, b) =>
-    a.name.localeCompare(b.name)
+    a.name.localeCompare(b.name),
   );
 
   document.getElementById("add-course-select").innerHTML =
@@ -499,7 +499,7 @@ document.getElementById("add-schedule-form").onsubmit = async function (e) {
     (s) =>
       String(s.course_id) === String(course_id) &&
       s.date === date &&
-      s.start_time === start_time
+      s.start_time === start_time,
   );
 
   if (overlap) {
@@ -641,7 +641,7 @@ function populateFilterOptions() {
         "Domenica",
       ];
       return dayOrder.indexOf(a) - dayOrder.indexOf(b);
-    }
+    },
   );
 
   console.log("Valori disponibili per i filtri:", {
@@ -664,7 +664,7 @@ function populateFilterOptions() {
   });
   teacherChoices.passedElement.element.addEventListener(
     "change",
-    renderSchedules
+    renderSchedules,
   );
 
   roomChoices = new Choices("#filter-room", {
@@ -679,7 +679,7 @@ function populateFilterOptions() {
   });
   subjectChoices.passedElement.element.addEventListener(
     "change",
-    renderSchedules
+    renderSchedules,
   );
 
   dayChoices = new Choices("#filter-day", {
@@ -831,7 +831,7 @@ function getFilteredSchedules() {
       .filter((c) => c.name === courseNameFilter)
       .map((c) => String(c.id));
     filtered = filtered.filter((s) =>
-      matchingCourseIds.includes(String(s.course_id))
+      matchingCourseIds.includes(String(s.course_id)),
     );
   }
 
