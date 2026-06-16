@@ -25,12 +25,9 @@ router.post("/", requireAdmin, (req, res) => {
     [name, description],
     function (err) {
       if (err) return res.status(400).send("Nome corso già esistente");
-      broadcast(req, "courses_updated", {
-        action: "created",
-        courseId: this.lastID,
-      });
+      broadcast(req, "courses_updated", { action: "created", courseId: this.lastID });
       res.send("OK");
-    },
+    }
   );
 });
 
@@ -39,29 +36,22 @@ router.put("/:id", requireAdmin, (req, res) => {
   const { id } = req.params;
   const { name, description } = req.body;
 
-  db.get(
-    "SELECT * FROM courses WHERE name = ? AND id != ?",
-    [name, id],
-    (err, existing) => {
-      if (err) return res.status(500).send("DB error");
-      if (existing) return res.status(400).send("Nome corso già esistente");
+  db.get("SELECT * FROM courses WHERE name = ? AND id != ?", [name, id], (err, existing) => {
+    if (err) return res.status(500).send("DB error");
+    if (existing) return res.status(400).send("Nome corso già esistente");
 
-      db.run(
-        "UPDATE courses SET name=?, description=? WHERE id=?",
-        [name, description, id],
-        function (err) {
-          if (err) return res.status(400).send("Errore update corso");
-          broadcast(req, "courses_updated", {
-            action: "updated",
-            courseId: Number(id),
-          });
-          // Aggiorna anche gli orari degli utenti che potrebbero essere connessi
-          broadcast(req, "schedule_updated", { courseId: Number(id) });
-          res.send("OK");
-        },
-      );
-    },
-  );
+    db.run(
+      "UPDATE courses SET name=?, description=? WHERE id=?",
+      [name, description, id],
+      function (err) {
+        if (err) return res.status(400).send("Errore update corso");
+        broadcast(req, "courses_updated", { action: "updated", courseId: Number(id) });
+        // Aggiorna anche gli orari degli utenti che potrebbero essere connessi
+        broadcast(req, "schedule_updated", { courseId: Number(id) });
+        res.send("OK");
+      }
+    );
+  });
 });
 
 // DELETE /api/courses/:id
@@ -69,10 +59,7 @@ router.delete("/:id", requireAdmin, (req, res) => {
   const { id } = req.params;
   db.run("DELETE FROM courses WHERE id=?", [id], function (err) {
     if (err) return res.status(500).send("DB error");
-    broadcast(req, "courses_updated", {
-      action: "deleted",
-      courseId: Number(id),
-    });
+    broadcast(req, "courses_updated", { action: "deleted", courseId: Number(id) });
     broadcast(req, "schedule_updated", { courseId: Number(id) });
     res.send("OK");
   });

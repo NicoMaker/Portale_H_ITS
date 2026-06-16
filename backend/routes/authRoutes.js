@@ -13,7 +13,7 @@ router.post("/login", (req, res) => {
     if (err) return res.status(500).send("Errore interno del server.");
     if (!user) {
       return res.send(
-        '<div class="hint" style="color:red;text-align:center">Credenziali non valide</div>',
+        '<div class="hint" style="color:red;text-align:center">Credenziali non valide</div>'
       );
     }
 
@@ -21,7 +21,7 @@ router.post("/login", (req, res) => {
       if (compareErr) return res.status(500).send("Errore interno del server.");
       if (!result) {
         return res.send(
-          '<div class="hint" style="color:red;text-align:center">Credenziali non valide</div>',
+          '<div class="hint" style="color:red;text-align:center">Credenziali non valide</div>'
         );
       }
 
@@ -32,9 +32,7 @@ router.post("/login", (req, res) => {
       });
       res.cookie("sid", sid, { httpOnly: true, path: "/" });
       res.redirect(
-        user.role === "admin"
-          ? "/admin_dashboard.html"
-          : "/user_dashboard.html",
+        user.role === "admin" ? "/admin_dashboard.html" : "/user_dashboard.html"
       );
     });
   });
@@ -52,10 +50,7 @@ router.get("/api/session", (req, res) => {
   const { sessions } = require("../configuration/auth");
   if (sid && sessions[sid]) {
     const s = sessions[sid];
-    return res.json({
-      ok: true,
-      user: { id: s.user.id, username: s.user.username, role: s.user.role },
-    });
+    return res.json({ ok: true, user: { id: s.user.id, username: s.user.username, role: s.user.role } });
   }
   res.json({ ok: false });
 });

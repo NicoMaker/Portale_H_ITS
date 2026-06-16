@@ -877,11 +877,9 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!window.AppSocket) return;
 
   AppSocket.on("schedules_updated", () => {
-    if (typeof fetchCoursesAndSchedules === "function")
-      fetchCoursesAndSchedules();
+    if (typeof fetchCoursesAndSchedules === "function") fetchCoursesAndSchedules();
   });
   AppSocket.on("courses_updated", () => {
-    if (typeof fetchCoursesAndSchedules === "function")
-      fetchCoursesAndSchedules();
+    if (typeof fetchCoursesAndSchedules === "function") fetchCoursesAndSchedules();
   });
 });
