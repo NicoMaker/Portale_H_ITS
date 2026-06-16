@@ -348,3 +348,17 @@ function renderCoursesList() {
   }
   updateCourseStats();
 }
+
+// ============================================================
+// REAL-TIME — Socket.IO
+// ============================================================
+document.addEventListener("DOMContentLoaded", () => {
+  if (!window.AppSocket) return;
+
+  AppSocket.on("courses_updated", () => {
+    if (typeof fetchCourses === "function") fetchCourses();
+  });
+  AppSocket.on("users_updated", () => {
+    if (typeof fetchCourses === "function") fetchCourses();
+  });
+});

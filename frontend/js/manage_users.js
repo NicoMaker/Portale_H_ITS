@@ -710,3 +710,55 @@ function getFilteredUsers() {
 
 // Initialize
 fetchCourses().then(fetchUsers);
+
+// ============================================================
+// REAL-TIME — Socket.IO
+// ============================================================
+document.addEventListener("DOMContentLoaded", () => {
+  if (!window.AppSocket) return;
+
+  // Quando un utente viene creato/modificato/eliminato da qualsiasi sessione admin
+  AppSocket.on("users_updated", ({ action, userId }) => {
+    // Ricarica la lista utenti in tempo reale
+    fetchCourses().then(fetchUsers);
+
+    // Toast notifica non-intrusiva
+    showRealtimeToast(action, userId);
+  });
+
+  AppSocket.on("courses_updated", () => {
+    fetchCourses().then(fetchUsers);
+  });
+});
+
+function showRealtimeToast(action, userId) {
+  const messages = {
+    created: "✅ Nuovo utente creato",
+    deleted: "🗑️ Utente eliminato",
+    edited: "✏️ Utente modificato",
+    promoted: "👑 Utente promosso ad admin",
+    demoted: "👤 Admin retrocesso a utente",
+    course_assigned: "📚 Corso aggiornato",
+    profile_updated: "👤 Profilo utente aggiornato",
+  };
+  const msg = messages[action] || "🔄 Dati aggiornati";
+  const toast = document.createElement("div");
+  toast.style.cssText = `
+    position:fixed;bottom:24px;right:24px;z-index:9999;
+    background:#1e293b;color:#f8fafc;padding:12px 20px;
+    border-radius:12px;font-size:13px;font-weight:500;
+    box-shadow:0 8px 24px rgba(0,0,0,.25);
+    animation:fadeInUp .3s ease-out;pointer-events:none;
+    max-width:280px;
+  `;
+  const style = document.createElement("style");
+  style.textContent = `@keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}`;
+  document.head.appendChild(style);
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    toast.style.transition = "opacity .4s";
+    toast.style.opacity = "0";
+    setTimeout(() => toast.remove(), 400);
+  }, 3000);
+}

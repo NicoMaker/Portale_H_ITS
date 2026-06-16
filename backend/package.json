@@ -1,6 +1,6 @@
 {
   "name": "course-management-app",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -14,7 +14,7 @@
     "cookie-parser": "^1.4.7",
     "express": "^5.1.0",
     "nodemon": "^3.1.10",
-    "parser": "^0.1.4",
+    "socket.io": "^4.7.5",
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {

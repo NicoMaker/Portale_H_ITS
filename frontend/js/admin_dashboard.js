@@ -315,3 +315,32 @@ modal.addEventListener("transitionend", () => {
     newPassword.focus();
   }
 });
+
+// ============================================================
+// REAL-TIME — Socket.IO
+// ============================================================
+document.addEventListener("DOMContentLoaded", () => {
+  if (!window.AppSocket) return;
+
+  // Quando utenti/corsi/orari cambiano → aggiorna le statistiche
+  AppSocket.on("users_updated", () => {
+    if (window.adminDashboard) adminDashboard.loadDashboardData();
+  });
+  AppSocket.on("courses_updated", () => {
+    if (window.adminDashboard) adminDashboard.loadDashboardData();
+  });
+  AppSocket.on("schedules_updated", () => {
+    if (window.adminDashboard) adminDashboard.loadDashboardData();
+  });
+
+  // Indicatore connessione live
+  const refreshBtn = document.getElementById("refresh-data");
+  if (refreshBtn) {
+    AppSocket.socket.on("connect", () => {
+      refreshBtn.title = "Connesso in tempo reale ✅";
+    });
+    AppSocket.socket.on("disconnect", () => {
+      refreshBtn.title = "Connessione persa — aggiorna manualmente";
+    });
+  }
+});

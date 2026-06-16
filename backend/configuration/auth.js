@@ -1,6 +1,6 @@
 const crypto = require("crypto");
 
-// In-memory session store
+// In-memory session store: { sid: { user, created } }
 const sessions = {};
 
 function createSession(user) {
@@ -10,18 +10,42 @@ function createSession(user) {
 }
 
 function getSession(req) {
-  const sid = req.cookies.sid;
+  const sid = req.cookies?.sid;
   if (sid && sessions[sid]) return sessions[sid];
   return null;
 }
 
+function getSessionBySid(sid) {
+  return sessions[sid] || null;
+}
+
 function destroySession(req, res) {
-  const sid = req.cookies.sid;
+  const sid = req.cookies?.sid;
   if (sid) delete sessions[sid];
   res.clearCookie("sid");
 }
 
-// Middleware for admin authentication
+// Invalida tutte le sessioni di un utente (per id) e ritorna gli sid invalidati
+function invalidateUserSessions(userId) {
+  const invalidated = [];
+  for (const [sid, sess] of Object.entries(sessions)) {
+    if (sess.user.id == userId) {
+      invalidated.push(sid);
+      delete sessions[sid];
+    }
+  }
+  return invalidated;
+}
+
+// Aggiorna lo username nelle sessioni attive dell'utente (senza fare logout)
+function updateSessionUsername(userId, newUsername) {
+  for (const sess of Object.values(sessions)) {
+    if (sess.user.id == userId) {
+      sess.user.username = newUsername;
+    }
+  }
+}
+
 function requireAdmin(req, res, next) {
   const session = getSession(req);
   if (!session || session.user.role !== "admin") {
@@ -31,7 +55,6 @@ function requireAdmin(req, res, next) {
   next();
 }
 
-// Middleware for user authentication
 function requireUser(req, res, next) {
   const session = getSession(req);
   if (!session || session.user.role !== "user") {
@@ -41,7 +64,6 @@ function requireUser(req, res, next) {
   next();
 }
 
-// Generic authentication middleware
 function requireAuth(req, res, next) {
   const session = getSession(req);
   if (!session) {
@@ -52,9 +74,13 @@ function requireAuth(req, res, next) {
 }
 
 module.exports = {
+  sessions,
   createSession,
   getSession,
+  getSessionBySid,
   destroySession,
+  invalidateUserSessions,
+  updateSessionUsername,
   requireAdmin,
   requireUser,
   requireAuth,

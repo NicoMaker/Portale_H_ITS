@@ -484,3 +484,53 @@ function getFilteredUserSchedules() {
 
   return filtered;
 }
+
+// ============================================================
+// REAL-TIME — Socket.IO
+// ============================================================
+document.addEventListener("DOMContentLoaded", () => {
+  if (!window.AppSocket) return;
+
+  // Quando l'admin aggiorna gli orari o cambia il corso dell'utente
+  AppSocket.on("schedule_updated", () => {
+    // Ricarica silenziosa dei dati
+    Promise.all([
+      fetch("/user/courses").then(r => r.json()),
+      fetch("/user/schedules").then(r => r.json())
+    ]).then(([courses, schedules]) => {
+      allCourses = courses;
+      allSchedules = schedules;
+      if (typeof renderSchedulesTable === "function") renderSchedulesTable();
+      if (typeof renderCoursesCards === "function") renderCoursesCards();
+      showRealtimeToastUser("🔄 Orari aggiornati in tempo reale");
+    }).catch(() => {});
+  });
+
+  AppSocket.on("courses_updated", () => {
+    fetch("/user/courses").then(r => r.json()).then(courses => {
+      allCourses = courses;
+      if (typeof renderCoursesCards === "function") renderCoursesCards();
+    }).catch(() => {});
+  });
+});
+
+function showRealtimeToastUser(msg) {
+  const toast = document.createElement("div");
+  toast.style.cssText = `
+    position:fixed;bottom:24px;right:24px;z-index:9999;
+    background:#0f172a;color:#f8fafc;padding:12px 20px;
+    border-radius:12px;font-size:13px;font-weight:500;
+    box-shadow:0 8px 24px rgba(0,0,0,.25);
+    animation:fadeInUpU .3s ease-out;pointer-events:none;
+  `;
+  const style = document.createElement("style");
+  style.textContent = `@keyframes fadeInUpU{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}`;
+  document.head.appendChild(style);
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    toast.style.transition = "opacity .4s";
+    toast.style.opacity = "0";
+    setTimeout(() => toast.remove(), 400);
+  }, 3000);
+}
