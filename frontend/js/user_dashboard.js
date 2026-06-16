@@ -495,22 +495,27 @@ document.addEventListener("DOMContentLoaded", () => {
   AppSocket.on("schedule_updated", () => {
     // Ricarica silenziosa dei dati
     Promise.all([
-      fetch("/user/courses").then(r => r.json()),
-      fetch("/user/schedules").then(r => r.json())
-    ]).then(([courses, schedules]) => {
-      allCourses = courses;
-      allSchedules = schedules;
-      if (typeof renderSchedulesTable === "function") renderSchedulesTable();
-      if (typeof renderCoursesCards === "function") renderCoursesCards();
-      showRealtimeToastUser("🔄 Orari aggiornati in tempo reale");
-    }).catch(() => {});
+      fetch("/user/courses").then((r) => r.json()),
+      fetch("/user/schedules").then((r) => r.json()),
+    ])
+      .then(([courses, schedules]) => {
+        allCourses = courses;
+        allSchedules = schedules;
+        if (typeof renderSchedulesTable === "function") renderSchedulesTable();
+        if (typeof renderCoursesCards === "function") renderCoursesCards();
+        showRealtimeToastUser("🔄 Orari aggiornati in tempo reale");
+      })
+      .catch(() => {});
   });
 
   AppSocket.on("courses_updated", () => {
-    fetch("/user/courses").then(r => r.json()).then(courses => {
-      allCourses = courses;
-      if (typeof renderCoursesCards === "function") renderCoursesCards();
-    }).catch(() => {});
+    fetch("/user/courses")
+      .then((r) => r.json())
+      .then((courses) => {
+        allCourses = courses;
+        if (typeof renderCoursesCards === "function") renderCoursesCards();
+      })
+      .catch(() => {});
   });
 });
 

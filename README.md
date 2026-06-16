@@ -3,20 +3,23 @@
 ## 🚀 Novità v2.0 — Real-time & Forced Logout
 
 ### Socket.IO integrato
+
 Tutte le pagine admin e utente sono connesse via WebSocket. Ogni modifica si propaga automaticamente a tutte le sessioni aperte senza bisogno di refresh manuale:
 
-| Evento | Chi riceve |
-|--------|-----------|
-| Utente creato / modificato / eliminato | Tutti gli admin su `manage_users` |
-| Ruolo cambiato (promote/demote) | Tutti gli admin + **logout forzato** dell'utente interessato |
+| Evento                                   | Chi riceve                                                   |
+| ---------------------------------------- | ------------------------------------------------------------ |
+| Utente creato / modificato / eliminato   | Tutti gli admin su `manage_users`                            |
+| Ruolo cambiato (promote/demote)          | Tutti gli admin + **logout forzato** dell'utente interessato |
 | Credenziali cambiate (username/password) | Tutti gli admin + **logout forzato** dell'utente interessato |
-| Utente eliminato | Tutti gli admin + **logout forzato** dell'utente eliminato |
-| Corso creato/modificato/eliminato | Tutti gli admin su `manage_courses` + utenti interessati |
-| Orario creato/modificato/eliminato | Tutti gli admin + utenti interessati (refresh automatico) |
-| Corso riassegnato a un utente | L'utente vede i nuovi orari in tempo reale |
+| Utente eliminato                         | Tutti gli admin + **logout forzato** dell'utente eliminato   |
+| Corso creato/modificato/eliminato        | Tutti gli admin su `manage_courses` + utenti interessati     |
+| Orario creato/modificato/eliminato       | Tutti gli admin + utenti interessati (refresh automatico)    |
+| Corso riassegnato a un utente            | L'utente vede i nuovi orari in tempo reale                   |
 
 ### Logout forzato
+
 Quando un admin:
+
 - **modifica username o password** di un utente → quell'utente vede un banner rosso e viene reindirizzato al login
 - **promuove o retrocede** un utente → logout forzato (deve ri-loginare col nuovo ruolo)
 - **elimina** un utente → logout forzato immediato
@@ -70,12 +73,12 @@ frontend/
 ```
 Client (browser)
   ↓ socket.emit("register", sid)   ← mappa sid → socketId sul server
-  
+
 Server
   invalidateUserSessions(userId)   ← cancella sessioni in-memory
   forceLogout(sid)                 ← emette "force_logout" al socket del sid
   io.emit("users_updated", {...})  ← broadcast a tutti i client
-  
+
 Client (browser)
   AppSocket.on("force_logout", …)  ← banner rosso + redirect /login.html
   AppSocket.on("users_updated", …) ← fetchUsers() automatico
