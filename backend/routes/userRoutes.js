@@ -35,7 +35,7 @@ router.get("/", requireAdmin, (req, res) => {
         (e, courses) => {
           u.courses = courses || [];
           if (++done === users.length) res.json(users);
-        }
+        },
       );
     });
   });
@@ -58,7 +58,10 @@ router.post("/", requireAdmin, (req, res) => {
 
         const newUserId = this.lastID;
         const afterInsert = () => {
-          broadcast(req, "users_updated", { action: "created", userId: newUserId });
+          broadcast(req, "users_updated", {
+            action: "created",
+            userId: newUserId,
+          });
           res.send("OK");
         };
 
@@ -69,12 +72,12 @@ router.post("/", requireAdmin, (req, res) => {
             (err2) => {
               if (err2) return res.send("Errore nell'associazione del corso");
               afterInsert();
-            }
+            },
           );
         } else {
           afterInsert();
         }
-      }
+      },
     );
   });
 });
@@ -90,7 +93,10 @@ router.post("/:id/promote", requireAdmin, (req, res) => {
       // Forza logout utente promosso (deve ri-loginare come admin)
       const sids = invalidateUserSessions(Number(id));
       forceLogout(req, sids);
-      broadcast(req, "users_updated", { action: "promoted", userId: Number(id) });
+      broadcast(req, "users_updated", {
+        action: "promoted",
+        userId: Number(id),
+      });
       res.send("OK");
     });
   });
@@ -113,10 +119,13 @@ router.post("/:id/demote", requireAdmin, (req, res) => {
 
           const sids = invalidateUserSessions(Number(id));
           forceLogout(req, sids);
-          broadcast(req, "users_updated", { action: "demoted", userId: Number(id) });
+          broadcast(req, "users_updated", {
+            action: "demoted",
+            userId: Number(id),
+          });
           res.send("OK");
         });
-      }
+      },
     );
   });
 });
@@ -130,17 +139,24 @@ router.delete("/:id", requireAdmin, (req, res) => {
       forceLogout(req, sids);
       db.run("DELETE FROM users WHERE id=?", [id], function (err) {
         if (err) return res.status(500).send("DB error");
-        broadcast(req, "users_updated", { action: "deleted", userId: Number(id) });
+        broadcast(req, "users_updated", {
+          action: "deleted",
+          userId: Number(id),
+        });
         res.send("OK");
       });
     };
 
     if (user && user.role === "admin") {
-      db.get('SELECT COUNT(*) as n FROM users WHERE role="admin"', [], (e, row) => {
-        if (row && row.n <= 1)
-          return res.status(400).send("Non puoi eliminare l'ultimo admin");
-        doDelete();
-      });
+      db.get(
+        'SELECT COUNT(*) as n FROM users WHERE role="admin"',
+        [],
+        (e, row) => {
+          if (row && row.n <= 1)
+            return res.status(400).send("Non puoi eliminare l'ultimo admin");
+          doDelete();
+        },
+      );
     } else {
       doDelete();
     }
@@ -154,7 +170,10 @@ router.post("/:id/assign_course", requireAdmin, (req, res) => {
 
   db.run("DELETE FROM user_courses WHERE user_id=?", [id], function () {
     if (!course_id) {
-      broadcast(req, "users_updated", { action: "course_assigned", userId: Number(id) });
+      broadcast(req, "users_updated", {
+        action: "course_assigned",
+        userId: Number(id),
+      });
       return res.send("OK");
     }
     db.run(
@@ -162,12 +181,15 @@ router.post("/:id/assign_course", requireAdmin, (req, res) => {
       [id, course_id],
       function (err) {
         if (err) return res.status(500).send("DB error");
-        broadcast(req, "users_updated", { action: "course_assigned", userId: Number(id) });
+        broadcast(req, "users_updated", {
+          action: "course_assigned",
+          userId: Number(id),
+        });
         // Notifica l'utente interessato in real-time
         const io = getIO(req);
         if (io) io.emit("schedule_updated", { userId: Number(id) });
         res.send("OK");
-      }
+      },
     );
   });
 });
@@ -177,37 +199,45 @@ router.post("/:id/edit", requireAdmin, (req, res) => {
   const { id } = req.params;
   const { username, password } = req.body;
 
-  db.get("SELECT * FROM users WHERE username=? AND id!=?", [username, id], (err, existing) => {
-    if (existing) return res.send("Username già esistente");
+  db.get(
+    "SELECT * FROM users WHERE username=? AND id!=?",
+    [username, id],
+    (err, existing) => {
+      if (existing) return res.send("Username già esistente");
 
-    const doUpdate = (hashedPassword) => {
-      const sql = hashedPassword
-        ? "UPDATE users SET username=?, password=? WHERE id=?"
-        : "UPDATE users SET username=? WHERE id=?";
-      const params = hashedPassword
-        ? [username, hashedPassword, id]
-        : [username, id];
+      const doUpdate = (hashedPassword) => {
+        const sql = hashedPassword
+          ? "UPDATE users SET username=?, password=? WHERE id=?"
+          : "UPDATE users SET username=? WHERE id=?";
+        const params = hashedPassword
+          ? [username, hashedPassword, id]
+          : [username, id];
 
-      db.run(sql, params, function (err) {
-        if (err) return res.status(500).send("Errore aggiornamento utente.");
+        db.run(sql, params, function (err) {
+          if (err) return res.status(500).send("Errore aggiornamento utente.");
 
-        // Forza logout: le credenziali sono cambiate
-        const sids = invalidateUserSessions(Number(id));
-        forceLogout(req, sids);
-        broadcast(req, "users_updated", { action: "edited", userId: Number(id) });
-        res.send("OK");
-      });
-    };
+          // Forza logout: le credenziali sono cambiate
+          const sids = invalidateUserSessions(Number(id));
+          forceLogout(req, sids);
+          broadcast(req, "users_updated", {
+            action: "edited",
+            userId: Number(id),
+          });
+          res.send("OK");
+        });
+      };
 
-    if (password) {
-      bcrypt.hash(password, 10, (hashErr, hashed) => {
-        if (hashErr) return res.status(500).send("Errore interno del server.");
-        doUpdate(hashed);
-      });
-    } else {
-      doUpdate(null);
-    }
-  });
+      if (password) {
+        bcrypt.hash(password, 10, (hashErr, hashed) => {
+          if (hashErr)
+            return res.status(500).send("Errore interno del server.");
+          doUpdate(hashed);
+        });
+      } else {
+        doUpdate(null);
+      }
+    },
+  );
 });
 
 // PUT /api/users/:id — modifica credenziali (admin, via PUT) → forza logout
@@ -215,33 +245,43 @@ router.put("/:id", requireAdmin, (req, res) => {
   const { id } = req.params;
   const { username, password } = req.body;
 
-  db.get("SELECT * FROM users WHERE username=? AND id!=?", [username, id], (err, existing) => {
-    if (existing) return res.send("Username già esistente");
+  db.get(
+    "SELECT * FROM users WHERE username=? AND id!=?",
+    [username, id],
+    (err, existing) => {
+      if (existing) return res.send("Username già esistente");
 
-    const doUpdate = (hashedPassword) => {
-      const sql = hashedPassword
-        ? "UPDATE users SET username=?, password=? WHERE id=?"
-        : "UPDATE users SET username=? WHERE id=?";
-      const params = hashedPassword ? [username, hashedPassword, id] : [username, id];
+      const doUpdate = (hashedPassword) => {
+        const sql = hashedPassword
+          ? "UPDATE users SET username=?, password=? WHERE id=?"
+          : "UPDATE users SET username=? WHERE id=?";
+        const params = hashedPassword
+          ? [username, hashedPassword, id]
+          : [username, id];
 
-      db.run(sql, params, function (err) {
-        if (err) return res.status(500).send("Errore aggiornamento utente.");
-        const sids = invalidateUserSessions(Number(id));
-        forceLogout(req, sids);
-        broadcast(req, "users_updated", { action: "edited", userId: Number(id) });
-        res.send("OK");
-      });
-    };
+        db.run(sql, params, function (err) {
+          if (err) return res.status(500).send("Errore aggiornamento utente.");
+          const sids = invalidateUserSessions(Number(id));
+          forceLogout(req, sids);
+          broadcast(req, "users_updated", {
+            action: "edited",
+            userId: Number(id),
+          });
+          res.send("OK");
+        });
+      };
 
-    if (password) {
-      bcrypt.hash(password, 10, (hashErr, hashed) => {
-        if (hashErr) return res.status(500).send("Errore interno del server.");
-        doUpdate(hashed);
-      });
-    } else {
-      doUpdate(null);
-    }
-  });
+      if (password) {
+        bcrypt.hash(password, 10, (hashErr, hashed) => {
+          if (hashErr)
+            return res.status(500).send("Errore interno del server.");
+          doUpdate(hashed);
+        });
+      } else {
+        doUpdate(null);
+      }
+    },
+  );
 });
 
 // POST /api/users/profile — modifica profilo utente corrente → forza logout
@@ -250,38 +290,48 @@ router.post("/profile", requireAuth, (req, res) => {
   const userId = req.session.user.id;
   const sid = req.cookies?.sid;
 
-  db.get("SELECT * FROM users WHERE username=? AND id!=?", [username, userId], (err, existing) => {
-    if (existing) return res.send("Username già esistente");
+  db.get(
+    "SELECT * FROM users WHERE username=? AND id!=?",
+    [username, userId],
+    (err, existing) => {
+      if (existing) return res.send("Username già esistente");
 
-    const doUpdate = (hashedPassword) => {
-      const sql = hashedPassword
-        ? "UPDATE users SET username=?, password=? WHERE id=?"
-        : "UPDATE users SET username=? WHERE id=?";
-      const params = hashedPassword ? [username, hashedPassword, userId] : [username, userId];
+      const doUpdate = (hashedPassword) => {
+        const sql = hashedPassword
+          ? "UPDATE users SET username=?, password=? WHERE id=?"
+          : "UPDATE users SET username=? WHERE id=?";
+        const params = hashedPassword
+          ? [username, hashedPassword, userId]
+          : [username, userId];
 
-      db.run(sql, params, function (err) {
-        if (err) return res.status(500).send("Errore DB");
+        db.run(sql, params, function (err) {
+          if (err) return res.status(500).send("Errore DB");
 
-        // Forza logout della sessione corrente (dovranno ri-loginare con le nuove credenziali)
-        const { invalidateUserSessions } = require("../configuration/auth");
-        const fn = req.app.get("forceLogout");
-        const sids = invalidateUserSessions(userId);
-        if (fn) sids.forEach((s) => fn(s));
+          // Forza logout della sessione corrente (dovranno ri-loginare con le nuove credenziali)
+          const { invalidateUserSessions } = require("../configuration/auth");
+          const fn = req.app.get("forceLogout");
+          const sids = invalidateUserSessions(userId);
+          if (fn) sids.forEach((s) => fn(s));
 
-        broadcast(req, "users_updated", { action: "profile_updated", userId });
-        res.send("OK");
-      });
-    };
+          broadcast(req, "users_updated", {
+            action: "profile_updated",
+            userId,
+          });
+          res.send("OK");
+        });
+      };
 
-    if (password) {
-      bcrypt.hash(password, 10, (hashErr, hashed) => {
-        if (hashErr) return res.status(500).send("Errore interno del server.");
-        doUpdate(hashed);
-      });
-    } else {
-      doUpdate(null);
-    }
-  });
+      if (password) {
+        bcrypt.hash(password, 10, (hashErr, hashed) => {
+          if (hashErr)
+            return res.status(500).send("Errore interno del server.");
+          doUpdate(hashed);
+        });
+      } else {
+        doUpdate(null);
+      }
+    },
+  );
 });
 
 module.exports = router;
