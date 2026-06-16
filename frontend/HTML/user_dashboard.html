@@ -1,483 +1,268 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="it">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard Utente</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"
-    />
-
-    <script src="js/tailwind.js"></script>
-    <link rel="stylesheet" href="CSS/styleuser.css" />
-  </head>
-
-  <body
-    class="bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 min-h-screen"
-  >
-    <nav
-      class="bg-white shadow-lg border-b border-gray-200 backdrop-blur-sm bg-white/95 sticky top-0 z-50"
-    >
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-          <div class="hidden md:flex space-x-8 items-center">
-            <a
-              href="/user_dashboard.html"
-              class="inline-flex items-center px-1 pt-1 text-sm font-medium text-blue-600 border-b-2 border-blue-500 transition-all duration-200"
-            >
-              🏠 Dashboard User
-            </a>
-          </div>
-
-          <div class="hidden md:flex items-center space-x-4">
-            <a
-              href="/logout"
-              class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg transition-all duration-200"
-            >
-              🚪 Logout
-            </a>
-          </div>
-
-          <div class="md:hidden flex items-center">
-            <button
-              id="mobile-menu-btn"
-              class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
-            >
-              <svg
-                class="block h-6 w-6"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-            </button>
-          </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🏠 Dashboard Utente - Portale ITS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+  <script src="js/tailwind.js"></script>
+  <link rel="stylesheet" href="CSS/styleuser.css" />
+</head>
+<body class="bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 min-h-screen">
+  <!-- Navigation -->
+  <nav class="glass-effect sticky top-0 z-50 border-b border-white/20 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="hidden md:flex space-x-8 items-center">
+          <a href="/user_dashboard.html" class="text-blue-600 font-medium border-b-2 border-blue-500 pb-1">
+            🏠 Dashboard
+          </a>
         </div>
 
-        <div id="mobile-menu" class="md:hidden hidden">
-          <div
-            class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200"
-          >
-            <a
-              href="/user_dashboard.html"
-              class="block px-3 py-2 text-base font-medium text-blue-600 bg-blue-50 rounded-md"
-            >
-              🏠 Dashboard User
-            </a>
-            <a
-              href="/logout"
-              class="block px-3 py-2 text-base font-medium text-white bg-red-500 hover:bg-red-600 rounded-md"
-            >
-              🚪 Logout
-            </a>
-          </div>
-        </div>
-      </div>
-    </nav>
-
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div class="mb-8">
-        <div
-          class="flex flex-col md:flex-row md:items-center md:justify-between"
-        >
-          <div class="mb-4 md:mb-0">
-            <h1
-              class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent gradient-animate"
-            >
-              🏠 Dashboard Utente
-            </h1>
-            <p class="text-gray-600 mt-2 text-base md:text-lg">
-              Visualizza gli orari delle tue lezioni.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Statistiche Personali -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-        <!-- Totale Lezioni -->
-        <div
-          class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6"
-        >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-600">Lezioni Totali</p>
-              <p id="total-lessons" class="text-3xl font-bold text-gray-900">
-                -
-              </p>
-            </div>
-            <div
-              class="bg-gradient-to-r from-blue-500 to-blue-600 p-3 rounded-xl"
-            >
-              <svg
-                class="w-6 h-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v16a2 2 0 002 2z"
-                ></path>
-              </svg>
-            </div>
-          </div>
-          <div class="mt-4">
-            <div class="flex items-center text-sm">
-              <span class="text-blue-600 font-medium">Lezioni Programmate</span>
-            </div>
-          </div>
+        <div class="hidden md:flex items-center space-x-4">
+          <a href="/logout" class="inline-flex items-center px-4 py-2 text-white bg-red-500 hover:bg-red-600 rounded-lg transition-all font-medium">
+            🚪 Logout
+          </a>
         </div>
 
-        <!-- Lezioni Questa Settimana -->
-        <div
-          class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6"
-        >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-600">Questa Settimana</p>
-              <p id="week-lessons" class="text-3xl font-bold text-gray-900">
-                -
-              </p>
-            </div>
-            <div
-              class="bg-gradient-to-r from-green-500 to-green-600 p-3 rounded-xl"
-            >
-              <svg
-                class="w-6 h-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M13 10V3L4 14h7v7l9-11h-7z"
-                ></path>
-              </svg>
-            </div>
-          </div>
-          <div class="mt-4">
-            <div class="flex items-center text-sm">
-              <span class="text-green-600 font-medium">Lezioni in Arrivo</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Prossima Lezione -->
-        <div
-          class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6"
-        >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-600">Prossima Lezione</p>
-              <p id="next-lesson" class="text-lg font-bold text-gray-900">-</p>
-            </div>
-            <div
-              class="bg-gradient-to-r from-purple-500 to-purple-600 p-3 rounded-xl"
-            >
-              <svg
-                class="w-6 h-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                ></path>
-              </svg>
-            </div>
-          </div>
-          <div class="mt-4">
-            <div class="flex items-center text-sm">
-              <span class="text-purple-600 font-medium">In Arrivo</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Lezioni Filtate -->
-        <div
-          class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6"
-        >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-600">Visualizzate</p>
-              <p id="filtered-lessons" class="text-3xl font-bold text-gray-900">
-                -
-              </p>
-            </div>
-            <div
-              class="bg-gradient-to-r from-orange-500 to-orange-600 p-3 rounded-xl"
-            >
-              <svg
-                class="w-6 h-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"
-                ></path>
-              </svg>
-            </div>
-          </div>
-          <div class="mt-4">
-            <div class="flex items-center text-sm">
-              <span class="text-orange-600 font-medium">Con Filtri</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div id="courses-section" class="mb-8 animate-slide-up">
-        <div
-          class="bg-white/95 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-lg hover-lift overflow-hidden border border-gray-100"
-        >
-          <div class="p-4 md:p-6">
-            <div class="flex items-center space-x-3 md:space-x-4 mb-4 md:mb-6">
-              <div
-                class="p-2 md:p-3 bg-gradient-to-r from-purple-100 via-blue-100 to-indigo-100 rounded-xl md:rounded-2xl shadow-lg"
-              >
-                <span class="text-2xl md:text-3xl">📚</span>
-              </div>
-              <div>
-                <h2
-                  class="text-xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent"
-                >
-                  Il tuo Corso
-                </h2>
-                <p class="text-gray-600 text-sm md:text-lg">
-                  Corso assegnato al tuo profilo
-                </p>
-              </div>
-            </div>
-            <div id="user-courses" class="flex flex-wrap gap-2 md:gap-3"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="mb-8 animate-slide-up">
-        <div
-          class="bg-white/95 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-lg hover-lift overflow-hidden border border-gray-100"
-        >
-          <div class="p-4 md:p-6">
-            <div class="flex items-center space-x-3 md:space-x-4 mb-4 md:mb-6">
-              <div
-                class="p-2 md:p-3 bg-gradient-to-r from-purple-100 via-blue-100 to-indigo-100 rounded-xl md:rounded-2xl shadow-lg"
-              >
-                <span class="text-2xl md:text-3xl">🔎</span>
-              </div>
-              <div>
-                <h2
-                  class="text-xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent"
-                >
-                  Filtra Risultati
-                </h2>
-                <p class="text-gray-600 text-sm md:text-lg">
-                  Cerca lezioni per docente, aula, materia, giorno o data
-                </p>
-              </div>
-            </div>
-
-            <div
-              class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"
-            >
-              <div class="space-y-2">
-                <label
-                  for="filter-teacher-u"
-                  class="block text-xs md:text-sm font-semibold text-gray-700 flex items-center"
-                >
-                  <span class="mr-2">👨‍🏫</span>
-                  Docente
-                </label>
-                <select id="filter-teacher-u" multiple class="w-full"></select>
-              </div>
-
-              <div class="space-y-2">
-                <label
-                  for="filter-room-u"
-                  class="block text-xs md:text-sm font-semibold text-gray-700 flex items-center"
-                >
-                  <span class="mr-2">🏫</span>
-                  Aula
-                </label>
-                <select id="filter-room-u" multiple class="w-full"></select>
-              </div>
-
-              <div class="space-y-2">
-                <label
-                  for="filter-subject-u"
-                  class="block text-xs md:text-sm font-semibold text-gray-700 flex items-center"
-                >
-                  <span class="mr-2">📖</span>
-                  Materia
-                </label>
-                <select id="filter-subject-u" multiple class="w-full"></select>
-              </div>
-
-              <div class="space-y-2">
-                <label
-                  for="filter-date-u"
-                  class="block text-xs md:text-sm font-semibold text-gray-700 flex items-center"
-                >
-                  <span class="mr-2">📅</span>
-                  Giorno
-                </label>
-                <select id="filter-date-u" multiple class="w-full"></select>
-              </div>
-
-              <div class="space-y-2">
-                <label
-                  for="filter-date-exact-u"
-                  class="block text-xs md:text-sm font-semibold text-gray-700 flex items-center"
-                >
-                  <span class="mr-2">📆</span>
-                  Data
-                </label>
-                <input
-                  type="date"
-                  id="filter-date-exact-u"
-                  class="w-full px-3 md:px-4 py-2 md:py-3 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-sm md:text-base"
-                />
-              </div>
-            </div>
-            <div class="mt-6 text-center">
-              <button
-                id="reset-filters-btn-u"
-                class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-xl shadow-sm text-white bg-gray-500 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200"
-              >
-                <span class="mr-2"></span> Azzera Filtri
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="animate-slide-up">
-        <div
-          class="bg-white/95 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-lg hover-lift overflow-hidden border border-gray-100"
-        >
-          <div class="p-4 md:p-6">
-            <div class="flex items-center space-x-3 md:space-x-4 mb-4 md:mb-6">
-              <div
-                class="p-2 md:p-3 bg-gradient-to-r from-purple-100 via-blue-100 to-indigo-100 rounded-xl md:rounded-2xl shadow-lg"
-              >
-                <span class="text-2xl md:text-3xl">📋</span>
-              </div>
-              <div>
-                <h2
-                  class="text-xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent"
-                >
-                  Orari delle Lezioni
-                </h2>
-                <p class="text-gray-600 text-sm md:text-lg">
-                  Visualizza tutti gli orari delle tue lezioni
-                </p>
-              </div>
-            </div>
-
-            <div id="user-schedules-table" class="mobile-table-container"></div>
-          </div>
-        </div>
-      </div>
-    </main>
-
-    <div
-      id="edit-profile-modal"
-      class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
-    >
-      <div
-        class="bg-white/95 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-3xl max-w-md w-full overflow-hidden border border-gray-100 animate-slide-up"
-      >
-        <div
-          class="flex items-center justify-between p-6 md:p-8 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-blue-50"
-        >
-          <h3
-            class="text-xl md:text-2xl font-bold text-gray-900 flex items-center"
-          >
-            <span class="text-2xl md:text-3xl mr-3">⚙️</span>
-            Modifica Profilo
-          </h3>
-          <button
-            id="close-modal"
-            class="text-gray-400 hover:text-gray-600 text-2xl md:text-3xl font-bold transition-colors"
-          >
-            ×
+        <div class="md:hidden flex items-center">
+          <button id="mobile-menu-btn" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+            <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
           </button>
         </div>
+      </div>
 
-        <div class="p-6 md:p-8">
-          <form id="edit-profile-form" class="space-y-4 md:space-y-6">
-            <div>
-              <label
-                class="block text-xs md:text-sm font-semibold text-gray-700 mb-2 md:mb-3"
-              >
-                Username
-              </label>
-              <input
-                type="text"
-                id="new_username"
-                disabled
-                class="w-full px-4 md:px-6 py-3 md:py-4 border-2 border-gray-200 rounded-xl md:rounded-2xl bg-gray-50 text-gray-500 text-sm md:text-base"
-              />
-            </div>
+      <div id="mobile-menu" class="md:hidden hidden">
+        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200">
+          <a href="/user_dashboard.html" class="block px-3 py-2 text-base font-medium text-blue-600 bg-blue-50 rounded-md">🏠 Dashboard</a>
+          <a href="/logout" class="block px-3 py-2 text-base font-medium text-white bg-red-500 hover:bg-red-600 rounded-md">🚪 Logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
 
-            <div>
-              <label
-                class="block text-xs md:text-sm font-semibold text-gray-700 mb-2 md:mb-3"
-              >
-                Nuova Password
-              </label>
-              <input
-                type="password"
-                id="new_password"
-                placeholder="Inserisci la nuova password"
-                required
-                class="w-full px-4 md:px-6 py-3 md:py-4 border-2 border-gray-300 rounded-xl md:rounded-2xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-sm md:text-base"
-              />
-              <div
-                id="edit-password-hint"
-                class="text-xs md:text-sm mt-2 text-red-500"
-              ></div>
-            </div>
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-4xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent gradient-animate">
+        🏠 Dashboard Utente
+      </h1>
+      <p class="text-gray-600 mt-2 text-lg">Visualizza gli orari delle tue lezioni</p>
+    </div>
 
-            <button
-              type="submit"
-              class="w-full bg-gradient-to-r from-purple-500 to-blue-600 text-white py-3 md:py-4 px-6 rounded-xl md:rounded-2xl font-semibold hover:from-purple-600 hover:to-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg text-sm md:text-base"
-            >
-              Salva Modifiche
-            </button>
+    <!-- Statistics Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+      <!-- Total Lessons -->
+      <div class="glass-effect rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6 animate-slide-up">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-600">Lezioni Totali</p>
+            <p id="total-lessons" class="text-3xl font-bold text-gray-900 mt-2">-</p>
+          </div>
+          <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-3 rounded-xl shadow-lg">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v16a2 2 0 002 2z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="mt-4">
+          <p class="text-xs text-blue-600 font-medium">📍 Lezioni Programmate</p>
+        </div>
+      </div>
 
-            <div
-              id="edit-profile-msg"
-              class="text-center text-xs md:text-sm font-medium"
-            ></div>
-          </form>
+      <!-- This Week -->
+      <div class="glass-effect rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6 animate-slide-up animation-delay-200">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-600">Questa Settimana</p>
+            <p id="week-lessons" class="text-3xl font-bold text-gray-900 mt-2">-</p>
+          </div>
+          <div class="bg-gradient-to-r from-green-500 to-green-600 p-3 rounded-xl shadow-lg">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="mt-4">
+          <p class="text-xs text-green-600 font-medium">⚡ Lezioni in Arrivo</p>
+        </div>
+      </div>
+
+      <!-- Next Lesson -->
+      <div class="glass-effect rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6 animate-slide-up animation-delay-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-600">Prossima Lezione</p>
+            <p id="next-lesson" class="text-lg font-bold text-gray-900 mt-2">-</p>
+          </div>
+          <div class="bg-gradient-to-r from-purple-500 to-purple-600 p-3 rounded-xl shadow-lg">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="mt-4">
+          <p class="text-xs text-purple-600 font-medium">⏰ In Arrivo</p>
+        </div>
+      </div>
+
+      <!-- Filtered Lessons -->
+      <div class="glass-effect rounded-2xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6 animate-slide-up animation-delay-400">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-600">Visualizzate</p>
+            <p id="filtered-lessons" class="text-3xl font-bold text-gray-900 mt-2">-</p>
+          </div>
+          <div class="bg-gradient-to-r from-orange-500 to-orange-600 p-3 rounded-xl shadow-lg">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="mt-4">
+          <p class="text-xs text-orange-600 font-medium">🔍 Con Filtri</p>
         </div>
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="js/socket-client.js"></script>
-    <script src="js/user_dashboard.js"></script>
-  </body>
+    <!-- Your Course -->
+    <div id="courses-section" class="mb-8 animate-slide-up">
+      <div class="glass-effect rounded-3xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6">
+        <div class="flex items-center space-x-4 mb-6">
+          <div class="p-3 bg-gradient-to-r from-purple-100 via-blue-100 to-indigo-100 rounded-2xl shadow-lg">
+            <span class="text-3xl">📚</span>
+          </div>
+          <div>
+            <h2 class="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Il tuo Corso</h2>
+            <p class="text-gray-600 text-lg">Corso assegnato al tuo profilo</p>
+          </div>
+        </div>
+        <div id="user-courses" class="flex flex-wrap gap-3"></div>
+      </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="mb-8 animate-slide-up">
+      <div class="glass-effect rounded-3xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6">
+        <div class="flex items-center space-x-4 mb-6">
+          <div class="p-3 bg-gradient-to-r from-purple-100 via-blue-100 to-indigo-100 rounded-2xl shadow-lg">
+            <span class="text-3xl">🔎</span>
+          </div>
+          <div>
+            <h2 class="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Filtra Risultati</h2>
+            <p class="text-gray-600 text-lg">Cerca lezioni per docente, aula, materia, giorno o data</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="space-y-2">
+            <label for="filter-teacher-u" class="block text-xs md:text-sm font-semibold text-gray-700 flex items-center">
+              <span class="mr-2">👨‍🏫</span>
+              Docente
+            </label>
+            <select id="filter-teacher-u" multiple class="w-full"></select>
+          </div>
+
+          <div class="space-y-2">
+            <label for="filter-room-u" class="block text-xs md:text-sm font-semibold text-gray-700 flex items-center">
+              <span class="mr-2">🏫</span>
+              Aula
+            </label>
+            <select id="filter-room-u" multiple class="w-full"></select>
+          </div>
+
+          <div class="space-y-2">
+            <label for="filter-subject-u" class="block text-xs md:text-sm font-semibold text-gray-700 flex items-center">
+              <span class="mr-2">📖</span>
+              Materia
+            </label>
+            <select id="filter-subject-u" multiple class="w-full"></select>
+          </div>
+
+          <div class="space-y-2">
+            <label for="filter-date-u" class="block text-xs md:text-sm font-semibold text-gray-700 flex items-center">
+              <span class="mr-2">📅</span>
+              Giorno
+            </label>
+            <select id="filter-date-u" multiple class="w-full"></select>
+          </div>
+
+          <div class="space-y-2">
+            <label for="filter-date-exact-u" class="block text-xs md:text-sm font-semibold text-gray-700 flex items-center">
+              <span class="mr-2">📆</span>
+              Data
+            </label>
+            <input type="date" id="filter-date-exact-u" class="w-full px-3 md:px-4 py-2 md:py-3 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all" />
+          </div>
+        </div>
+
+        <div class="mt-6 text-center">
+          <button id="reset-filters-btn-u" class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-xl shadow-sm text-white bg-gray-500 hover:bg-gray-600 focus:outline-none transition-all">
+            ↻ Azzera Filtri
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Schedules Table -->
+    <div class="animate-slide-up">
+      <div class="glass-effect rounded-3xl shadow-lg hover-lift overflow-hidden border border-gray-100 p-6">
+        <div class="flex items-center space-x-4 mb-6">
+          <div class="p-3 bg-gradient-to-r from-purple-100 via-blue-100 to-indigo-100 rounded-2xl shadow-lg">
+            <span class="text-3xl">📋</span>
+          </div>
+          <div>
+            <h2 class="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Orari delle Lezioni</h2>
+            <p class="text-gray-600 text-lg">Visualizza tutti gli orari delle tue lezioni</p>
+          </div>
+        </div>
+
+        <div id="user-schedules-table" class="mobile-table-container"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Edit Profile Modal -->
+  <div id="edit-profile-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div class="bg-white/95 backdrop-blur-sm rounded-3xl shadow-3xl max-w-md w-full overflow-hidden border border-gray-100 animate-slide-up">
+      <div class="flex items-center justify-between p-8 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-blue-50">
+        <h3 class="text-2xl font-bold text-gray-900 flex items-center">
+          <span class="text-3xl mr-3">⚙️</span>
+          Modifica Profilo
+        </h3>
+        <button id="close-modal" class="text-gray-400 hover:text-gray-600 text-3xl font-bold transition-colors">×</button>
+      </div>
+
+      <div class="p-8">
+        <form id="edit-profile-form" class="space-y-6">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-3">Username</label>
+            <input type="text" id="new_username" disabled class="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl bg-gray-50 text-gray-500" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-3">Nuova Password</label>
+            <input type="password" id="new_password" placeholder="Inserisci la nuova password" required class="w-full px-6 py-4 border-2 border-gray-300 rounded-2xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all" />
+            <div id="edit-password-hint" class="text-sm mt-2 text-red-500"></div>
+          </div>
+
+          <button type="submit" class="w-full bg-gradient-to-r from-purple-500 to-blue-600 text-white py-4 px-6 rounded-2xl font-semibold hover:from-purple-600 hover:to-blue-700 transform hover:-translate-y-1 transition-all">
+            Salva Modifiche
+          </button>
+
+          <div id="edit-profile-msg" class="text-center text-sm font-medium"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/socket-client.js"></script>
+  <script src="js/user_dashboard.js"></script>
+</body>
 </html>
