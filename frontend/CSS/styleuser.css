@@ -181,11 +181,13 @@
 
 /* Modern overrides */
 .hover-lift {
-  transition: transform 0.22s cubic-bezier(0.4,0,0.2,1), box-shadow 0.22s ease;
+  transition:
+    transform 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.22s ease;
 }
 .hover-lift:hover {
   transform: translateY(-5px);
-  box-shadow: 0 12px 32px rgba(79,70,229,0.14);
+  box-shadow: 0 12px 32px rgba(79, 70, 229, 0.14);
 }
 .float-animation {
   animation: float 6s ease-in-out infinite;
