@@ -21,7 +21,6 @@
   --nav-height: 64px;
 }
 
-/* ── Layout ── */
 body { margin: 0; min-height: 100vh; }
 
 /* ── Glassmorphism ── */
@@ -323,6 +322,15 @@ body { margin: 0; min-height: 100vh; }
   50%  { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(79,70,229,0.4); }
+  70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(79,70,229,0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(79,70,229,0); }
+}
 
 .animate-slide-up { animation: slideUp 0.5s ease forwards; }
 .animate-fade-in  { animation: fadeIn  0.5s ease forwards; }
@@ -338,4 +346,16 @@ body { margin: 0; min-height: 100vh; }
   .nav-links { display: none; }
   .admin-nav .nav-inner { padding: 0 1rem; }
   .btn-logout span { display: none; }
+}
+
+/* ── Hover lift ── */
+.hover-lift {
+  transition: transform 0.22s cubic-bezier(0.4,0,0.2,1), box-shadow 0.22s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 32px rgba(79,70,229,0.14);
+}
+.float-animation {
+  animation: float 6s ease-in-out infinite;
 }
