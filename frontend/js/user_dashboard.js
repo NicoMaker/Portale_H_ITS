@@ -195,15 +195,20 @@ function populateFilterOptions() {
 function renderCoursesBadges(courses) {
   const container = document.getElementById("user-courses");
   if (!courses.length) {
-    container.innerHTML = '<div style="text-align:center;padding:2rem;color:#9ca3af;font-size:.875rem;">Nessun corso assegnato.</div>';
+    container.innerHTML =
+      '<div style="text-align:center;padding:2rem;color:#9ca3af;font-size:.875rem;">Nessun corso assegnato.</div>';
     return;
   }
-  container.innerHTML = courses.map(c => `
+  container.innerHTML = courses
+    .map(
+      (c) => `
     <span style="display:inline-flex;align-items:center;gap:.4rem;padding:.4rem 1rem;border-radius:9999px;font-size:.8rem;font-weight:600;background:linear-gradient(135deg,#eef2ff,#f0f9ff);color:#4f46e5;border:1.5px solid #c7d2fe;transition:all .15s;cursor:default;"
       onmouseover="this.style.background='linear-gradient(135deg,#e0e7ff,#dbeafe)';this.style.transform='scale(1.04)'"
       onmouseout="this.style.background='linear-gradient(135deg,#eef2ff,#f0f9ff)';this.style.transform='scale(1)'">
       📚 ${c.name}
-    </span>`).join('');
+    </span>`,
+    )
+    .join("");
 }
 
 // ------------------------------
@@ -242,7 +247,8 @@ function renderSchedulesTable(courses, schedules) {
 
   let html = "";
   if (!filtered.length) {
-    html = '<div style="padding:3rem;text-align:center;"><div style="font-size:3rem;margin-bottom:.75rem;">📅</div><p style="font-weight:700;color:#374151;margin:0 0 .25rem;">Nessun orario trovato</p><p style="font-size:.875rem;color:#9ca3af;margin:0;">Modifica i filtri per vedere altri risultati.</p></div>';
+    html =
+      '<div style="padding:3rem;text-align:center;"><div style="font-size:3rem;margin-bottom:.75rem;">📅</div><p style="font-weight:700;color:#374151;margin:0 0 .25rem;">Nessun orario trovato</p><p style="font-size:.875rem;color:#9ca3af;margin:0;">Modifica i filtri per vedere altri risultati.</p></div>';
   } else {
     html = `
       <div style="overflow-x:auto;">
@@ -515,9 +521,14 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function showRealtimeToastUser(msg) {
-  const t = document.createElement('div');
-  t.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;background:#1e1b4b;color:#e0e7ff;padding:.7rem 1.1rem;border-radius:12px;font-size:.8rem;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.25);pointer-events:none;';
+  const t = document.createElement("div");
+  t.style.cssText =
+    "position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;background:#1e1b4b;color:#e0e7ff;padding:.7rem 1.1rem;border-radius:12px;font-size:.8rem;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.25);pointer-events:none;";
   t.textContent = msg;
   document.body.appendChild(t);
-  setTimeout(() => { t.style.transition = 'opacity .35s'; t.style.opacity = '0'; setTimeout(() => t.remove(), 350); }, 2800);
+  setTimeout(() => {
+    t.style.transition = "opacity .35s";
+    t.style.opacity = "0";
+    setTimeout(() => t.remove(), 350);
+  }, 2800);
 }
