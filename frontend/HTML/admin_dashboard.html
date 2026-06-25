@@ -5,19 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css"
-      rel="stylesheet"
-    />
     <script src="js/tailwind.js"></script>
     <link rel="stylesheet" href="CSS/style.css" />
+    <style>
+      /* Assicura che le card animate siano sempre visibili */
+      .stat-card, .action-card { opacity: 1 !important; transform: none !important; }
+      @keyframes cardIn {
+        from { opacity: 0; transform: translateY(24px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      .card-anim { animation: cardIn 0.5s ease forwards; }
+      .card-anim-2 { animation: cardIn 0.5s 0.12s ease both; }
+      .card-anim-3 { animation: cardIn 0.5s 0.24s ease both; }
+      .card-anim-4 { animation: cardIn 0.5s 0.36s ease both; }
+    </style>
   </head>
 
-  <body
-    class="bg-gradient-to-br from-slate-50 via-indigo-50 to-purple-50 min-h-screen"
-  >
-    <!-- Header con effetto glassmorphism -->
-        <nav class="admin-nav">
+  <body class="bg-gradient-to-br from-slate-50 via-indigo-50 to-purple-50 min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="admin-nav">
       <div class="nav-inner">
         <a href="/admin_dashboard.html" class="nav-brand">
           <div class="nav-brand-icon">
@@ -28,10 +35,10 @@
           <span class="nav-brand-label">Admin Panel</span>
         </a>
         <div class="nav-links">
-            <a href="/admin_dashboard.html" class="nav-link active">🏠 Dashboard Admin</a>
-            <a href="/manage_users.html" class="nav-link">👥 Gestione Utenti</a>
-            <a href="/manage_courses.html" class="nav-link">📚 Gestione Corsi</a>
-            <a href="/manage_schedules.html" class="nav-link">📅 Gestione Orari</a>
+          <a href="/admin_dashboard.html" class="nav-link active">🏠 Dashboard Admin</a>
+          <a href="/manage_users.html" class="nav-link">👥 Gestione Utenti</a>
+          <a href="/manage_courses.html" class="nav-link">📚 Gestione Corsi</a>
+          <a href="/manage_schedules.html" class="nav-link">📅 Gestione Orari</a>
         </div>
         <div class="nav-actions">
           <a href="/logout" class="btn-logout">
@@ -44,243 +51,148 @@
       </div>
     </nav>
 
-    <!-- Hero Section con animazioni -->
-    <section
-      class="relative gradient-bg text-white py-16 md:py-24 overflow-hidden"
-    >
+    <!-- Hero -->
+    <section class="relative gradient-bg text-white py-14 md:py-20 overflow-hidden">
       <div class="floating-shapes"></div>
       <div class="relative z-10 max-w-6xl mx-auto text-center px-4">
-        <h1 class="text-4xl md:text-6xl font-bold mb-6 animate-slide-up">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">
           Dashboard
-          <span
-            class="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent"
-            >Admin</span
-          >
+          <span class="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">Admin</span>
         </h1>
-        <p
-          class="text-xl md:text-2xl text-blue-100 mb-8 animate-fade-in animation-delay-300 max-w-3xl mx-auto"
-        >
-          Un portale per gestire utenti, corsi e calendario in modo semplice
+        <p class="text-lg md:text-xl text-blue-100 max-w-2xl mx-auto">
+          Gestisci utenti, corsi e orari della tua piattaforma
         </p>
-        <div
-          class="flex flex-wrap justify-center gap-4 animate-fade-in animation-delay-500"
-        ></div>
       </div>
     </section>
 
-    <!-- Main Content -->
+    <!-- Main -->
     <main class="max-w-7xl mx-auto px-4 py-12">
-      <!-- Statistiche Principali -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-        <!-- Totale Utenti -->
-        <div class="glass-effect rounded-2xl p-6 card-hover animate-slide-up">
+
+      <!-- ── Statistiche ── -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
+
+        <!-- Utenti -->
+        <div class="stat-card glass-effect rounded-2xl p-6 card-hover card-anim">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm font-medium text-gray-600">Totale Utenti</p>
+              <p class="text-sm font-medium text-gray-500 mb-1">Totale Utenti</p>
               <p id="total-users" class="text-3xl font-bold text-gray-900">-</p>
             </div>
-            <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-3 rounded-xl">
+            <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-3 rounded-xl shadow-md">
               <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/>
               </svg>
             </div>
           </div>
-          <div class="mt-4">
-            <div class="flex items-center text-sm">
-              <span id="users-admin" class="text-blue-600 font-medium">Admin: -</span>
-              <span class="mx-2">•</span>
-              <span id="users-regular" class="text-green-600 font-medium">Utenti: -</span>
-            </div>
+          <div class="mt-3 flex items-center gap-2 text-sm">
+            <span id="users-admin" class="text-blue-600 font-medium">Admin: -</span>
+            <span class="text-gray-300">•</span>
+            <span id="users-regular" class="text-green-600 font-medium">Utenti: -</span>
           </div>
         </div>
 
-        <!-- Totale Corsi -->
-        <div class="glass-effect rounded-2xl p-6 card-hover animate-slide-up animation-delay-200">
+        <!-- Corsi -->
+        <div class="stat-card glass-effect rounded-2xl p-6 card-hover card-anim-2">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm font-medium text-gray-600">Totale Corsi</p>
+              <p class="text-sm font-medium text-gray-500 mb-1">Totale Corsi</p>
               <p id="total-courses" class="text-3xl font-bold text-gray-900">-</p>
             </div>
-            <div class="bg-gradient-to-r from-green-500 to-green-600 p-3 rounded-xl">
+            <div class="bg-gradient-to-br from-green-500 to-emerald-600 p-3 rounded-xl shadow-md">
               <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
               </svg>
             </div>
           </div>
-          <div class="mt-4">
-            <div class="flex items-center text-sm">
-              <span class="text-green-600 font-medium">Corsi Attivi</span>
-            </div>
+          <div class="mt-3 text-sm">
+            <span class="text-green-600 font-medium">Corsi Attivi</span>
           </div>
         </div>
 
-        <!-- Totale Lezioni -->
-        <div class="glass-effect rounded-2xl p-6 card-hover animate-slide-up animation-delay-300">
+        <!-- Lezioni -->
+        <div class="stat-card glass-effect rounded-2xl p-6 card-hover card-anim-3">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm font-medium text-gray-600">Totale Lezioni</p>
+              <p class="text-sm font-medium text-gray-500 mb-1">Totale Lezioni</p>
               <p id="total-schedules" class="text-3xl font-bold text-gray-900">-</p>
             </div>
-            <div class="bg-gradient-to-r from-purple-500 to-purple-600 p-3 rounded-xl">
+            <div class="bg-gradient-to-br from-purple-500 to-indigo-600 p-3 rounded-xl shadow-md">
               <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v16a2 2 0 002 2z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v16a2 2 0 002 2z"/>
               </svg>
             </div>
           </div>
-          <div class="mt-4">
-            <div class="flex items-center text-sm">
-              <span class="text-purple-600 font-medium">Lezioni Programmate</span>
-            </div>
+          <div class="mt-3 text-sm">
+            <span class="text-purple-600 font-medium">Lezioni Programmate</span>
           </div>
         </div>
 
       </div>
 
+      <!-- ── Quick Actions ── -->
+      <h2 class="text-xl font-bold text-gray-700 mb-6">Accesso Rapido</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
 
-      <!-- Quick Actions Grid - Fixed to ensure equal height and alignment -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
-        <!-- Gestione Utenti Card -->
-        <div
-          class="glass-effect rounded-3xl p-8 card-hover animate-slide-up flex flex-col"
-        >
-          <div class="flex items-center justify-between mb-6">
-            <div class="icon-bg p-4 rounded-2xl shadow-lg">
-              <svg
-                class="w-8 h-8 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
-                ></path>
-              </svg>
-            </div>
+        <!-- Gestione Utenti -->
+        <div class="action-card glass-effect rounded-3xl p-8 card-hover card-anim flex flex-col">
+          <div class="icon-bg p-4 rounded-2xl shadow-lg w-fit mb-6">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/>
+            </svg>
           </div>
-          <h3 class="text-xl font-bold text-gray-800 mb-3">Gestione Utenti</h3>
-          <p class="text-gray-600 mb-6 flex-grow">
-            Amministra account utente, permessi e profili..
+          <h3 class="text-xl font-bold text-gray-800 mb-2">Gestione Utenti</h3>
+          <p class="text-gray-500 mb-6 flex-grow leading-relaxed">
+            Amministra account utente, permessi e profili della piattaforma.
           </p>
-          <a
-            href="/manage_users.html"
-            class="inline-flex items-center justify-center w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-6 py-3 rounded-xl font-medium transition-all transform hover:scale-105 hover:shadow-lg mt-auto"
-          >
+          <a href="/manage_users.html"
+            class="inline-flex items-center justify-center w-full bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition-all transform hover:scale-105 hover:shadow-lg mt-auto">
             <span>Gestisci Utenti</span>
-            <svg
-              class="w-4 h-4 ml-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 5l7 7-7 7"
-              ></path>
+            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
             </svg>
           </a>
         </div>
 
-        <!-- Gestione Corsi Card -->
-        <div
-          class="glass-effect rounded-3xl p-8 card-hover animate-slide-up animation-delay-200 flex flex-col"
-        >
-          <div class="flex items-center justify-between mb-6">
-            <div
-              class="bg-gradient-to-r from-green-500 to-emerald-600 p-4 rounded-2xl shadow-lg"
-            >
-              <svg
-                class="w-8 h-8 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                ></path>
-              </svg>
-            </div>
+        <!-- Gestione Corsi -->
+        <div class="action-card glass-effect rounded-3xl p-8 card-hover card-anim-2 flex flex-col">
+          <div class="bg-gradient-to-br from-green-500 to-emerald-600 p-4 rounded-2xl shadow-lg w-fit mb-6">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
           </div>
-          <h3 class="text-xl font-bold text-gray-800 mb-3">Gestione Corsi</h3>
-          <p class="text-gray-600 mb-6 flex-grow">
-            Crea, modifica e organizza corsi. Gestisci Corsi.
+          <h3 class="text-xl font-bold text-gray-800 mb-2">Gestione Corsi</h3>
+          <p class="text-gray-500 mb-6 flex-grow leading-relaxed">
+            Crea, modifica e organizza i corsi della tua istituzione.
           </p>
-          <a
-            href="/manage_courses.html"
-            class="inline-flex items-center justify-center w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-6 py-3 rounded-xl font-medium transition-all transform hover:scale-105 hover:shadow-lg mt-auto"
-          >
+          <a href="/manage_courses.html"
+            class="inline-flex items-center justify-center w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-6 py-3 rounded-xl font-semibold transition-all transform hover:scale-105 hover:shadow-lg mt-auto">
             <span>Gestisci Corsi</span>
-            <svg
-              class="w-4 h-4 ml-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 5l7 7-7 7"
-              ></path>
+            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
             </svg>
           </a>
         </div>
 
-        <!-- Gestione Orari Card -->
-        <div
-          class="glass-effect rounded-3xl p-8 card-hover animate-slide-up animation-delay-400 flex flex-col"
-        >
-          <div class="flex items-center justify-between mb-6">
-            <div
-              class="bg-gradient-to-r from-purple-500 to-indigo-600 p-4 rounded-2xl shadow-lg"
-            >
-              <svg
-                class="w-8 h-8 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v16a2 2 0 002 2z"
-                ></path>
-              </svg>
-            </div>
+        <!-- Gestione Orari -->
+        <div class="action-card glass-effect rounded-3xl p-8 card-hover card-anim-3 flex flex-col">
+          <div class="bg-gradient-to-br from-purple-500 to-indigo-600 p-4 rounded-2xl shadow-lg w-fit mb-6">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v16a2 2 0 002 2z"/>
+            </svg>
           </div>
-          <h3 class="text-xl font-bold text-gray-800 mb-3">Gestione Orari</h3>
-          <p class="text-gray-600 mb-6 flex-grow">
-            Programma lezioni, gestisci calendari e ottimizza la pianificazione
-            didattica.
+          <h3 class="text-xl font-bold text-gray-800 mb-2">Gestione Orari</h3>
+          <p class="text-gray-500 mb-6 flex-grow leading-relaxed">
+            Programma lezioni, gestisci calendari e ottimizza la pianificazione didattica.
           </p>
-          <a
-            href="/manage_schedules.html"
-            class="inline-flex items-center justify-center w-full bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-medium transition-all transform hover:scale-105 hover:shadow-lg mt-auto"
-          >
+          <a href="/manage_schedules.html"
+            class="inline-flex items-center justify-center w-full bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition-all transform hover:scale-105 hover:shadow-lg mt-auto">
             <span>Gestisci Orari</span>
-            <svg
-              class="w-4 h-4 ml-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 5l7 7-7 7"
-              ></path>
+            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
             </svg>
           </a>
         </div>
+
       </div>
     </main>
 
