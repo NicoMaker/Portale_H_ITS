@@ -195,19 +195,15 @@ function populateFilterOptions() {
 function renderCoursesBadges(courses) {
   const container = document.getElementById("user-courses");
   if (!courses.length) {
-    container.innerHTML =
-      '<div class="text-gray-500 text-center py-8 text-sm md:text-base">Nessun corso assegnato.</div>';
+    container.innerHTML = '<div style="text-align:center;padding:2rem;color:#9ca3af;font-size:.875rem;">Nessun corso assegnato.</div>';
     return;
   }
-  container.innerHTML = courses
-    .map(
-      (c) => `
-        <span class="inline-flex items-center px-3 md:px-4 py-2 rounded-full text-xs md:text-sm font-medium bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 hover:from-blue-200 hover:to-purple-200 transition-all duration-200 transform hover:scale-105">
-          📚 corso: ${c.name}
-        </span>
-      `,
-    )
-    .join("");
+  container.innerHTML = courses.map(c => `
+    <span style="display:inline-flex;align-items:center;gap:.4rem;padding:.4rem 1rem;border-radius:9999px;font-size:.8rem;font-weight:600;background:linear-gradient(135deg,#eef2ff,#f0f9ff);color:#4f46e5;border:1.5px solid #c7d2fe;transition:all .15s;cursor:default;"
+      onmouseover="this.style.background='linear-gradient(135deg,#e0e7ff,#dbeafe)';this.style.transform='scale(1.04)'"
+      onmouseout="this.style.background='linear-gradient(135deg,#eef2ff,#f0f9ff)';this.style.transform='scale(1)'">
+      📚 ${c.name}
+    </span>`).join('');
 }
 
 // ------------------------------
@@ -246,39 +242,38 @@ function renderSchedulesTable(courses, schedules) {
 
   let html = "";
   if (!filtered.length) {
-    html =
-      '<div class="text-center py-12 text-gray-500"><div class="text-4xl md:text-6xl mb-4">📅</div><p class="text-lg md:text-xl">Nessun orario trovato per questi filtri.</p></div>';
+    html = '<div style="padding:3rem;text-align:center;"><div style="font-size:3rem;margin-bottom:.75rem;">📅</div><p style="font-weight:700;color:#374151;margin:0 0 .25rem;">Nessun orario trovato</p><p style="font-size:.875rem;color:#9ca3af;margin:0;">Modifica i filtri per vedere altri risultati.</p></div>';
   } else {
     html = `
-      <div class="modern-table mobile-table">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="gradient-bg">
-            <tr class="text-white">
-              <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">🕐 Orario</th>
-              <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">📅 Giorno</th>
-              <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">📆 Data</th>
-              <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">👨‍🏫 Docente</th>
-              <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">🏫 Aula</th>
-              <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">📖 Materia</th>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead>
+            <tr style="background:linear-gradient(135deg,#4f46e5,#7c3aed);">
+              <th style="padding:.75rem 1rem;text-align:left;font-size:.75rem;font-weight:600;color:#fff;white-space:nowrap;">🕐 Orario</th>
+              <th style="padding:.75rem 1rem;text-align:left;font-size:.75rem;font-weight:600;color:#fff;white-space:nowrap;">📅 Giorno</th>
+              <th style="padding:.75rem 1rem;text-align:left;font-size:.75rem;font-weight:600;color:#fff;white-space:nowrap;">📆 Data</th>
+              <th style="padding:.75rem 1rem;text-align:left;font-size:.75rem;font-weight:600;color:#fff;white-space:nowrap;">👨‍🏫 Docente</th>
+              <th style="padding:.75rem 1rem;text-align:left;font-size:.75rem;font-weight:600;color:#fff;white-space:nowrap;">🏫 Aula</th>
+              <th style="padding:.75rem 1rem;text-align:left;font-size:.75rem;font-weight:600;color:#fff;white-space:nowrap;">📖 Materia</th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
+          <tbody>
     `;
     for (const s of filtered) {
       html += `
-        <tr class="hover:bg-blue-50 transition-all duration-200">
-          <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-900">
-            <div class="flex items-center gap-2">
-              <span class="bg-green-100 text-green-800 px-2 md:px-3 py-1 rounded-full text-xs font-bold font-mono">${s.start_time}</span>
-              <span class="text-gray-400">→</span>
-              <span class="bg-red-100 text-red-800 px-2 md:px-3 py-1 rounded-full text-xs font-bold font-mono">${s.end_time}</span>
+        <tr style="border-bottom:1px solid #f3f4f6;transition:background .15s;" onmouseover="this.style.background='#f9f8ff'" onmouseout="this.style.background=''">
+          <td style="padding:.75rem 1rem;">
+            <div style="display:flex;align-items:center;gap:.4rem;">
+              <span style="background:#f0fdf4;color:#15803d;padding:3px 8px;border-radius:9999px;font-size:.75rem;font-weight:700;font-family:monospace;">${s.start_time}</span>
+              <span style="color:#9ca3af;font-size:.7rem;">→</span>
+              <span style="background:#fff5f5;color:#dc2626;padding:3px 8px;border-radius:9999px;font-size:.75rem;font-weight:700;font-family:monospace;">${s.end_time}</span>
             </div>
           </td>
-          <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-700">${s.day}</td>
-          <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-700">${formatDate(s.date)}</td>
-          <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-900 font-medium">${s.teacher}</td>
-          <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-700">${s.room}</td>
-          <td class="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-700">${s.subject}</td>
+          <td style="padding:.75rem 1rem;font-size:.875rem;color:#374151;">${s.day}</td>
+          <td style="padding:.75rem 1rem;font-size:.875rem;color:#374151;">${formatDate(s.date)}</td>
+          <td style="padding:.75rem 1rem;font-size:.875rem;font-weight:600;color:#111827;">${s.teacher}</td>
+          <td style="padding:.75rem 1rem;font-size:.875rem;color:#374151;">${s.room}</td>
+          <td style="padding:.75rem 1rem;font-size:.875rem;color:#6b7280;font-style:italic;">${s.subject}</td>
         </tr>
       `;
     }
@@ -520,22 +515,9 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function showRealtimeToastUser(msg) {
-  const toast = document.createElement("div");
-  toast.style.cssText = `
-    position:fixed;bottom:24px;right:24px;z-index:9999;
-    background:#0f172a;color:#f8fafc;padding:12px 20px;
-    border-radius:12px;font-size:13px;font-weight:500;
-    box-shadow:0 8px 24px rgba(0,0,0,.25);
-    animation:fadeInUpU .3s ease-out;pointer-events:none;
-  `;
-  const style = document.createElement("style");
-  style.textContent = `@keyframes fadeInUpU{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}`;
-  document.head.appendChild(style);
-  toast.textContent = msg;
-  document.body.appendChild(toast);
-  setTimeout(() => {
-    toast.style.transition = "opacity .4s";
-    toast.style.opacity = "0";
-    setTimeout(() => toast.remove(), 400);
-  }, 3000);
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;background:#1e1b4b;color:#e0e7ff;padding:.7rem 1.1rem;border-radius:12px;font-size:.8rem;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.25);pointer-events:none;';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.transition = 'opacity .35s'; t.style.opacity = '0'; setTimeout(() => t.remove(), 350); }, 2800);
 }
