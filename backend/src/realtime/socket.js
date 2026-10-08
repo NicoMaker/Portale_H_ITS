@@ -5,17 +5,22 @@ const { Server } = require("socket.io");
 let io = null;
 const sessionSocketMap = {}; // { sid: socketId }
 
+function leggiSid(cookieHeader = "") {
+  const m = cookieHeader.match(/(?:^|;\s*)sid=([^;]+)/);
+  return m ? decodeURIComponent(m[1]) : null;
+}
+
 function init(httpServer) {
   io = new Server(httpServer);
 
   io.on("connection", (socket) => {
-    // Il client si registra inviando il proprio sid (letto dal cookie)
-    socket.on("register", (sid) => {
-      if (sid) {
-        sessionSocketMap[sid] = socket.id;
-        socket.data.sid = sid;
-      }
-    });
+    // Il sid arriva nell'handshake dal cookie httpOnly: il browser non deve
+    // più esporlo a JavaScript.
+    const sid = leggiSid(socket.handshake.headers.cookie);
+    if (sid) {
+      sessionSocketMap[sid] = socket.id;
+      socket.data.sid = sid;
+    }
 
     socket.on("disconnect", () => {
       const sid = socket.data.sid;

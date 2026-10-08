@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
-const { db } = require("../src/config/database");
-const { initDb } = require("../src/config/schema");
+const { db } = require("../config/database");
+const { initDb } = require("../config/schema");
 const readline = require("readline");
 
 const rl = readline.createInterface({

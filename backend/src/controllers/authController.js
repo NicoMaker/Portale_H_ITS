@@ -1,6 +1,9 @@
 // Controller auth: login/logout/sessione/profilo corrente
 const authService = require("../services/authService");
-const { destroySession } = require("../services/sessionService");
+const {
+  destroySession,
+  SESSION_TTL_MS,
+} = require("../services/sessionService");
 
 const authController = {
   async login(req, res) {
@@ -13,11 +16,13 @@ const authController = {
       );
     }
 
-    res.cookie("sid", esito.sid, { httpOnly: true, path: "/" });
-    // Cookie gemello leggibile da JS: serve solo al client Socket.IO per
-    // registrarsi e ricevere il force-logout mirato. Non concede accesso:
-    // l'autorizzazione resta legata al cookie httpOnly.
-    res.cookie("sid_client", esito.sid, { httpOnly: false, path: "/" });
+    res.cookie("sid", esito.sid, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: SESSION_TTL_MS,
+      path: "/",
+    });
     res.redirect(
       esito.role === "admin" ? "/admin_dashboard.html" : "/user_dashboard.html",
     );
@@ -25,7 +30,6 @@ const authController = {
 
   logout(req, res) {
     destroySession(req, res);
-    res.clearCookie("sid_client");
     res.redirect("/login.html");
   },
 

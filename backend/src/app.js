@@ -9,6 +9,17 @@ const { getLocalIP, getPublicIP } = require("./utils/network");
 function creaApp({ port } = {}) {
   const app = express();
 
+  app.disable("x-powered-by");
+  app.use((_req, res, next) => {
+    res.set({
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "SAMEORIGIN",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+    });
+    next();
+  });
+
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());

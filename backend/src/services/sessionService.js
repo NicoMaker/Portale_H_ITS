@@ -3,6 +3,19 @@ const crypto = require("crypto");
 
 const sessions = {};
 
+// Durata massima di una sessione (8 ore) e pulizia periodica delle scadute
+const SESSION_TTL_MS = 8 * 60 * 60 * 1000;
+const isExpired = (sess) => Date.now() - sess.created > SESSION_TTL_MS;
+
+setInterval(
+  () => {
+    for (const [sid, sess] of Object.entries(sessions)) {
+      if (isExpired(sess)) delete sessions[sid];
+    }
+  },
+  10 * 60 * 1000,
+).unref();
+
 function createSession(user) {
   const sid = crypto.randomBytes(16).toString("hex");
   sessions[sid] = { user, created: Date.now() };
@@ -11,12 +24,17 @@ function createSession(user) {
 
 function getSession(req) {
   const sid = req.cookies?.sid;
-  if (sid && sessions[sid]) return sessions[sid];
-  return null;
+  return getSessionBySid(sid);
 }
 
 function getSessionBySid(sid) {
-  return sessions[sid] || null;
+  const sess = sid ? sessions[sid] : null;
+  if (!sess) return null;
+  if (isExpired(sess)) {
+    delete sessions[sid];
+    return null;
+  }
+  return sess;
 }
 
 function destroySession(req, res) {
@@ -47,6 +65,7 @@ function updateSessionUsername(userId, newUsername) {
 }
 
 module.exports = {
+  SESSION_TTL_MS,
   sessions,
   createSession,
   getSession,

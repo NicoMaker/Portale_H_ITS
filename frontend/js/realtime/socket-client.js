@@ -9,20 +9,8 @@
 
   const socket = io({ transports: ["websocket", "polling"] });
 
-  function getSid() {
-    const match = document.cookie.match(
-      /(?:^|;\s*)sid_client=([^;]+)/,
-    );
-    if (match) return match[1];
-    // Fallback: vecchio cookie (se leggibile)
-    const legacy = document.cookie.match(/(?:^|;\s*)sid=([^;]+)/);
-    return legacy ? legacy[1] : null;
-  }
-
-  socket.on("connect", () => {
-    const sid = getSid();
-    if (sid) socket.emit("register", sid);
-  });
+  // La registrazione della sessione avviene lato server leggendo il cookie
+  // httpOnly: qui non serve più nessun evento "register".
 
   // ======================================================
   // FORCE LOGOUT

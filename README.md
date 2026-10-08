@@ -1,4 +1,4 @@
-# Portale H ITS — v2.0 (architettura a componenti)
+# Portale H ITS — v3.0 (modernizzato)
 
 Portale di gestione corsi, utenti e orari per un ITS, con aggiornamenti in tempo reale via Socket.IO. Stesse funzionalità della v1, ma tutto il codice — backend e frontend — è stato diviso in componenti con una sola responsabilità ciascuno.
 
@@ -13,6 +13,18 @@ npm run seed       # (opzionale) popola il database con dati di esempio
 
 Al primo avvio viene creato l'admin predefinito: **Admin / Admin123!**. Il database SQLite è generato in `backend/db/database.db`.
 
+## Novità della v3.0
+
+- **Sicurezza sessioni**: cookie `sid` con `SameSite=Lax`, `Secure` in produzione (`NODE_ENV=production`) e scadenza a 8 ore; le sessioni scadute vengono ripulite in automatico.
+- **Socket.IO**: il `sid` viene letto dal cookie `httpOnly` nell'handshake. Il cookie `sid_client` leggibile da JavaScript è stato rimosso.
+- **Header di sicurezza** di base (`nosniff`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`) e `x-powered-by` disattivato.
+- **Chiusura ordinata** del server su `SIGINT`/`SIGTERM` e gestione degli errori di avvio.
+- **Pulizia repository**: rimossi i vecchi `backend/routes`, `backend/configuration` e il riferimento a `js/tailwind.js` (file inesistente). Lo schema ER si trova ora in `docs/Schema/`.
+- **Tema**: nuovo `frontend/CSS/theme.css` con modalità scura automatica, focus da tastiera visibile e rispetto di `prefers-reduced-motion`.
+- **Dipendenze** aggiornate; `nodemon` spostato in `devDependencies`; Node ≥ 20.
+
+> Nota: le sessioni restano in memoria, quindi un riavvio del server le azzera. Per più istanze serve uno store condiviso (es. Redis).
+
 ## Architettura backend
 
 Flusso di ogni richiesta: **route → controller → service → repository → DB**. Nessun layer scavalca quello sotto.
@@ -20,12 +32,13 @@ Flusso di ogni richiesta: **route → controller → service → repository → 
 ```
 backend/
 ├── server.js                    → entry point: DB + Socket.IO + HTTP
-├── scripts/seed.js              → popolamento dati di esempio
 └── src/
     ├── app.js                   → composizione Express
     ├── config/
     │   ├── database.js          → connessione SQLite + helper Promise (get/all/run)
     │   └── schema.js            → tabelle, migrazioni, admin predefinito
+    ├── scripts/
+    │   └── seed.js              → popolamento dati di esempio
     ├── routes/                  → solo mappatura URL → controller
     │   ├── index.js             → aggregatore
     │   ├── authRoutes.js

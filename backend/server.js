@@ -14,6 +14,14 @@ async function avvia() {
   const server = http.createServer(app);
   realtime.init(server);
 
+  const chiudi = (segnale) => {
+    console.log(`\n${segnale} ricevuto: chiusura del server...`);
+    server.close(() => process.exit(0));
+    setTimeout(() => process.exit(1), 5000).unref();
+  };
+  process.on("SIGINT", () => chiudi("SIGINT"));
+  process.on("SIGTERM", () => chiudi("SIGTERM"));
+
   server.listen(PORT, "0.0.0.0", async () => {
     const localIP = getLocalIP();
     const publicIP = await getPublicIP();
@@ -24,4 +32,7 @@ async function avvia() {
   });
 }
 
-avvia();
+avvia().catch((err) => {
+  console.error("Avvio fallito:", err);
+  process.exit(1);
+});
