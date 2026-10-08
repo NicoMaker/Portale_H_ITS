@@ -2,14 +2,8 @@
 import { userApi } from "../../shared/api.js";
 import { toast } from "../../shared/dom.js";
 import { state } from "./state.js";
-import {
-  populateFilterOptions,
-  resetFilters,
-} from "./filters.js";
-import {
-  renderCoursesBadges,
-  renderSchedulesTable,
-} from "./render.js";
+import { populateFilterOptions, resetFilters } from "./filters.js";
+import { renderCoursesBadges, renderSchedulesTable } from "./render.js";
 import { initEditProfile } from "./editProfile.js";
 
 const $ = (id) => document.getElementById(id);
@@ -47,7 +41,10 @@ function initFiltri() {
     state.subjectChoices,
     state.dayChoices,
   ].forEach((choice) => {
-    choice.passedElement.element.addEventListener("change", renderSchedulesTable);
+    choice.passedElement.element.addEventListener(
+      "change",
+      renderSchedulesTable,
+    );
   });
 
   $("filter-date-exact-u")?.addEventListener("change", renderSchedulesTable);

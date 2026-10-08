@@ -32,7 +32,11 @@ const usersService = {
 
     let newUserId;
     try {
-      newUserId = await usersRepository.crea(username, hashedPassword, userRole);
+      newUserId = await usersRepository.crea(
+        username,
+        hashedPassword,
+        userRole,
+      );
     } catch (err) {
       return "Username già esistente";
     }
@@ -45,7 +49,10 @@ const usersService = {
       }
     }
 
-    realtime.broadcast("users_updated", { action: "created", userId: newUserId });
+    realtime.broadcast("users_updated", {
+      action: "created",
+      userId: newUserId,
+    });
     return null;
   },
 

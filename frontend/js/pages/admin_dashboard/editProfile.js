@@ -93,7 +93,9 @@ export function initEditProfile() {
     submitBtn.disabled = true;
 
     try {
-      const resp = await userApi.aggiornaProfilo({ password: newPassword.value });
+      const resp = await userApi.aggiornaProfilo({
+        password: newPassword.value,
+      });
       if (resp.success) {
         editMsg.innerHTML = `<div class="flex items-center justify-center space-x-2 text-green-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>Profilo aggiornato con successo!</span></div>`;
         setTimeout(() => location.reload(), 1500);

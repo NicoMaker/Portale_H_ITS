@@ -72,7 +72,8 @@ export const userApi = {
   corsi: () => getJson("/user/courses"),
   orari: () => getJson("/user/schedules"),
   // Ritorna { success, message? }
-  aggiornaProfilo: async (dati) => (await postJson("/user/profile", dati)).json(),
+  aggiornaProfilo: async (dati) =>
+    (await postJson("/user/profile", dati)).json(),
 };
 
 export const statsApi = {

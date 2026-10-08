@@ -37,8 +37,7 @@ export function updateDatalists() {
 
   const riempi = (id, valori) => {
     const el = document.getElementById(id);
-    if (el)
-      el.innerHTML = valori.map((v) => `<option value="${v}">`).join("");
+    if (el) el.innerHTML = valori.map((v) => `<option value="${v}">`).join("");
   };
 
   riempi("teacher-list", unici("teacher"));

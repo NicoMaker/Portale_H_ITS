@@ -19,8 +19,13 @@ function valoriUnici(arr, key) {
 }
 
 export function populateFilterOptions() {
-  const { allSchedules, teacherChoices, roomChoices, subjectChoices, dayChoices } =
-    state;
+  const {
+    allSchedules,
+    teacherChoices,
+    roomChoices,
+    subjectChoices,
+    dayChoices,
+  } = state;
 
   const setChoices = (instance, valori) => {
     instance.clearChoices();
@@ -58,8 +63,14 @@ export function populateFilterOptions() {
 
 // Applica i filtri correnti alle lezioni dell'utente
 export function getFilteredUserSchedules() {
-  const { allCourses, allSchedules, teacherChoices, roomChoices, subjectChoices, dayChoices } =
-    state;
+  const {
+    allCourses,
+    allSchedules,
+    teacherChoices,
+    roomChoices,
+    subjectChoices,
+    dayChoices,
+  } = state;
 
   let filtered = allSchedules.filter((s) =>
     allCourses.some((c) => c.id == s.course_id),

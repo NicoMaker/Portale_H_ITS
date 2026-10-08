@@ -12,7 +12,8 @@ export function setupAutoEndTime() {
     const end = $(endId);
     let endModified = false;
     start.addEventListener("change", () => {
-      if (!endModified && start.value) end.value = addOneHourToTime(start.value);
+      if (!endModified && start.value)
+        end.value = addOneHourToTime(start.value);
       endModified = false;
     });
     end.addEventListener("input", () => {

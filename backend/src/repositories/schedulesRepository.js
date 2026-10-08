@@ -33,7 +33,16 @@ const schedulesRepository = {
     return dbGet("SELECT course_id FROM schedules WHERE id=?", [scheduleId]);
   },
 
-  async crea({ course_id, teacher, room, subject, day, date, start_time, end_time }) {
+  async crea({
+    course_id,
+    teacher,
+    room,
+    subject,
+    day,
+    date,
+    start_time,
+    end_time,
+  }) {
     const r = await dbRun(
       "INSERT INTO schedules (course_id, teacher, room, subject, day, date, start_time, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
       [course_id, teacher, room, subject, day, date, start_time, end_time],
@@ -41,7 +50,10 @@ const schedulesRepository = {
     return r.lastID;
   },
 
-  aggiorna(id, { course_id, teacher, room, subject, day, date, start_time, end_time }) {
+  aggiorna(
+    id,
+    { course_id, teacher, room, subject, day, date, start_time, end_time },
+  ) {
     return dbRun(
       "UPDATE schedules SET course_id=?, teacher=?, room=?, subject=?, day=?, date=?, start_time=?, end_time=? WHERE id=?",
       [course_id, teacher, room, subject, day, date, start_time, end_time, id],

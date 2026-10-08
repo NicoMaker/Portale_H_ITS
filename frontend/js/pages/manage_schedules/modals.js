@@ -16,7 +16,10 @@ function mostraMsg(el, testo, ok) {
 }
 
 // Valida i campi comuni ad add/edit; ritorna un messaggio d'errore o null
-function validaOrario({ start_time, end_time, course_id, date, ignoreId }, prefix) {
+function validaOrario(
+  { start_time, end_time, course_id, date, ignoreId },
+  prefix,
+) {
   const bottoniAperti = ["teacher", "room", "subject"].some(
     (f) => $(`${prefix}-${f}-btn`).style.display !== "none",
   );
@@ -39,7 +42,9 @@ function validaOrario({ start_time, end_time, course_id, date, ignoreId }, prefi
 // ── AGGIUNGI ──
 function apriAdd() {
   const filterVal = $("filter-course").value;
-  const sorted = [...state.courses].sort((a, b) => a.name.localeCompare(b.name));
+  const sorted = [...state.courses].sort((a, b) =>
+    a.name.localeCompare(b.name),
+  );
   $("add-course-select").innerHTML =
     `<option value="" disabled selected>Seleziona un corso</option>` +
     sorted
@@ -81,7 +86,9 @@ async function submitAdd(e) {
 export function openEditSchedule(id) {
   state.editingScheduleId = id;
   const s = state.schedules.find((x) => x.id == id);
-  const sorted = [...state.courses].sort((a, b) => a.name.localeCompare(b.name));
+  const sorted = [...state.courses].sort((a, b) =>
+    a.name.localeCompare(b.name),
+  );
 
   $("edit-course-select").innerHTML = sorted
     .map(
@@ -136,10 +143,7 @@ function raccogliDati(prefix) {
     teacher: $(`${prefix}-teacher`).value,
     room: $(`${prefix}-room`).value,
     subject: $(`${prefix}-subject`).value,
-    day:
-      prefix === "add"
-        ? $("add-day").value
-        : $("edit-day").textContent,
+    day: prefix === "add" ? $("add-day").value : $("edit-day").textContent,
     date: $(`${prefix}-date`).value,
     start_time: $(`${prefix}-start`).value,
     end_time: $(`${prefix}-end`).value,

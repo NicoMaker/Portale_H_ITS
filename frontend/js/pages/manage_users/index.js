@@ -1,11 +1,7 @@
 // Entry point pagina Gestione Utenti: collega dati, render, modali, filtri e realtime
 import { toast } from "../../shared/dom.js";
 import { renderUsersList } from "./render.js";
-import {
-  fetchCourses,
-  fetchUsers,
-  updateNewCourseSelect,
-} from "./data.js";
+import { fetchCourses, fetchUsers, updateNewCourseSelect } from "./data.js";
 import {
   initModali,
   showChangeRoleModal,

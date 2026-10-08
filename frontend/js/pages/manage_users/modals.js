@@ -148,7 +148,11 @@ export function initModali() {
   $("add-user-form").onsubmit = async function (e) {
     e.preventDefault();
     if (addHint.textContent && !addHint.textContent.startsWith("✓")) {
-      showMessage("add-user-msg", "Correggi gli errori nella password", "error");
+      showMessage(
+        "add-user-msg",
+        "Correggi gli errori nella password",
+        "error",
+      );
       return;
     }
     const msg = await usersApi.crea({
@@ -173,7 +177,11 @@ export function initModali() {
   $("edit-user-form").onsubmit = async function (e) {
     e.preventDefault();
     if (editHint.textContent && !editHint.textContent.startsWith("✓")) {
-      showMessage("edit-user-msg", "Correggi gli errori nella password", "error");
+      showMessage(
+        "edit-user-msg",
+        "Correggi gli errori nella password",
+        "error",
+      );
       return;
     }
     const msg = await usersApi.modifica(state.editingUserId, {

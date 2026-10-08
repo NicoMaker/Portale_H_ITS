@@ -19,8 +19,7 @@ export function openEditCourse(id) {
 export function deleteCourse(id) {
   state.courseToDeleteId = id;
   const course = state.allCourses.find((c) => c.id == id);
-  if (course)
-    $("delete-course-name-display").textContent = `"${course.name}"`;
+  if (course) $("delete-course-name-display").textContent = `"${course.name}"`;
   $("delete-confirm-modal").style.display = "flex";
 }
 

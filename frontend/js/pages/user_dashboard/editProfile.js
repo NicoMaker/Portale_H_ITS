@@ -35,9 +35,11 @@ export function initEditProfile() {
   }
 
   // Tre pulsanti possono aprire il modale (desktop, mobile, header)
-  ["edit-profile-btn", "edit-profile-btn-mobile", "edit-profile-btn-header"].forEach(
-    (id) => $(id)?.addEventListener("click", openModal),
-  );
+  [
+    "edit-profile-btn",
+    "edit-profile-btn-mobile",
+    "edit-profile-btn-header",
+  ].forEach((id) => $(id)?.addEventListener("click", openModal));
   $("close-modal")?.addEventListener("click", closeModal);
   window.addEventListener("click", (e) => {
     if (e.target === modal) closeModal();

@@ -134,7 +134,8 @@ function getFilteredUsers() {
       f = f.filter(
         (u) => u.role === "user" && (!u.courses || u.courses.length === 0),
       );
-    else f = f.filter((u) => u.courses && u.courses.some((c) => c.id == course));
+    else
+      f = f.filter((u) => u.courses && u.courses.some((c) => c.id == course));
   }
   const search = document.getElementById("search-user").value.toLowerCase();
   if (search) f = f.filter((u) => u.username.toLowerCase().includes(search));

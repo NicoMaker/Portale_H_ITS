@@ -56,7 +56,9 @@ const usersRepository = {
   },
 
   async contaAdmin() {
-    const row = await dbGet('SELECT COUNT(*) as n FROM users WHERE role="admin"');
+    const row = await dbGet(
+      'SELECT COUNT(*) as n FROM users WHERE role="admin"',
+    );
     return row.n;
   },
 
