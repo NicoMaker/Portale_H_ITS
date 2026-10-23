@@ -6,7 +6,8 @@ const { HttpError } = require("../middleware/errorHandler");
 const MAX_LUNGHEZZA = 120;
 
 function pulisciNome(valore, etichetta) {
-  const nome = typeof valore === "string" ? valore.trim().replace(/\s+/g, " ") : "";
+  const nome =
+    typeof valore === "string" ? valore.trim().replace(/\s+/g, " ") : "";
   if (!nome) throw new HttpError(400, `Il campo ${etichetta} è obbligatorio`);
   if (nome.length > MAX_LUNGHEZZA)
     throw new HttpError(400, `Il campo ${etichetta} è troppo lungo`);

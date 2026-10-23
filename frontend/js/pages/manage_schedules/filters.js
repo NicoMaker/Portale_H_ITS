@@ -6,11 +6,36 @@ import { renderSchedules } from "./render.js";
 const $ = (id) => document.getElementById(id);
 
 const CAMPI = {
-  course: { host: "filter-course", placeholder: "Tutti i corsi", search: "Cerca corso…", label: "Filtra per corso" },
-  teacher: { host: "filter-teacher", placeholder: "Tutti i docenti", search: "Cerca docente…", label: "Filtra per docente" },
-  room: { host: "filter-room", placeholder: "Tutte le aule", search: "Cerca aula…", label: "Filtra per aula" },
-  subject: { host: "filter-subject", placeholder: "Tutte le materie", search: "Cerca materia…", label: "Filtra per materia" },
-  day: { host: "filter-day", placeholder: "Tutti i giorni", search: "Cerca giorno…", label: "Filtra per giorno" },
+  course: {
+    host: "filter-course",
+    placeholder: "Tutti i corsi",
+    search: "Cerca corso…",
+    label: "Filtra per corso",
+  },
+  teacher: {
+    host: "filter-teacher",
+    placeholder: "Tutti i docenti",
+    search: "Cerca docente…",
+    label: "Filtra per docente",
+  },
+  room: {
+    host: "filter-room",
+    placeholder: "Tutte le aule",
+    search: "Cerca aula…",
+    label: "Filtra per aula",
+  },
+  subject: {
+    host: "filter-subject",
+    placeholder: "Tutte le materie",
+    search: "Cerca materia…",
+    label: "Filtra per materia",
+  },
+  day: {
+    host: "filter-day",
+    placeholder: "Tutti i giorni",
+    search: "Cerca giorno…",
+    label: "Filtra per giorno",
+  },
 };
 
 // Crea i selettori (una volta sola, all'avvio della pagina)
@@ -24,11 +49,13 @@ export function initFilterControls() {
 export function populateFilterOptions() {
   const daAnagrafica = (voci, chiave) => {
     const presenti = new Set(state.schedules.map((s) => s[chiave]));
-    return voci.filter((v) => presenti.has(v.id)).map((v) => ({ value: v.id, label: v.name }));
+    return voci
+      .filter((v) => presenti.has(v.id))
+      .map((v) => ({ value: v.id, label: v.name }));
   };
-  const giorni = [...new Set(state.schedules.map((s) => s.day).filter(Boolean))].sort(
-    (a, b) => ORDINE_GIORNI.indexOf(a) - ORDINE_GIORNI.indexOf(b),
-  );
+  const giorni = [
+    ...new Set(state.schedules.map((s) => s.day).filter(Boolean)),
+  ].sort((a, b) => ORDINE_GIORNI.indexOf(a) - ORDINE_GIORNI.indexOf(b));
 
   state.filters?.setOptions({
     course: state.courses.map((c) => ({ value: c.id, label: c.name })),

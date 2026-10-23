@@ -40,7 +40,9 @@
   border-radius: 0.5rem;
   cursor: pointer;
   font-size: 0.875rem;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
 }
 .ms-control:hover {
   border-color: var(--ms-accent);

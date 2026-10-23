@@ -3,7 +3,8 @@ import { state } from "./state.js";
 import { normalize } from "../../shared/dom.js";
 
 // Prima lettera senza accenti, maiuscola (È → E)
-export const inizialeDi = (nome) => normalize(nome.trim()).charAt(0).toUpperCase();
+export const inizialeDi = (nome) =>
+  normalize(nome.trim()).charAt(0).toUpperCase();
 
 export function getFilters() {
   return {

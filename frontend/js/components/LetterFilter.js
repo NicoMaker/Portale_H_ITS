@@ -4,7 +4,10 @@
 // Clic su una lettera: la aggiunge/toglie. «Tutti» azzera la selezione.
 const ALFABETO = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
-export function createLetterFilter(host, { onChange = () => {}, lettere = ALFABETO } = {}) {
+export function createLetterFilter(
+  host,
+  { onChange = () => {}, lettere = ALFABETO } = {},
+) {
   if (!host) throw new Error("createLetterFilter: contenitore non trovato");
   const selezionate = new Set();
 
@@ -12,12 +15,17 @@ export function createLetterFilter(host, { onChange = () => {}, lettere = ALFABE
   host.innerHTML =
     `<button type="button" class="letter-btn letter-all" data-letter="" style="width:auto;padding:0 .6rem">Tutti</button>` +
     lettere
-      .map((l) => `<button type="button" class="letter-btn" data-letter="${l}">${l}</button>`)
+      .map(
+        (l) =>
+          `<button type="button" class="letter-btn" data-letter="${l}">${l}</button>`,
+      )
       .join("");
 
   function sync() {
     host.querySelectorAll(".letter-btn").forEach((btn) => {
-      const attivo = btn.dataset.letter ? selezionate.has(btn.dataset.letter) : selezionate.size === 0;
+      const attivo = btn.dataset.letter
+        ? selezionate.has(btn.dataset.letter)
+        : selezionate.size === 0;
       btn.classList.toggle("active", attivo);
       btn.setAttribute("aria-pressed", String(attivo));
     });

@@ -73,7 +73,8 @@ function cleanString(str) {
 }
 
 const pad = (n) => String(n).padStart(2, "0");
-const isoDate = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const isoDate = (d) =>
+  `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
 // Lunedì dell'Angelo (Pasquetta) con l'algoritmo gregoriano anonimo
 function pasquetta(year) {
@@ -96,192 +97,204 @@ function pasquetta(year) {
 
 // Giorni festivi italiani dell'anno indicato
 function festivi(year) {
-  const fissi = ["01-01", "01-06", "04-25", "05-01", "06-02", "08-15", "11-01", "12-08", "12-25", "12-26", "12-31"];
+  const fissi = [
+    "01-01",
+    "01-06",
+    "04-25",
+    "05-01",
+    "06-02",
+    "08-15",
+    "11-01",
+    "12-08",
+    "12-25",
+    "12-26",
+    "12-31",
+  ];
   return new Set([...fissi.map((d) => `${year}-${d}`), pasquetta(year)]);
 }
 
 // ── Dati di esempio ───────────────────────────────────────────────────────────
 const NOMI = [
-"Mario",
-"Giulia",
-"Luca",
-"Sara",
-"Marco",
-"Elena",
-"Francesco",
-"Chiara",
-"Paolo",
-"Laura",
-"Giorgio",
-"Valentina",
-"Andrea",
-"Martina",
-"Davide",
-"Simona",
-"Pietro",
-"Alice",
-"Matteo",
-"Isabella",
-"Antonio",
-"Francesca",
-"Giuseppe",
-"Anna",
-"Alessandro",
-"Maria",
-"Roberto",
-"Giulio",
-"Claudia",
-"Stefano",
-"Silvia",
-"Federico",
-"Elisabetta",
-"Riccardo",
-"Cristina",
-  ];
+  "Mario",
+  "Giulia",
+  "Luca",
+  "Sara",
+  "Marco",
+  "Elena",
+  "Francesco",
+  "Chiara",
+  "Paolo",
+  "Laura",
+  "Giorgio",
+  "Valentina",
+  "Andrea",
+  "Martina",
+  "Davide",
+  "Simona",
+  "Pietro",
+  "Alice",
+  "Matteo",
+  "Isabella",
+  "Antonio",
+  "Francesca",
+  "Giuseppe",
+  "Anna",
+  "Alessandro",
+  "Maria",
+  "Roberto",
+  "Giulio",
+  "Claudia",
+  "Stefano",
+  "Silvia",
+  "Federico",
+  "Elisabetta",
+  "Riccardo",
+  "Cristina",
+];
 const COGNOMI = [
-"Rossi",
-"Bianchi",
-"Verdi",
-"Neri",
-"Gialli",
-"Blu",
-"Viola",
-"Grigi",
-"Marroni",
-"Argento",
-"Ferrari",
-"Conti",
-"De Luca",
-"Lombardi",
-"Moretti",
-"Marchetti",
-"Serra",
-"Gentile",
-"Barbieri",
-"Santoro",
-"Romano",
-"Gallo",
-"Costa",
-"Ricci",
-"Fontana",
-"Esposito",
-"Russo",
-"Villa",
-"Colombo",
-"Marino",
-"Greco",
-"Bruno",
-"Galli",
-"Leone",
-"Longo",
-"Giordano",
-"Mancini",
-  ];
+  "Rossi",
+  "Bianchi",
+  "Verdi",
+  "Neri",
+  "Gialli",
+  "Blu",
+  "Viola",
+  "Grigi",
+  "Marroni",
+  "Argento",
+  "Ferrari",
+  "Conti",
+  "De Luca",
+  "Lombardi",
+  "Moretti",
+  "Marchetti",
+  "Serra",
+  "Gentile",
+  "Barbieri",
+  "Santoro",
+  "Romano",
+  "Gallo",
+  "Costa",
+  "Ricci",
+  "Fontana",
+  "Esposito",
+  "Russo",
+  "Villa",
+  "Colombo",
+  "Marino",
+  "Greco",
+  "Bruno",
+  "Galli",
+  "Leone",
+  "Longo",
+  "Giordano",
+  "Mancini",
+];
 const ARGOMENTI = [
-"Informatica",
-"Ingegneria del Software",
-"Data Science",
-"Cybersecurity",
-"Web Development",
-"Intelligenza Artificiale",
-"Blockchain",
-"Cloud Computing",
-"UX/UI Design",
-"Game Development",
-"Big Data Analytics",
-"Robotica",
-"IoT",
-"Bioinformatica",
-"Machine Learning",
-"DevOps",
-"Mobile Development",
-"Computer Graphics",
-"Networking",
-"Database Management",
-"Software Testing",
-"Computer Vision",
-"Natural Language Processing",
-"Quantum Computing",
-"Algoritmi Avanzati",
-"Sicurezza delle Reti",
-"Programmazione Web",
-"Analisi dei Dati",
-"Sistemi Distribuiti",
-"Architettura Software",
-  ];
+  "Informatica",
+  "Ingegneria del Software",
+  "Data Science",
+  "Cybersecurity",
+  "Web Development",
+  "Intelligenza Artificiale",
+  "Blockchain",
+  "Cloud Computing",
+  "UX/UI Design",
+  "Game Development",
+  "Big Data Analytics",
+  "Robotica",
+  "IoT",
+  "Bioinformatica",
+  "Machine Learning",
+  "DevOps",
+  "Mobile Development",
+  "Computer Graphics",
+  "Networking",
+  "Database Management",
+  "Software Testing",
+  "Computer Vision",
+  "Natural Language Processing",
+  "Quantum Computing",
+  "Algoritmi Avanzati",
+  "Sicurezza delle Reti",
+  "Programmazione Web",
+  "Analisi dei Dati",
+  "Sistemi Distribuiti",
+  "Architettura Software",
+];
 const LIVELLI = [
-"Base",
-"Avanzato",
-"Specialistico",
-"Master",
-"Triennale",
-"Magistrale",
-"Professionale",
-  ];
+  "Base",
+  "Avanzato",
+  "Specialistico",
+  "Master",
+  "Triennale",
+  "Magistrale",
+  "Professionale",
+];
 const DOCENTI = [
-"Prof. Smith",
-"Prof. Johnson",
-"Prof. Garcia",
-"Prof. Miller",
-"Prof. Davis",
-"Prof. Rossi",
-"Prof. Bianchi",
-"Prof. Verdi",
-"Prof. Neri",
-"Prof. Bruno",
-"Prof. Ferrari",
-"Prof. Romano",
-"Prof. Gallo",
-"Prof. Conti",
-"Prof. Ricci",
-"Prof. Lombardi",
-"Prof. Moretti",
-"Prof. Marchetti",
-"Prof. Serra",
-"Prof. Gentile",
-"Prof. Barbieri",
-"Prof. Santoro",
-"Prof. Costa",
-"Prof. Fontana",
-"Prof. Esposito",
-"Prof. Villa",
-"Prof. Colombo",
-"Prof. Marino",
-"Prof. Greco",
-"Prof. Leone",
-  ];
+  "Prof. Smith",
+  "Prof. Johnson",
+  "Prof. Garcia",
+  "Prof. Miller",
+  "Prof. Davis",
+  "Prof. Rossi",
+  "Prof. Bianchi",
+  "Prof. Verdi",
+  "Prof. Neri",
+  "Prof. Bruno",
+  "Prof. Ferrari",
+  "Prof. Romano",
+  "Prof. Gallo",
+  "Prof. Conti",
+  "Prof. Ricci",
+  "Prof. Lombardi",
+  "Prof. Moretti",
+  "Prof. Marchetti",
+  "Prof. Serra",
+  "Prof. Gentile",
+  "Prof. Barbieri",
+  "Prof. Santoro",
+  "Prof. Costa",
+  "Prof. Fontana",
+  "Prof. Esposito",
+  "Prof. Villa",
+  "Prof. Colombo",
+  "Prof. Marino",
+  "Prof. Greco",
+  "Prof. Leone",
+];
 const AULE = [
-"Aula A101",
-"Aula A102",
-"Aula A103",
-"Aula B201",
-"Aula B202",
-"Aula B203",
-"Lab Informatica 1",
-"Lab Informatica 2",
-"Lab Informatica 3",
-"Aula C301",
-"Aula C302",
-"Aula C303",
-"Lab Software",
-"Lab AI",
-"Lab Machine Learning",
-"Aula D401",
-"Aula D402",
-"Aula D403",
-"Lab Sicurezza",
-"Lab Networking",
-"Aula E501",
-"Aula E502",
-"Lab Robotica",
-"Lab Database",
-"Lab Cloud",
-"Aula Magna",
-"Sala Conferenze A",
-"Sala Conferenze B",
-"Aula F601",
-"Aula F602",
-  ];
+  "Aula A101",
+  "Aula A102",
+  "Aula A103",
+  "Aula B201",
+  "Aula B202",
+  "Aula B203",
+  "Lab Informatica 1",
+  "Lab Informatica 2",
+  "Lab Informatica 3",
+  "Aula C301",
+  "Aula C302",
+  "Aula C303",
+  "Lab Software",
+  "Lab AI",
+  "Lab Machine Learning",
+  "Aula D401",
+  "Aula D402",
+  "Aula D403",
+  "Lab Sicurezza",
+  "Lab Networking",
+  "Aula E501",
+  "Aula E502",
+  "Lab Robotica",
+  "Lab Database",
+  "Lab Cloud",
+  "Aula Magna",
+  "Sala Conferenze A",
+  "Sala Conferenze B",
+  "Aula F601",
+  "Aula F602",
+];
 const MATERIE = [
   "Programmazione",
   "Algoritmi e Strutture Dati",
@@ -314,7 +327,15 @@ const MATERIE = [
   "Quantum Computing",
 ];
 
-const GIORNI = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"];
+const GIORNI = [
+  "Domenica",
+  "Lunedì",
+  "Martedì",
+  "Mercoledì",
+  "Giovedì",
+  "Venerdì",
+  "Sabato",
+];
 const DESCRIZIONE_CORSO =
   "Descrizione del corso generato automaticamente per il sistema di gestione accademico. Include teoria e pratica.";
 
@@ -329,7 +350,9 @@ function generatoreUnico(creaNome) {
         return nome;
       }
     }
-    throw new Error("Impossibile generare un nome univoco: riduci le quantità richieste");
+    throw new Error(
+      "Impossibile generare un nome univoco: riduci le quantità richieste",
+    );
   };
 }
 
@@ -351,7 +374,11 @@ function randomDataLavorativa(year) {
   for (;;) {
     const month = Math.floor(Math.random() * 5) + 8; // 8 = agosto … 12 = dicembre
     const daysInMonth = new Date(year, month, 0).getDate();
-    const d = new Date(year, month - 1, Math.floor(Math.random() * daysInMonth) + 1);
+    const d = new Date(
+      year,
+      month - 1,
+      Math.floor(Math.random() * daysInMonth) + 1,
+    );
     const dow = d.getDay();
     if (dow !== 0 && dow !== 6 && !holidays.has(isoDate(d))) {
       return { date: isoDate(d), day: GIORNI[dow] };
@@ -369,7 +396,9 @@ function randomOrario() {
 async function inserisciAnagrafica(tabella, nomi) {
   const ids = [];
   for (const nome of nomi) {
-    const r = await dbRun(`INSERT INTO ${tabella} (name) VALUES (?)`, [cleanString(nome)]);
+    const r = await dbRun(`INSERT INTO ${tabella} (name) VALUES (?)`, [
+      cleanString(nome),
+    ]);
     ids.push(r.lastID);
   }
   return ids;
@@ -385,23 +414,63 @@ async function populateDatabase() {
     console.log("📊 Inizializzazione del database...");
     await initDb();
 
-    const numAdmins = await leggiNumero("admins", "Quanti admin casuali vuoi generare (oltre ad Admin principale)?", 0, 100);
-    const numStudentsEnrolled = await leggiNumero("enrolled", "Quanti studenti vuoi iscrivere a un corso?", 0, 1000);
-    const numStudentsUnenrolled = await leggiNumero("unenrolled", "Quanti studenti vuoi che NON siano iscritti a un corso?", 0, 1000);
-    const numCoursesWithStudents = await leggiNumero("courses-with", "Quanti corsi vuoi che abbiano studenti iscritti?", 0, 500);
-    const numCoursesWithoutStudents = await leggiNumero("courses-without", "Quanti corsi vuoi che NON abbiano studenti iscritti?", 0, 500);
-    const schedulesPerCourse = await leggiNumero("per-course", "Quanti orari per corso (anche quelli senza studenti)?", 1, 200);
+    const numAdmins = await leggiNumero(
+      "admins",
+      "Quanti admin casuali vuoi generare (oltre ad Admin principale)?",
+      0,
+      100,
+    );
+    const numStudentsEnrolled = await leggiNumero(
+      "enrolled",
+      "Quanti studenti vuoi iscrivere a un corso?",
+      0,
+      1000,
+    );
+    const numStudentsUnenrolled = await leggiNumero(
+      "unenrolled",
+      "Quanti studenti vuoi che NON siano iscritti a un corso?",
+      0,
+      1000,
+    );
+    const numCoursesWithStudents = await leggiNumero(
+      "courses-with",
+      "Quanti corsi vuoi che abbiano studenti iscritti?",
+      0,
+      500,
+    );
+    const numCoursesWithoutStudents = await leggiNumero(
+      "courses-without",
+      "Quanti corsi vuoi che NON abbiano studenti iscritti?",
+      0,
+      500,
+    );
+    const schedulesPerCourse = await leggiNumero(
+      "per-course",
+      "Quanti orari per corso (anche quelli senza studenti)?",
+      1,
+      200,
+    );
     rl?.close();
 
     if (numStudentsEnrolled > 0 && numCoursesWithStudents === 0) {
-      console.log("   ⚠️  Studenti da iscrivere ma nessun corso con iscritti: nessuna iscrizione verrà creata.");
+      console.log(
+        "   ⚠️  Studenti da iscrivere ma nessun corso con iscritti: nessuna iscrizione verrà creata.",
+      );
     }
 
     const year = parseInt(args.year, 10) || new Date().getFullYear();
 
     console.log("🗑️  Pulizia database...");
     await dbRun("PRAGMA foreign_keys = ON;");
-    for (const t of ["schedules", "user_courses", "courses", "users", "teachers", "rooms", "subjects"]) {
+    for (const t of [
+      "schedules",
+      "user_courses",
+      "courses",
+      "users",
+      "teachers",
+      "rooms",
+      "subjects",
+    ]) {
       await dbRun(`DELETE FROM ${t}`);
     }
     await dbRun(
@@ -416,35 +485,52 @@ async function populateDatabase() {
     const adminHash = await bcrypt.hash("Admin123!", 10);
     const userHash = await bcrypt.hash("User123!", 10);
     const insUser = (username, hash, role) =>
-      dbRun("INSERT INTO users (username, password, role) VALUES (?, ?, ?)", [username, hash, role]);
+      dbRun("INSERT INTO users (username, password, role) VALUES (?, ?, ?)", [
+        username,
+        hash,
+        role,
+      ]);
 
     console.log("👤 Creazione admin...");
     await insUser("Admin", adminHash, "admin");
-    for (let i = 0; i < numAdmins; i++) await insUser(randomUsername("admin"), adminHash, "admin");
+    for (let i = 0; i < numAdmins; i++)
+      await insUser(randomUsername("admin"), adminHash, "admin");
 
     console.log("👨‍🎓 Creazione studenti...");
     const studentsEnrolledIds = [];
     for (let i = 0; i < numStudentsEnrolled; i++) {
-      studentsEnrolledIds.push((await insUser(randomUsername("user"), userHash, "user")).lastID);
+      studentsEnrolledIds.push(
+        (await insUser(randomUsername("user"), userHash, "user")).lastID,
+      );
     }
-    for (let i = 0; i < numStudentsUnenrolled; i++) await insUser(randomUsername("user"), userHash, "user");
+    for (let i = 0; i < numStudentsUnenrolled; i++)
+      await insUser(randomUsername("user"), userHash, "user");
 
     console.log("📚 Creazione corsi...");
     const coursesWithStudentsIds = [];
     const insCourse = (name) =>
-      dbRun("INSERT INTO courses (name, description) VALUES (?, ?)", [name, DESCRIZIONE_CORSO]);
+      dbRun("INSERT INTO courses (name, description) VALUES (?, ?)", [
+        name,
+        DESCRIZIONE_CORSO,
+      ]);
     for (let i = 0; i < numCoursesWithStudents; i++) {
       coursesWithStudentsIds.push((await insCourse(randomCourseName())).lastID);
     }
-    for (let i = 0; i < numCoursesWithoutStudents; i++) await insCourse(randomCourseName());
+    for (let i = 0; i < numCoursesWithoutStudents; i++)
+      await insCourse(randomCourseName());
 
-    console.log("🔗 Assegnazione studenti ai corsi (MAX 1 corso per studente)...");
+    console.log(
+      "🔗 Assegnazione studenti ai corsi (MAX 1 corso per studente)...",
+    );
     if (studentsEnrolledIds.length && coursesWithStudentsIds.length) {
       for (let i = 0; i < studentsEnrolledIds.length; i++) {
-        await dbRun("INSERT INTO user_courses (user_id, course_id) VALUES (?, ?)", [
-          studentsEnrolledIds[i],
-          coursesWithStudentsIds[i % coursesWithStudentsIds.length],
-        ]);
+        await dbRun(
+          "INSERT INTO user_courses (user_id, course_id) VALUES (?, ?)",
+          [
+            studentsEnrolledIds[i],
+            coursesWithStudentsIds[i % coursesWithStudentsIds.length],
+          ],
+        );
       }
       console.log("   ✅ Studenti iscritti ai corsi designati.");
     }
@@ -482,7 +568,17 @@ async function populateDatabase() {
     }
     await dbRun("COMMIT");
 
-    const [utenti, admin, studenti, corsi, orari, iscrizioni, docenti, aule, materie] = await Promise.all([
+    const [
+      utenti,
+      admin,
+      studenti,
+      corsi,
+      orari,
+      iscrizioni,
+      docenti,
+      aule,
+      materie,
+    ] = await Promise.all([
       contaRighe("users"),
       contaRighe("users", "WHERE role = 'admin'"),
       contaRighe("users", "WHERE role = 'user'"),
@@ -504,11 +600,21 @@ async function populateDatabase() {
     console.log(`👥 Utenti totali: ${utenti}`);
     console.log(`   • Admin/Docenti: ${admin} (incluso Admin principale)`);
     console.log(`   • Studenti (role 'user'): ${studenti}`);
-    console.log(`     - Iscritti a un corso: ${studentsEnrolledIds.length ? numStudentsEnrolled : 0}`);
-    console.log(`     - Non iscritti a un corso: ${numStudentsUnenrolled + (studentsEnrolledIds.length ? 0 : numStudentsEnrolled)}`);
-    console.log(`📚 Corsi: ${corsi} (con studenti: ${numCoursesWithStudents}, senza: ${numCoursesWithoutStudents})`);
-    console.log(`🔗 Iscrizioni totali: ${iscrizioni} (MAX 1 corso per studente)`);
-    console.log(`🏷️  Anagrafiche: ${docenti} docenti, ${aule} aule, ${materie} materie`);
+    console.log(
+      `     - Iscritti a un corso: ${studentsEnrolledIds.length ? numStudentsEnrolled : 0}`,
+    );
+    console.log(
+      `     - Non iscritti a un corso: ${numStudentsUnenrolled + (studentsEnrolledIds.length ? 0 : numStudentsEnrolled)}`,
+    );
+    console.log(
+      `📚 Corsi: ${corsi} (con studenti: ${numCoursesWithStudents}, senza: ${numCoursesWithoutStudents})`,
+    );
+    console.log(
+      `🔗 Iscrizioni totali: ${iscrizioni} (MAX 1 corso per studente)`,
+    );
+    console.log(
+      `🏷️  Anagrafiche: ${docenti} docenti, ${aule} aule, ${materie} materie`,
+    );
     console.log(`🕒 Orari totali: ${orari} (${schedulesPerCourse} per corso)`);
     console.log("\n📊 DISTRIBUZIONE STUDENTI PER CORSO:");
     console.log("─".repeat(50));
@@ -519,17 +625,26 @@ async function populateDatabase() {
     });
     console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
     console.log("\n🔑 Credenziali predefinite:");
-    console.log("   👨‍💼 Admin principale: username='Admin', password='Admin123!'");
+    console.log(
+      "   👨‍💼 Admin principale: username='Admin', password='Admin123!'",
+    );
     console.log("   👨‍💼 Admin casuali: password='Admin123!'");
     console.log("   👨‍🎓 Studenti (role 'user'): password='User123!'");
     console.log("\n📋 Note importanti:");
-    console.log("   • I docenti dell'anagrafica sono nomi, non account: gli account admin gestiscono il portale");
+    console.log(
+      "   • I docenti dell'anagrafica sono nomi, non account: gli account admin gestiscono il portale",
+    );
     console.log("   • Gli studenti hanno role 'user' (non 'student')");
     console.log("   • Ogni studente iscritto è assegnato a MASSIMO 1 corso");
-    console.log(`   • Orari distribuiti su 5 mesi (Agosto-Dicembre ${year}), solo giorni lavorativi non festivi`);
+    console.log(
+      `   • Orari distribuiti su 5 mesi (Agosto-Dicembre ${year}), solo giorni lavorativi non festivi`,
+    );
     console.log("\n🎯 Database pronto per l'uso!");
   } catch (error) {
-    console.error("❌ Errore critico durante il popolamento del database:", error.message);
+    console.error(
+      "❌ Errore critico durante il popolamento del database:",
+      error.message,
+    );
     await dbRun("ROLLBACK").catch(() => {});
     process.exitCode = 1;
   } finally {

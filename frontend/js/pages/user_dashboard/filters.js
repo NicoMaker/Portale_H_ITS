@@ -17,7 +17,8 @@ const GIORNI_SETTIMANA = [
 function opzioniDa(arr, chiaveId, chiaveNome) {
   const mappa = new Map();
   arr.forEach((s) => {
-    if (s[chiaveId] != null && s[chiaveNome]) mappa.set(s[chiaveId], s[chiaveNome]);
+    if (s[chiaveId] != null && s[chiaveNome])
+      mappa.set(s[chiaveId], s[chiaveNome]);
   });
   return [...mappa]
     .map(([value, label]) => ({ value, label }))
@@ -28,10 +29,30 @@ function opzioniDa(arr, chiaveId, chiaveNome) {
 export function initFilterControls(onChange) {
   state.filters = createFilterGroup(
     {
-      teacher: { host: "filter-teacher-u", placeholder: "Tutti i docenti", search: "Cerca docente…", label: "Filtra per docente" },
-      room: { host: "filter-room-u", placeholder: "Tutte le aule", search: "Cerca aula…", label: "Filtra per aula" },
-      subject: { host: "filter-subject-u", placeholder: "Tutte le materie", search: "Cerca materia…", label: "Filtra per materia" },
-      day: { host: "filter-date-u", placeholder: "Tutti i giorni", search: "Cerca giorno…", label: "Filtra per giorno" },
+      teacher: {
+        host: "filter-teacher-u",
+        placeholder: "Tutti i docenti",
+        search: "Cerca docente…",
+        label: "Filtra per docente",
+      },
+      room: {
+        host: "filter-room-u",
+        placeholder: "Tutte le aule",
+        search: "Cerca aula…",
+        label: "Filtra per aula",
+      },
+      subject: {
+        host: "filter-subject-u",
+        placeholder: "Tutte le materie",
+        search: "Cerca materia…",
+        label: "Filtra per materia",
+      },
+      day: {
+        host: "filter-date-u",
+        placeholder: "Tutti i giorni",
+        search: "Cerca giorno…",
+        label: "Filtra per giorno",
+      },
     },
     onChange,
   );
@@ -40,12 +61,16 @@ export function initFilterControls(onChange) {
 // Aggiorna le opzioni dagli orari correnti, mantenendo le selezioni ancora valide
 export function populateFilterOptions() {
   const { allSchedules } = state;
-  const etichette = new Map(allSchedules.filter((s) => s.day).map((s) => [normalize(s.day), s.day]));
+  const etichette = new Map(
+    allSchedules.filter((s) => s.day).map((s) => [normalize(s.day), s.day]),
+  );
   state.filters?.setOptions({
     teacher: opzioniDa(allSchedules, "teacher_id", "teacher"),
     room: opzioniDa(allSchedules, "room_id", "room"),
     subject: opzioniDa(allSchedules, "subject_id", "subject"),
-    day: GIORNI_SETTIMANA.filter((g) => etichette.has(g)).map((g) => etichette.get(g)),
+    day: GIORNI_SETTIMANA.filter((g) => etichette.has(g)).map((g) =>
+      etichette.get(g),
+    ),
   });
 }
 
@@ -71,7 +96,8 @@ export function getFilteredUserSchedules() {
     )
     .sort(
       (a, b) =>
-        a.date.localeCompare(b.date) || a.start_time.localeCompare(b.start_time),
+        a.date.localeCompare(b.date) ||
+        a.start_time.localeCompare(b.start_time),
     );
 }
 

@@ -68,7 +68,9 @@ async function handleAdd(field, modalType) {
   const { api, etichetta } = ANAGRAFICA[field];
   const esito = await api.crea(value);
   if (!esito.ok) {
-    toast(`⚠️ ${esito.errore || `Impossibile aggiungere: ${etichetta.toLowerCase()}`}`);
+    toast(
+      `⚠️ ${esito.errore || `Impossibile aggiungere: ${etichetta.toLowerCase()}`}`,
+    );
     return;
   }
   await fetchCatalogs();
@@ -82,7 +84,8 @@ export function setupDynamicFields() {
   const campi = ["teacher", "room", "subject"];
   ["add", "edit"].forEach((modalType) => {
     campi.forEach((field) => {
-      $(`${modalType}-${field}-btn`).onclick = () => handleAdd(field, modalType);
+      $(`${modalType}-${field}-btn`).onclick = () =>
+        handleAdd(field, modalType);
       $(`${modalType}-${field}`).addEventListener("input", () =>
         toggleAddButtonVisibility(modalType, field),
       );

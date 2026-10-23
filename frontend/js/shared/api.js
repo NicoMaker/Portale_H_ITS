@@ -73,7 +73,9 @@ const catalogoApi = (percorso) => ({
   // Ritorna { ok, voce?, errore? }
   crea: async (name) => {
     const r = await postJson(`/api/${percorso}`, { name });
-    return r.ok ? { ok: true, voce: await r.json() } : { ok: false, errore: await r.text() };
+    return r.ok
+      ? { ok: true, voce: await r.json() }
+      : { ok: false, errore: await r.text() };
   },
 });
 

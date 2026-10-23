@@ -28,9 +28,10 @@ const catalogRepository = {
   },
 
   trovaPerNome(tabella, name) {
-    return dbGet(`SELECT id, name FROM ${tabellaValida(tabella)} WHERE name = ?`, [
-      name,
-    ]);
+    return dbGet(
+      `SELECT id, name FROM ${tabellaValida(tabella)} WHERE name = ?`,
+      [name],
+    );
   },
 
   // Ritorna { id, name, creato }: riusa la voce esistente (nome senza maiuscole/minuscole)

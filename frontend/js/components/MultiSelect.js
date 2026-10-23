@@ -116,7 +116,12 @@ export function createMultiSelect(host, opts = {}) {
         .join("");
       const extra =
         sel.length > maxChips
-          ? `<span class="ms-chip ms-chip-more" title="${esc(sel.slice(maxChips).map((o) => o.label).join(", "))}">+${sel.length - maxChips}</span>`
+          ? `<span class="ms-chip ms-chip-more" title="${esc(
+              sel
+                .slice(maxChips)
+                .map((o) => o.label)
+                .join(", "),
+            )}">+${sel.length - maxChips}</span>`
           : "";
       valuesEl.innerHTML = chips + extra;
     }
@@ -145,7 +150,8 @@ export function createMultiSelect(host, opts = {}) {
             <span class="ms-text">${evidenzia(o.label, q)}</span></li>`;
       })
       .join("");
-    if (attivo >= 0) search.setAttribute("aria-activedescendant", `${id}-o${attivo}`);
+    if (attivo >= 0)
+      search.setAttribute("aria-activedescendant", `${id}-o${attivo}`);
     else search.removeAttribute("aria-activedescendant");
   }
 
@@ -182,7 +188,9 @@ export function createMultiSelect(host, opts = {}) {
 
   function getValue() {
     const mappa = perChiave();
-    return selezionati.map((k) => mappa.get(k)?.value).filter((v) => v !== undefined);
+    return selezionati
+      .map((k) => mappa.get(k)?.value)
+      .filter((v) => v !== undefined);
   }
 
   // ── Apertura/chiusura ──
@@ -263,7 +271,8 @@ export function createMultiSelect(host, opts = {}) {
       muovi(e.key === "ArrowDown" ? 1 : -1);
     } else if (e.key === "Enter") {
       e.preventDefault();
-      if (attivo >= 0 && visibili[attivo]) alterna(chiave(visibili[attivo].value));
+      if (attivo >= 0 && visibili[attivo])
+        alterna(chiave(visibili[attivo].value));
     } else if (e.key === "Escape") {
       e.preventDefault();
       chiudi(true);
@@ -297,7 +306,8 @@ export function createMultiSelect(host, opts = {}) {
     const act = e.target.closest("[data-act]")?.dataset.act;
     if (act === "all") {
       visibili.forEach((o) => {
-        if (!selezionati.includes(chiave(o.value))) selezionati.push(chiave(o.value));
+        if (!selezionati.includes(chiave(o.value)))
+          selezionati.push(chiave(o.value));
       });
     } else if (act === "none") {
       selezionati = [];
@@ -334,5 +344,14 @@ export function createMultiSelect(host, opts = {}) {
   }
 
   renderControl();
-  return { el: host, getValue, setOptions, setValue, clear, destroy, open: apri, close: chiudi };
+  return {
+    el: host,
+    getValue,
+    setOptions,
+    setValue,
+    clear,
+    destroy,
+    open: apri,
+    close: chiudi,
+  };
 }
