@@ -3,13 +3,14 @@
 export const state = {
   courses: [],
   schedules: [],
+  // Anagrafiche lette dalle rispettive tabelle: [{ id, name, schedules_count }]
+  teachers: [],
+  rooms: [],
+  subjects: [],
   editingScheduleId: null,
   deletingScheduleId: null,
-  // Istanze Choices.js
-  teacherChoices: null,
-  roomChoices: null,
-  subjectChoices: null,
-  dayChoices: null,
+  // Gruppo di filtri (components/FilterGroup.js), creato all'avvio
+  filters: null,
 };
 
 const GIORNI = [

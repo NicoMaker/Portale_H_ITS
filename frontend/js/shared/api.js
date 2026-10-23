@@ -67,6 +67,20 @@ export const schedulesApi = {
   elimina: (id) => fetch(`/api/schedules/${id}`, { method: "DELETE" }),
 };
 
+// Anagrafiche: docenti, aule, materie (ognuna con la propria tabella sul server)
+const catalogoApi = (percorso) => ({
+  lista: () => getJson(`/api/${percorso}`),
+  // Ritorna { ok, voce?, errore? }
+  crea: async (name) => {
+    const r = await postJson(`/api/${percorso}`, { name });
+    return r.ok ? { ok: true, voce: await r.json() } : { ok: false, errore: await r.text() };
+  },
+});
+
+export const teachersApi = catalogoApi("teachers");
+export const roomsApi = catalogoApi("rooms");
+export const subjectsApi = catalogoApi("subjects");
+
 export const userApi = {
   corrente: () => getJson("/user/current"),
   corsi: () => getJson("/user/courses"),

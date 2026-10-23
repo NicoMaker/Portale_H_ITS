@@ -2,7 +2,11 @@
 import { userApi } from "../../shared/api.js";
 import { toast } from "../../shared/dom.js";
 import { state } from "./state.js";
-import { populateFilterOptions, resetFilters } from "./filters.js";
+import {
+  initFilterControls,
+  populateFilterOptions,
+  resetFilters,
+} from "./filters.js";
 import { renderCoursesBadges, renderSchedulesTable } from "./render.js";
 import { initEditProfile } from "./editProfile.js";
 
@@ -23,29 +27,7 @@ function renderTutto() {
 }
 
 function initFiltri() {
-  // Istanze Choices.js (libreria caricata globalmente nell'HTML)
-  state.teacherChoices = new Choices("#filter-teacher-u", {
-    removeItemButton: true,
-  });
-  state.roomChoices = new Choices("#filter-room-u", { removeItemButton: true });
-  state.subjectChoices = new Choices("#filter-subject-u", {
-    removeItemButton: true,
-  });
-  state.dayChoices = new Choices("#filter-date-u", {
-    removeItemButton: true,
-  });
-
-  [
-    state.teacherChoices,
-    state.roomChoices,
-    state.subjectChoices,
-    state.dayChoices,
-  ].forEach((choice) => {
-    choice.passedElement.element.addEventListener(
-      "change",
-      renderSchedulesTable,
-    );
-  });
+  initFilterControls(renderSchedulesTable);
 
   $("filter-date-exact-u")?.addEventListener("change", renderSchedulesTable);
   $("reset-filters-btn-u")?.addEventListener("click", () => {

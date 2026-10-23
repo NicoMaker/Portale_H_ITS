@@ -1,17 +1,21 @@
 // Logica di filtro/ordinamento della pagina Gestione Corsi
 import { state } from "./state.js";
+import { normalize } from "../../shared/dom.js";
+
+// Prima lettera senza accenti, maiuscola (È → E)
+export const inizialeDi = (nome) => normalize(nome.trim()).charAt(0).toUpperCase();
 
 export function getFilters() {
   return {
     search: document.getElementById("search-course")?.value?.trim() || "",
     userFilter: document.getElementById("user-filter")?.value || "all",
     sortOrder: document.getElementById("sort-order")?.value || "name_asc",
-    letter: state.activeLetter,
+    letters: state.letterFilter?.getValue() ?? new Set(),
   };
 }
 
 export function applyFilters(courses) {
-  const { search, userFilter, sortOrder, letter } = getFilters();
+  const { search, userFilter, sortOrder, letters } = getFilters();
   const withUsersIds = new Set(
     state.users.flatMap((u) => (u.courses || []).map((c) => c.id)),
   );
@@ -23,7 +27,7 @@ export function applyFilters(courses) {
       if (userFilter === "without_users") return !withUsersIds.has(c.id);
       return true;
     })
-    .filter((c) => !letter || c.name.toUpperCase().startsWith(letter))
+    .filter((c) => !letters.size || letters.has(inizialeDi(c.name)))
     .filter((c) => {
       if (!q) return true;
       return (

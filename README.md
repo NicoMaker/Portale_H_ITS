@@ -1,4 +1,4 @@
-# Portale H ITS — v3.0 (modernizzato)
+# Portale H ITS — v3.1
 
 Portale di gestione corsi, utenti e orari per un ITS, con aggiornamenti in tempo reale via Socket.IO. Stesse funzionalità della v1, ma tutto il codice — backend e frontend — è stato diviso in componenti con una sola responsabilità ciascuno.
 
@@ -8,10 +8,23 @@ Portale di gestione corsi, utenti e orari per un ITS, con aggiornamenti in tempo
 cd backend
 npm install
 npm start          # oppure: npm run dev (nodemon)
-npm run seed       # (opzionale) popola il database con dati di esempio
+npm run seed       # (opzionale) popola il database con dati di esempio (interattivo)
 ```
 
+Seed non interattivo: `node src/scripts/seed.js --defaults` oppure con parametri
+`--admins=2 --enrolled=40 --unenrolled=10 --courses-with=4 --courses-without=2 --per-course=15 [--year=2026]`.
+
 Al primo avvio viene creato l'admin predefinito: **Admin / Admin123!**. Il database SQLite è generato in `backend/db/database.db`.
+
+## Novità della v3.1
+
+- **Anagrafiche in tabelle proprie**: `teachers`, `rooms` e `subjects` (nome unico, senza distinzione maiuscole/minuscole). `schedules` le referenzia con `teacher_id`, `room_id`, `subject_id`; la data resta solo in `schedules` e il giorno è ricavato dalla data dal server.
+- **Migrazione automatica**: al primo avvio un database vecchio (con docente/aula/materia come testo) viene convertito senza perdere orari.
+- **Nuove API** (solo admin): `GET/POST /api/teachers`, `/api/rooms`, `/api/subjects`. Le API orari accettano ancora i nomi e creano al volo le voci mancanti.
+- **Selettori con ricerca e selezione multipla** (`frontend/js/components/MultiSelect.js`, senza dipendenze da CDN) in Gestione Orari e nella dashboard utente.
+- **Gestione Corsi**: la lettera iniziale è a selezione multipla (clic per aggiungere/togliere, «Tutti» azzera).
+- **Seed**: usa le nuove tabelle, evita nomi duplicati, calcola i festivi dell'anno corrente e funziona anche da riga di comando.
+- Schema ER aggiornato in `backend/Schema/` (`Schema.mmd` e `Schema.png`).
 
 ## Novità della v3.0
 
@@ -19,7 +32,7 @@ Al primo avvio viene creato l'admin predefinito: **Admin / Admin123!**. Il datab
 - **Socket.IO**: il `sid` viene letto dal cookie `httpOnly` nell'handshake. Il cookie `sid_client` leggibile da JavaScript è stato rimosso.
 - **Header di sicurezza** di base (`nosniff`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`) e `x-powered-by` disattivato.
 - **Chiusura ordinata** del server su `SIGINT`/`SIGTERM` e gestione degli errori di avvio.
-- **Pulizia repository**: rimossi i vecchi `backend/routes`, `backend/configuration` e il riferimento a `js/tailwind.js` (file inesistente). Lo schema ER si trova ora in `docs/Schema/`.
+- **Pulizia repository**: rimossi i vecchi `backend/routes`, `backend/configuration` e il riferimento a `js/tailwind.js` (file inesistente). Lo schema ER si trova in `backend/Schema/`.
 - **Tema**: nuovo `frontend/CSS/theme.css` con modalità scura automatica, focus da tastiera visibile e rispetto di `prefers-reduced-motion`.
 - **Dipendenze** aggiornate; `nodemon` spostato in `devDependencies`; Node ≥ 20.
 
@@ -52,11 +65,13 @@ backend/
     │   ├── usersService.js
     │   ├── coursesService.js
     │   ├── schedulesService.js
+    │   ├── catalogService.js
     │   └── sessionService.js    → sessioni in-memory
     ├── repositories/            → unico punto di accesso al DB (tutto l'SQL)
     │   ├── usersRepository.js
     │   ├── coursesRepository.js
     │   ├── schedulesRepository.js
+    │   ├── catalogRepository.js → teachers / rooms / subjects
     │   └── statsRepository.js
     ├── middleware/
     │   ├── auth.js              → requireAdmin / requireUser / requireAuth
@@ -84,6 +99,10 @@ frontend/js/
 │   ├── api.js                   → tutte le fetch verso il backend
 │   ├── dom.js                   → toast, messaggi, formato date, highlight
 │   └── password.js              → regole password condivise
+├── components/                  → componenti UI riusabili (nessuna dipendenza esterna)
+│   ├── MultiSelect.js           → selettore multiplo con ricerca
+│   ├── FilterGroup.js           → gruppo di MultiSelect da configurazione
+│   └── LetterFilter.js          → filtro A–Z a selezione multipla
 ├── realtime/
 │   └── socket-client.js         → client Socket.IO globale (window.AppSocket)
 └── pages/                       → una cartella per pagina, un file per responsabilità
@@ -107,4 +126,5 @@ Il client apre una connessione Socket.IO e si registra con il proprio identifica
 - `GET/POST /api/users`, `PUT/DELETE /api/users/:id`, `POST /api/users/:id/{promote,demote,assign_course,edit}`
 - `GET/POST /api/courses`, `PUT/DELETE /api/courses/:id`
 - `GET/POST /api/schedules`, `PUT/DELETE /api/schedules/:id`, `GET /api/schedules/meta`
+- `GET/POST /api/teachers`, `GET/POST /api/rooms`, `GET/POST /api/subjects`
 - `GET /admin/stats`, `GET /admin/analytics`

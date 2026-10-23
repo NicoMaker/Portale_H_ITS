@@ -41,7 +41,9 @@ function validaOrario(
 
 // ── AGGIUNGI ──
 function apriAdd() {
-  const filterVal = $("filter-course").value;
+  // Se nei filtri è selezionato un solo corso, viene preselezionato nel form
+  const filtrati = [...(state.filters?.values("course") || [])];
+  const corsoPreselezionato = filtrati.length === 1 ? String(filtrati[0]) : "";
   const sorted = [...state.courses].sort((a, b) =>
     a.name.localeCompare(b.name),
   );
@@ -50,7 +52,7 @@ function apriAdd() {
     sorted
       .map(
         (c) =>
-          `<option value="${c.id}"${filterVal && c.name === filterVal ? " selected" : ""}>${c.name}</option>`,
+          `<option value="${c.id}"${corsoPreselezionato && String(c.id) === corsoPreselezionato ? " selected" : ""}>${c.name}</option>`,
       )
       .join("");
   ["teacher", "room", "subject", "day", "date", "start", "end"].forEach(
@@ -128,7 +130,6 @@ async function submitEdit(e) {
   await fetchCoursesAndSchedules();
   if (msg === "OK") {
     mostraMsg(msgEl, "Orario aggiornato!", true);
-    $("filter-course").value = dati.course_id;
     renderSchedules();
     setTimeout(() => ($("edit-schedule-modal").style.display = "none"), 1000);
   } else {

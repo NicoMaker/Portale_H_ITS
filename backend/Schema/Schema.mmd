@@ -2,6 +2,9 @@ erDiagram
     users ||--o{ user_courses : "1:N"
     courses ||--o{ user_courses : "1:N"
     courses ||--o{ schedules : "1:N"
+    teachers ||--o{ schedules : "1:N"
+    rooms ||--o{ schedules : "1:N"
+    subjects ||--o{ schedules : "1:N"
 
     users {
         INTEGER id PK
@@ -17,16 +20,31 @@ erDiagram
     }
 
     user_courses {
-        INTEGER user_id FK
-        INTEGER course_id FK
+        INTEGER user_id PK, FK
+        INTEGER course_id PK, FK
+    }
+
+    teachers {
+        INTEGER id PK
+        TEXT name UK
+    }
+
+    rooms {
+        INTEGER id PK
+        TEXT name UK
+    }
+
+    subjects {
+        INTEGER id PK
+        TEXT name UK
     }
 
     schedules {
         INTEGER id PK
         INTEGER course_id FK
-        TEXT teacher
-        TEXT room
-        TEXT subject
+        INTEGER teacher_id FK
+        INTEGER room_id FK
+        INTEGER subject_id FK
         TEXT start_time
         TEXT end_time
         TEXT day

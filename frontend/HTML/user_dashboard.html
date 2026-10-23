@@ -5,12 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard Utente</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"
-    />
     <link rel="stylesheet" href="CSS/styleuser.css" />
     <link rel="stylesheet" href="/CSS/theme.css" />
+    <link rel="stylesheet" href="/CSS/multiselect.css" />
   </head>
 
   <body
@@ -301,46 +298,46 @@
             >
               <div class="space-y-2">
                 <label
-                  for="filter-teacher-u"
+                  id="filter-teacher-u-label"
                   class="block text-xs md:text-sm font-semibold text-gray-700 flex items-center"
                 >
                   <span class="mr-2">👨‍🏫</span>
                   Docente
                 </label>
-                <select id="filter-teacher-u" multiple class="w-full"></select>
+                <div id="filter-teacher-u"></div>
               </div>
 
               <div class="space-y-2">
                 <label
-                  for="filter-room-u"
+                  id="filter-room-u-label"
                   class="block text-xs md:text-sm font-semibold text-gray-700 flex items-center"
                 >
                   <span class="mr-2">🏫</span>
                   Aula
                 </label>
-                <select id="filter-room-u" multiple class="w-full"></select>
+                <div id="filter-room-u"></div>
               </div>
 
               <div class="space-y-2">
                 <label
-                  for="filter-subject-u"
+                  id="filter-subject-u-label"
                   class="block text-xs md:text-sm font-semibold text-gray-700 flex items-center"
                 >
                   <span class="mr-2">📖</span>
                   Materia
                 </label>
-                <select id="filter-subject-u" multiple class="w-full"></select>
+                <div id="filter-subject-u"></div>
               </div>
 
               <div class="space-y-2">
                 <label
-                  for="filter-date-u"
+                  id="filter-date-u-label"
                   class="block text-xs md:text-sm font-semibold text-gray-700 flex items-center"
                 >
                   <span class="mr-2">📅</span>
                   Giorno
                 </label>
-                <select id="filter-date-u" multiple class="w-full"></select>
+                <div id="filter-date-u"></div>
               </div>
 
               <div class="space-y-2">
@@ -474,7 +471,6 @@
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="js/realtime/socket-client.js"></script>
     <script type="module" src="js/pages/user_dashboard/index.js"></script>

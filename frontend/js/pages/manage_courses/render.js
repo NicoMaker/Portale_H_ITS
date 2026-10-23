@@ -103,7 +103,7 @@ function updateSortIcons() {
 }
 
 function updateActiveTags() {
-  const { search, userFilter, letter } = getFilters();
+  const { search, userFilter, letters } = getFilters();
   const container = document.getElementById("active-filters-tags");
   if (!container) return;
   const tags = [];
@@ -119,9 +119,9 @@ function updateActiveTags() {
     tags.push(
       `<span class="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs rounded-full font-medium">🚫 Senza iscritti</span>`,
     );
-  if (letter)
+  if (letters.size)
     tags.push(
-      `<span class="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs rounded-full font-medium">🔤 "${letter}"</span>`,
+      `<span class="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs rounded-full font-medium">🔤 ${[...letters].sort().join(", ")}</span>`,
     );
   container.innerHTML = tags.join("");
 }

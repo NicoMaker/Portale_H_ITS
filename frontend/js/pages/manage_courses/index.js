@@ -1,6 +1,7 @@
 // Entry point pagina Gestione Corsi
 import { state, fetchCourses } from "./state.js";
 import { renderCoursesList } from "./render.js";
+import { createLetterFilter } from "../../components/LetterFilter.js";
 import { initModali, openEditCourse, deleteCourse } from "./modals.js";
 
 const $ = (id) => document.getElementById(id);
@@ -9,20 +10,12 @@ const $ = (id) => document.getElementById(id);
 window.openEditCourse = openEditCourse;
 window.deleteCourse = deleteCourse;
 
-function setLetter(letter) {
-  state.activeLetter = letter;
-  document.querySelectorAll(".letter-btn").forEach((btn) => {
-    btn.classList.toggle("active", btn.dataset.letter === letter);
-  });
-  renderCoursesList();
-}
-
 function clearAllFilters() {
   $("search-course").value = "";
   $("user-filter").value = "all";
   $("sort-order").value = "name_asc";
   $("clear-search").classList.add("hidden");
-  setLetter("");
+  state.letterFilter.clear({ silent: true });
   renderCoursesList();
 }
 
@@ -43,8 +36,8 @@ function initFiltri() {
   $("sort-order").addEventListener("change", renderCoursesList);
   $("clear-filters-btn").addEventListener("click", clearAllFilters);
 
-  document.querySelectorAll(".letter-btn").forEach((btn) => {
-    btn.addEventListener("click", () => setLetter(btn.dataset.letter));
+  state.letterFilter = createLetterFilter($("letter-filter"), {
+    onChange: renderCoursesList,
   });
 
   // Ordinamento cliccando le intestazioni della tabella

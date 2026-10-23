@@ -1,78 +1,69 @@
-// Filtri della pagina Gestione Orari: Choices.js + logica di filtro condivisa
+// Filtri della pagina Gestione Orari: usa il componente FilterGroup + logica di filtro
+import { createFilterGroup } from "../../components/FilterGroup.js";
 import { state, ORDINE_GIORNI } from "./state.js";
 import { renderSchedules } from "./render.js";
 
-// Inizializza (o reinizializza) le multi-select Choices.js
+const $ = (id) => document.getElementById(id);
+
+const CAMPI = {
+  course: { host: "filter-course", placeholder: "Tutti i corsi", search: "Cerca corso…", label: "Filtra per corso" },
+  teacher: { host: "filter-teacher", placeholder: "Tutti i docenti", search: "Cerca docente…", label: "Filtra per docente" },
+  room: { host: "filter-room", placeholder: "Tutte le aule", search: "Cerca aula…", label: "Filtra per aula" },
+  subject: { host: "filter-subject", placeholder: "Tutte le materie", search: "Cerca materia…", label: "Filtra per materia" },
+  day: { host: "filter-day", placeholder: "Tutti i giorni", search: "Cerca giorno…", label: "Filtra per giorno" },
+};
+
+// Crea i selettori (una volta sola, all'avvio della pagina)
+export function initFilterControls() {
+  state.filters = createFilterGroup(CAMPI, renderSchedules);
+}
+
+// Aggiorna le opzioni dai dati correnti, mantenendo le selezioni ancora valide.
+// Docenti/aule/materie arrivano dalle rispettive tabelle e vengono mostrati
+// solo se hanno almeno un orario (altrimenti il filtro non darebbe risultati).
 export function populateFilterOptions() {
-  const unici = (key) =>
-    [...new Set(state.schedules.map((s) => s[key]).filter(Boolean))].sort();
-
-  const teachers = unici("teacher");
-  const rooms = unici("room");
-  const subjects = unici("subject");
-  const days = [
-    ...new Set(state.schedules.map((s) => s.day).filter(Boolean)),
-  ].sort((a, b) => ORDINE_GIORNI.indexOf(a) - ORDINE_GIORNI.indexOf(b));
-
-  // Distrugge le istanze esistenti per evitare duplicati
-  state.teacherChoices?.destroy();
-  state.roomChoices?.destroy();
-  state.subjectChoices?.destroy();
-  state.dayChoices?.destroy();
-
-  const crea = (selector, valori) => {
-    const inst = new Choices(selector, {
-      choices: valori.map((v) => ({ value: v, label: v })),
-      removeItemButton: true,
-    });
-    inst.passedElement.element.addEventListener("change", renderSchedules);
-    return inst;
+  const daAnagrafica = (voci, chiave) => {
+    const presenti = new Set(state.schedules.map((s) => s[chiave]));
+    return voci.filter((v) => presenti.has(v.id)).map((v) => ({ value: v.id, label: v.name }));
   };
+  const giorni = [...new Set(state.schedules.map((s) => s.day).filter(Boolean))].sort(
+    (a, b) => ORDINE_GIORNI.indexOf(a) - ORDINE_GIORNI.indexOf(b),
+  );
 
-  state.teacherChoices = crea("#filter-teacher", teachers);
-  state.roomChoices = crea("#filter-room", rooms);
-  state.subjectChoices = crea("#filter-subject", subjects);
-  state.dayChoices = crea("#filter-day", days);
+  state.filters?.setOptions({
+    course: state.courses.map((c) => ({ value: c.id, label: c.name })),
+    teacher: daAnagrafica(state.teachers, "teacher_id"),
+    room: daAnagrafica(state.rooms, "room_id"),
+    subject: daAnagrafica(state.subjects, "subject_id"),
+    day: giorni,
+  });
 }
 
 // Ritorna gli orari filtrati secondo i controlli correnti
 export function getFilteredSchedules() {
-  const courseNameFilter = document.getElementById("filter-course")?.value;
-  const teacherFilter = state.teacherChoices?.getValue(true) || [];
-  const roomFilter = state.roomChoices?.getValue(true) || [];
-  const subjectFilter = state.subjectChoices?.getValue(true) || [];
-  const dayFilter = state.dayChoices?.getValue(true) || [];
-  const dateFilter = document.getElementById("filter-date")?.value;
+  const f = state.filters;
+  if (!f) return state.schedules;
+  const corsi = f.values("course");
+  const docenti = f.values("teacher");
+  const aule = f.values("room");
+  const materie = f.values("subject");
+  const giorni = f.values("day");
+  const data = $("filter-date")?.value;
 
-  let filtered = state.schedules;
-
-  if (courseNameFilter) {
-    const ids = state.courses
-      .filter((c) => c.name === courseNameFilter)
-      .map((c) => String(c.id));
-    filtered = filtered.filter((s) => ids.includes(String(s.course_id)));
-  }
-  if (teacherFilter.length)
-    filtered = filtered.filter((s) => teacherFilter.includes(s.teacher));
-  if (roomFilter.length)
-    filtered = filtered.filter((s) => roomFilter.includes(s.room));
-  if (subjectFilter.length)
-    filtered = filtered.filter((s) => subjectFilter.includes(s.subject));
-  if (dayFilter.length)
-    filtered = filtered.filter((s) => dayFilter.includes(s.day));
-  if (dateFilter) filtered = filtered.filter((s) => s.date === dateFilter);
-
-  return filtered;
+  return state.schedules.filter(
+    (s) =>
+      (!corsi.size || corsi.has(String(s.course_id))) &&
+      (!docenti.size || docenti.has(String(s.teacher_id))) &&
+      (!aule.size || aule.has(String(s.room_id))) &&
+      (!materie.size || materie.has(String(s.subject_id))) &&
+      (!giorni.size || giorni.has(s.day)) &&
+      (!data || s.date === data),
+  );
 }
 
 export function clearFilters() {
-  const courseSelect = document.getElementById("filter-course");
-  if (courseSelect) courseSelect.value = "";
-  state.teacherChoices?.removeActiveItems();
-  state.roomChoices?.removeActiveItems();
-  state.subjectChoices?.removeActiveItems();
-  state.dayChoices?.removeActiveItems();
-  const dateInput = document.getElementById("filter-date");
+  state.filters?.clear();
+  const dateInput = $("filter-date");
   if (dateInput) dateInput.value = "";
   renderSchedules();
 }

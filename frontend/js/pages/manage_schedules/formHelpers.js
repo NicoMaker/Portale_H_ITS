@@ -1,7 +1,9 @@
 // Comportamenti dei form: ora di fine automatica, giorno automatico,
-// e aggiunta dinamica di nuovi docenti/aule/materie.
+// e aggiunta di nuovi docenti/aule/materie alle rispettive tabelle.
+import { toast } from "../../shared/dom.js";
+import { teachersApi, roomsApi, subjectsApi } from "../../shared/api.js";
 import { state, addOneHourToTime, getDayOfWeek } from "./state.js";
-import { updateDatalists } from "./data.js";
+import { fetchCatalogs } from "./data.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -38,40 +40,41 @@ export function setupAutoDayOfWeek() {
   });
 }
 
-// Mostra il pulsante "+" se il valore digitato non esiste ancora
+// Campo del form → anagrafica corrispondente nello stato / sul server
+const ANAGRAFICA = {
+  teacher: { lista: "teachers", api: teachersApi, etichetta: "Docente" },
+  room: { lista: "rooms", api: roomsApi, etichetta: "Aula" },
+  subject: { lista: "subjects", api: subjectsApi, etichetta: "Materia" },
+};
+
+const chiaveNome = (v) => v.trim().replace(/\s+/g, " ").toLowerCase();
+
+// Mostra il pulsante "+" se il valore digitato non esiste ancora nell'anagrafica
 export function toggleAddButtonVisibility(modalType, field) {
   const input = $(`${modalType}-${field}`);
   const button = $(`${modalType}-${field}-btn`);
-  const value = input.value.trim();
-  const existing = [
-    ...new Set(state.schedules.map((s) => s[field]).filter(Boolean)),
-  ];
-  button.style.display = value && !existing.includes(value) ? "block" : "none";
+  const value = chiaveNome(input.value);
+  const esiste = state[ANAGRAFICA[field].lista].some(
+    (v) => chiaveNome(v.name) === value,
+  );
+  button.style.display = value && !esiste ? "block" : "none";
 }
 
-// Registra un nuovo valore (docente/aula/materia) come opzione disponibile
-function handleAdd(inputId, key, modalType) {
-  const input = $(`${modalType}-${inputId}`);
-  const value = input.value.trim();
-  if (value && !state.schedules.some((s) => s[key] === value)) {
-    state.schedules.push({
-      id: Date.now(),
-      course_id:
-        modalType === "add"
-          ? $("add-course-select").value
-          : $("edit-course-select").value,
-      teacher: key === "teacher" ? value : "",
-      room: key === "room" ? value : "",
-      subject: key === "subject" ? value : "",
-      day: "",
-      date: "",
-      start_time: "",
-      end_time: "",
-    });
-    updateDatalists();
-    input.value = value;
-    toggleAddButtonVisibility(modalType, inputId);
+// Crea il nuovo docente/aula/materia nella sua tabella e lo rende selezionabile
+async function handleAdd(field, modalType) {
+  const input = $(`${modalType}-${field}`);
+  const value = input.value.trim().replace(/\s+/g, " ");
+  if (!value) return;
+  const { api, etichetta } = ANAGRAFICA[field];
+  const esito = await api.crea(value);
+  if (!esito.ok) {
+    toast(`⚠️ ${esito.errore || `Impossibile aggiungere: ${etichetta.toLowerCase()}`}`);
+    return;
   }
+  await fetchCatalogs();
+  input.value = esito.voce.name;
+  toggleAddButtonVisibility(modalType, field);
+  toast(`✅ ${etichetta} aggiunto: ${esito.voce.name}`);
 }
 
 // Collega i listener dei campi con aggiunta dinamica
@@ -79,8 +82,7 @@ export function setupDynamicFields() {
   const campi = ["teacher", "room", "subject"];
   ["add", "edit"].forEach((modalType) => {
     campi.forEach((field) => {
-      $(`${modalType}-${field}-btn`).onclick = () =>
-        handleAdd(field, field, modalType);
+      $(`${modalType}-${field}-btn`).onclick = () => handleAdd(field, modalType);
       $(`${modalType}-${field}`).addEventListener("input", () =>
         toggleAddButtonVisibility(modalType, field),
       );

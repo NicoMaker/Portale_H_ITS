@@ -5,12 +5,9 @@
     <title>Gestione Orari</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"
-    />
     <link rel="stylesheet" href="CSS/style.css" />
     <link rel="stylesheet" href="/CSS/theme.css" />
+    <link rel="stylesheet" href="/CSS/multiselect.css" />
   </head>
 
   <body class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
@@ -338,10 +335,7 @@
               <span class="text-lg">📚</span>
               <span>Corso</span>
             </label>
-            <select
-              id="filter-course"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm transition-all duration-200"
-            ></select>
+            <div id="filter-course"></div>
           </div>
 
           <div class="space-y-2">
@@ -351,7 +345,7 @@
               <span class="text-lg">👨‍🏫</span>
               <span>Docente</span>
             </label>
-            <select id="filter-teacher" multiple class="w-full"></select>
+            <div id="filter-teacher"></div>
           </div>
 
           <div class="space-y-2">
@@ -361,7 +355,7 @@
               <span class="text-lg">🏫</span>
               <span>Aula</span>
             </label>
-            <select id="filter-room" multiple class="w-full"></select>
+            <div id="filter-room"></div>
           </div>
 
           <div class="space-y-2">
@@ -371,7 +365,7 @@
               <span class="text-lg">📖</span>
               <span>Materia</span>
             </label>
-            <select id="filter-subject" multiple class="w-full"></select>
+            <div id="filter-subject"></div>
           </div>
 
           <div class="space-y-2">
@@ -381,7 +375,7 @@
               <span class="text-lg">📅</span>
               <span>Giorno</span>
             </label>
-            <select id="filter-day" multiple class="w-full"></select>
+            <div id="filter-day"></div>
           </div>
 
           <div class="space-y-2">
@@ -891,7 +885,6 @@
     <datalist id="subject-list"></datalist>
     <datalist id="day-list"></datalist>
 
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="js/realtime/socket-client.js"></script>
     <script type="module" src="js/pages/manage_schedules/index.js"></script>

@@ -33,13 +33,13 @@ const statsRepository = {
         "SELECT day, COUNT(*) as count FROM schedules GROUP BY day ORDER BY CASE day WHEN 'Lunedì' THEN 1 WHEN 'Martedì' THEN 2 WHEN 'Mercoledì' THEN 3 WHEN 'Giovedì' THEN 4 WHEN 'Venerdì' THEN 5 WHEN 'Sabato' THEN 6 WHEN 'Domenica' THEN 7 END",
       ),
       dbAll(
-        "SELECT teacher, COUNT(*) as count FROM schedules GROUP BY teacher ORDER BY count DESC LIMIT 10",
+        "SELECT t.name as teacher, COUNT(*) as count FROM schedules s JOIN teachers t ON t.id = s.teacher_id GROUP BY t.id ORDER BY count DESC, t.name LIMIT 10",
       ),
       dbAll(
-        "SELECT room, COUNT(*) as count FROM schedules GROUP BY room ORDER BY count DESC LIMIT 10",
+        "SELECT r.name as room, COUNT(*) as count FROM schedules s JOIN rooms r ON r.id = s.room_id GROUP BY r.id ORDER BY count DESC, r.name LIMIT 10",
       ),
       dbAll(
-        "SELECT subject, COUNT(*) as count FROM schedules GROUP BY subject ORDER BY count DESC LIMIT 10",
+        "SELECT sub.name as subject, COUNT(*) as count FROM schedules s JOIN subjects sub ON sub.id = s.subject_id GROUP BY sub.id ORDER BY count DESC, sub.name LIMIT 10",
       ),
       dbAll(
         "SELECT c.name as course_name, COUNT(uc.user_id) as user_count FROM courses c LEFT JOIN user_courses uc ON c.id = uc.course_id GROUP BY c.id, c.name ORDER BY user_count DESC",

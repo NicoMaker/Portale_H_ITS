@@ -1,4 +1,5 @@
-// Filtri della dashboard utente: popolamento opzioni Choices.js e applicazione filtri
+// Filtri della dashboard utente: selettori multipli con ricerca + applicazione filtri
+import { createFilterGroup } from "../../components/FilterGroup.js";
 import { normalize } from "../../shared/dom.js";
 import { state } from "./state.js";
 
@@ -12,100 +13,70 @@ const GIORNI_SETTIMANA = [
   "domenica",
 ];
 
-function valoriUnici(arr, key) {
-  return [...new Set(arr.map((i) => i[key]).filter(Boolean))].sort((a, b) =>
-    a.localeCompare(b, "it"),
+// Opzioni uniche {value: id, label: nome} dagli orari dell'utente, ordinate per nome
+function opzioniDa(arr, chiaveId, chiaveNome) {
+  const mappa = new Map();
+  arr.forEach((s) => {
+    if (s[chiaveId] != null && s[chiaveNome]) mappa.set(s[chiaveId], s[chiaveNome]);
+  });
+  return [...mappa]
+    .map(([value, label]) => ({ value, label }))
+    .sort((a, b) => a.label.localeCompare(b.label, "it"));
+}
+
+// Crea i selettori (una volta sola, all'avvio della pagina)
+export function initFilterControls(onChange) {
+  state.filters = createFilterGroup(
+    {
+      teacher: { host: "filter-teacher-u", placeholder: "Tutti i docenti", search: "Cerca docente…", label: "Filtra per docente" },
+      room: { host: "filter-room-u", placeholder: "Tutte le aule", search: "Cerca aula…", label: "Filtra per aula" },
+      subject: { host: "filter-subject-u", placeholder: "Tutte le materie", search: "Cerca materia…", label: "Filtra per materia" },
+      day: { host: "filter-date-u", placeholder: "Tutti i giorni", search: "Cerca giorno…", label: "Filtra per giorno" },
+    },
+    onChange,
   );
 }
 
+// Aggiorna le opzioni dagli orari correnti, mantenendo le selezioni ancora valide
 export function populateFilterOptions() {
-  const {
-    allSchedules,
-    teacherChoices,
-    roomChoices,
-    subjectChoices,
-    dayChoices,
-  } = state;
-
-  const setChoices = (instance, valori) => {
-    instance.clearChoices();
-    instance.setChoices(
-      valori.map((v) => ({ value: v, label: v })),
-      "value",
-      "label",
-      true,
-    );
-  };
-
-  setChoices(teacherChoices, valoriUnici(allSchedules, "teacher"));
-  setChoices(roomChoices, valoriUnici(allSchedules, "room"));
-  setChoices(subjectChoices, valoriUnici(allSchedules, "subject"));
-
-  // Giorni ordinati secondo la settimana
-  const giorniPresenti = new Set(
-    allSchedules.map((s) => normalize(s.day)).filter(Boolean),
-  );
-  const giorniOrdinati = GIORNI_SETTIMANA.filter((g) => giorniPresenti.has(g));
-  const labelOriginali = new Map(
-    allSchedules.map((s) => [normalize(s.day), s.day]),
-  );
-  dayChoices.clearChoices();
-  dayChoices.setChoices(
-    giorniOrdinati.map((g) => ({
-      value: labelOriginali.get(g),
-      label: labelOriginali.get(g),
-    })),
-    "value",
-    "label",
-    true,
-  );
+  const { allSchedules } = state;
+  const etichette = new Map(allSchedules.filter((s) => s.day).map((s) => [normalize(s.day), s.day]));
+  state.filters?.setOptions({
+    teacher: opzioniDa(allSchedules, "teacher_id", "teacher"),
+    room: opzioniDa(allSchedules, "room_id", "room"),
+    subject: opzioniDa(allSchedules, "subject_id", "subject"),
+    day: GIORNI_SETTIMANA.filter((g) => etichette.has(g)).map((g) => etichette.get(g)),
+  });
 }
 
 // Applica i filtri correnti alle lezioni dell'utente
 export function getFilteredUserSchedules() {
-  const {
-    allCourses,
-    allSchedules,
-    teacherChoices,
-    roomChoices,
-    subjectChoices,
-    dayChoices,
-  } = state;
+  const { allCourses, allSchedules, filters } = state;
 
-  let filtered = allSchedules.filter((s) =>
-    allCourses.some((c) => c.id == s.course_id),
-  );
+  const docenti = filters.values("teacher");
+  const aule = filters.values("room");
+  const materie = filters.values("subject");
+  const giorni = filters.values("day", normalize);
+  const dataEsatta = document.getElementById("filter-date-exact-u")?.value;
 
-  const teacherFilter = teacherChoices ? teacherChoices.getValue(true) : [];
-  const roomFilter = roomChoices ? roomChoices.getValue(true) : [];
-  const subjectFilter = subjectChoices ? subjectChoices.getValue(true) : [];
-  const dayFilter = dayChoices ? dayChoices.getValue(true) : [];
-  const dateExact = document.getElementById("filter-date-exact-u")?.value;
-
-  if (teacherFilter.length)
-    filtered = filtered.filter((s) => teacherFilter.includes(s.teacher));
-  if (roomFilter.length)
-    filtered = filtered.filter((s) => roomFilter.includes(s.room));
-  if (subjectFilter.length)
-    filtered = filtered.filter((s) => subjectFilter.includes(s.subject));
-  if (dayFilter.length)
-    filtered = filtered.filter((s) =>
-      dayFilter.map(normalize).includes(normalize(s.day)),
+  return allSchedules
+    .filter(
+      (s) =>
+        allCourses.some((c) => c.id == s.course_id) &&
+        (!docenti.size || docenti.has(String(s.teacher_id))) &&
+        (!aule.size || aule.has(String(s.room_id))) &&
+        (!materie.size || materie.has(String(s.subject_id))) &&
+        (!giorni.size || giorni.has(normalize(s.day))) &&
+        (!dataEsatta || s.date === dataEsatta),
+    )
+    .sort(
+      (a, b) =>
+        a.date.localeCompare(b.date) || a.start_time.localeCompare(b.start_time),
     );
-  if (dateExact) filtered = filtered.filter((s) => s.date === dateExact);
-
-  return filtered.sort(
-    (a, b) =>
-      a.date.localeCompare(b.date) || a.start_time.localeCompare(b.start_time),
-  );
 }
 
 export function resetFilters() {
-  state.teacherChoices.clearStore();
-  state.roomChoices.clearStore();
-  state.subjectChoices.clearStore();
-  state.dayChoices.clearStore();
+  state.filters?.clear();
   const dateInput = document.getElementById("filter-date-exact-u");
   if (dateInput) dateInput.value = "";
-  populateFilterOptions();
 }

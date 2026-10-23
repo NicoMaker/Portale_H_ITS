@@ -1,11 +1,16 @@
-// Schema del database + creazione dell'admin predefinito al primo avvio
+// Schema del database + migrazioni + creazione dell'admin predefinito al primo avvio
+//
+// Tabelle:
+//   users, courses, user_courses      → utenti, corsi, iscrizioni
+//   teachers, rooms, subjects         → anagrafiche (una tabella per ciascuna)
+//   schedules                         → orari: riferiscono corso, docente, aula e materia
+//                                       tramite chiave esterna; la data vive solo qui
 const bcrypt = require("bcryptjs");
-const { dbGet, dbRun } = require("./database");
+const { dbGet, dbAll, dbRun } = require("./database");
 
-async function initDb() {
-  await dbRun("PRAGMA foreign_keys = ON;");
-  console.log("Chiavi esterne abilitate con successo.");
+const NOME_NON_SPECIFICATO = "Non specificato";
 
+async function creaTabelle() {
   await dbRun(`CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT UNIQUE NOT NULL,
@@ -24,18 +29,94 @@ async function initDb() {
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
   )`);
-  await dbRun(`CREATE TABLE IF NOT EXISTS schedules (
+
+  // Anagrafiche: nome unico, confronto senza distinzione maiuscole/minuscole
+  for (const tabella of ["teachers", "rooms", "subjects"]) {
+    await dbRun(`CREATE TABLE IF NOT EXISTS ${tabella} (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL UNIQUE COLLATE NOCASE
+    )`);
+  }
+}
+
+const SQL_CREA_SCHEDULES = (nome) => `CREATE TABLE IF NOT EXISTS ${nome} (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     course_id INTEGER NOT NULL,
-    teacher TEXT NOT NULL,
-    room TEXT NOT NULL,
-    subject TEXT NOT NULL,
+    teacher_id INTEGER NOT NULL,
+    room_id INTEGER NOT NULL,
+    subject_id INTEGER NOT NULL,
     start_time TEXT NOT NULL,
     end_time TEXT NOT NULL,
     day TEXT NOT NULL,
     date TEXT NOT NULL,
-    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
-  )`);
+    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
+    FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE RESTRICT,
+    FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE RESTRICT,
+    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE RESTRICT
+  )`;
+
+// Vecchio schema: schedules aveva teacher/room/subject come testo.
+// Le anagrafiche vengono ricavate dai valori esistenti e la tabella ricostruita.
+async function migraSchedulesDaTesto() {
+  const colonne = await dbAll("PRAGMA table_info(schedules)");
+  if (!colonne.some((c) => c.name === "teacher")) return;
+
+  console.log("Migrazione: schedules → anagrafiche docenti/aule/materie...");
+  // Le chiavi esterne non si possono cambiare dentro una transazione
+  await dbRun("PRAGMA foreign_keys = OFF;");
+  try {
+    await dbRun("BEGIN");
+    const nome = (col) =>
+      `COALESCE(NULLIF(TRIM(${col}), ''), '${NOME_NON_SPECIFICATO}')`;
+    await dbRun(
+      `INSERT OR IGNORE INTO teachers (name) SELECT DISTINCT ${nome("teacher")} FROM schedules`,
+    );
+    await dbRun(
+      `INSERT OR IGNORE INTO rooms (name) SELECT DISTINCT ${nome("room")} FROM schedules`,
+    );
+    await dbRun(
+      `INSERT OR IGNORE INTO subjects (name) SELECT DISTINCT ${nome("subject")} FROM schedules`,
+    );
+    await dbRun("ALTER TABLE schedules RENAME TO schedules_old");
+    await dbRun(SQL_CREA_SCHEDULES("schedules"));
+    await dbRun(`INSERT INTO schedules
+        (id, course_id, teacher_id, room_id, subject_id, start_time, end_time, day, date)
+      SELECT o.id, o.course_id, t.id, r.id, s.id, o.start_time, o.end_time, o.day, o.date
+      FROM schedules_old o
+      JOIN teachers t ON t.name = ${nome("o.teacher")}
+      JOIN rooms r ON r.name = ${nome("o.room")}
+      JOIN subjects s ON s.name = ${nome("o.subject")}`);
+    await dbRun("DROP TABLE schedules_old");
+    await dbRun("COMMIT");
+    console.log("Migrazione completata.");
+  } catch (err) {
+    await dbRun("ROLLBACK").catch(() => {});
+    throw err;
+  } finally {
+    await dbRun("PRAGMA foreign_keys = ON;");
+  }
+}
+
+async function creaIndici() {
+  const indici = [
+    "CREATE INDEX IF NOT EXISTS idx_schedules_course ON schedules(course_id)",
+    "CREATE INDEX IF NOT EXISTS idx_schedules_teacher ON schedules(teacher_id)",
+    "CREATE INDEX IF NOT EXISTS idx_schedules_room ON schedules(room_id)",
+    "CREATE INDEX IF NOT EXISTS idx_schedules_subject ON schedules(subject_id)",
+    "CREATE INDEX IF NOT EXISTS idx_schedules_date ON schedules(date)",
+    "CREATE INDEX IF NOT EXISTS idx_user_courses_course ON user_courses(course_id)",
+  ];
+  for (const sql of indici) await dbRun(sql);
+}
+
+async function initDb() {
+  await dbRun("PRAGMA foreign_keys = ON;");
+  console.log("Chiavi esterne abilitate con successo.");
+
+  await creaTabelle();
+  await migraSchedulesDaTesto();
+  await dbRun(SQL_CREA_SCHEDULES("schedules"));
+  await creaIndici();
 
   await creaAdminPredefinito();
 }
@@ -63,4 +144,4 @@ async function creaAdminPredefinito() {
   );
 }
 
-module.exports = { initDb };
+module.exports = { initDb, NOME_NON_SPECIFICATO };

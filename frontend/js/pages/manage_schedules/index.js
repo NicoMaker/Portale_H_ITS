@@ -2,7 +2,7 @@
 import { state } from "./state.js";
 import { fetchCoursesAndSchedules } from "./data.js";
 import { renderSchedules } from "./render.js";
-import { clearFilters } from "./filters.js";
+import { clearFilters, initFilterControls } from "./filters.js";
 import {
   setupAutoEndTime,
   setupAutoDayOfWeek,
@@ -21,7 +21,7 @@ window.openEditSchedule = openEditSchedule;
 window.openDeleteScheduleModal = openDeleteScheduleModal;
 
 function initFiltri() {
-  $("filter-course").onchange = renderSchedules;
+  initFilterControls();
   $("filter-date").oninput = renderSchedules;
   $("clear-filters-btn")?.addEventListener("click", clearFilters);
 }

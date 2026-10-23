@@ -7,7 +7,8 @@ export const state = {
   users: [],
   courseToDeleteId: null,
   editingCourseId: null,
-  activeLetter: "",
+  // Componente LetterFilter (components/LetterFilter.js), creato all'avvio
+  letterFilter: null,
 };
 
 export function fetchCourses() {

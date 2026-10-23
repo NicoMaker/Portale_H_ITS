@@ -2,9 +2,6 @@
 export const state = {
   allCourses: [],
   allSchedules: [],
-  // Istanze Choices.js dei filtri
-  teacherChoices: null,
-  roomChoices: null,
-  subjectChoices: null,
-  dayChoices: null,
+  // Gruppo di filtri (components/FilterGroup.js), creato all'avvio
+  filters: null,
 };
