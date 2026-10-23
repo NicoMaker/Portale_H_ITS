@@ -17,12 +17,22 @@ function mostraMsg(el, testo, ok) {
     : "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
 }
 
-function validaOrario({ start_time, end_time, course_id, date, subject_id, teacher_id, room_id }) {
+function validaOrario({
+  start_time,
+  end_time,
+  course_id,
+  date,
+  subject_id,
+  teacher_id,
+  room_id,
+}) {
   if (!course_id) return "Seleziona un corso.";
-  if (!subject_id || !teacher_id || !room_id) return "Seleziona materia, docente e aula.";
+  if (!subject_id || !teacher_id || !room_id)
+    return "Seleziona materia, docente e aula.";
   if (!date) return "Seleziona una data.";
   if (!start_time || !end_time) return "Indica ora di inizio e fine.";
-  if (start_time >= end_time) return "L'ora di inizio deve essere precedente a quella di fine.";
+  if (start_time >= end_time)
+    return "L'ora di inizio deve essere precedente a quella di fine.";
   return null;
 }
 
@@ -30,12 +40,17 @@ function validaOrario({ start_time, end_time, course_id, date, subject_id, teach
 function apriAdd() {
   const filtrati = [...(state.filters?.values("course") || [])];
   const corsoPreselezionato = filtrati.length === 1 ? String(filtrati[0]) : "";
-  const sorted = [...state.courses].sort((a, b) => a.name.localeCompare(b.name));
+  const sorted = [...state.courses].sort((a, b) =>
+    a.name.localeCompare(b.name),
+  );
   $("add-course-select").innerHTML =
     `<option value="" disabled selected>Seleziona un corso</option>` +
-    sorted.map((c) =>
-      `<option value="${c.id}"${corsoPreselezionato && String(c.id) === corsoPreselezionato ? " selected" : ""}>${c.name}</option>`
-    ).join("");
+    sorted
+      .map(
+        (c) =>
+          `<option value="${c.id}"${corsoPreselezionato && String(c.id) === corsoPreselezionato ? " selected" : ""}>${c.name}</option>`,
+      )
+      .join("");
   ["day", "date", "start", "end"].forEach((f) => ($(`add-${f}`).value = ""));
   riempiSelezioni("add", {});
   $("add-schedule-msg").textContent = "";
@@ -64,11 +79,20 @@ async function submitAdd(e) {
 export function openEditSchedule(id) {
   state.editingScheduleId = id;
   const s = state.schedules.find((x) => x.id == id);
-  const sorted = [...state.courses].sort((a, b) => a.name.localeCompare(b.name));
-  $("edit-course-select").innerHTML = sorted.map((c) =>
-    `<option value="${c.id}"${c.id == s.course_id ? " selected" : ""}>${c.name}</option>`
-  ).join("");
-  riempiSelezioni("edit", { subjectId: s.subject_id, teacherId: s.teacher_id, roomId: s.room_id });
+  const sorted = [...state.courses].sort((a, b) =>
+    a.name.localeCompare(b.name),
+  );
+  $("edit-course-select").innerHTML = sorted
+    .map(
+      (c) =>
+        `<option value="${c.id}"${c.id == s.course_id ? " selected" : ""}>${c.name}</option>`,
+    )
+    .join("");
+  riempiSelezioni("edit", {
+    subjectId: s.subject_id,
+    teacherId: s.teacher_id,
+    roomId: s.room_id,
+  });
   $("edit-day").textContent = s.day || "";
   $("edit-date").value = s.date;
   $("edit-start").value = s.start_time;
@@ -150,12 +174,15 @@ export function initModali() {
   $("cancel-edit-schedule").onclick = () => chiudi("edit-schedule-modal");
   $("close-add-schedule-modal").onclick = () => chiudi("add-schedule-modal");
   $("cancel-add-schedule").onclick = () => chiudi("add-schedule-modal");
-  $("close-delete-schedule-modal").onclick = () => chiudi("delete-schedule-modal", true);
-  $("cancel-delete-schedule").onclick = () => chiudi("delete-schedule-modal", true);
+  $("close-delete-schedule-modal").onclick = () =>
+    chiudi("delete-schedule-modal", true);
+  $("cancel-delete-schedule").onclick = () =>
+    chiudi("delete-schedule-modal", true);
 
   window.addEventListener("click", (e) => {
     if (e.target === $("edit-schedule-modal")) chiudi("edit-schedule-modal");
     if (e.target === $("add-schedule-modal")) chiudi("add-schedule-modal");
-    if (e.target === $("delete-schedule-modal")) chiudi("delete-schedule-modal", true);
+    if (e.target === $("delete-schedule-modal"))
+      chiudi("delete-schedule-modal", true);
   });
 }

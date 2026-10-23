@@ -38,7 +38,10 @@ function elencoId(valore) {
 function notifica(tabella, azione) {
   realtime.broadcast("catalog_updated", { catalog: tabella, action: azione });
   // Le pagine che mostrano gli orari devono rileggere nomi e relazioni
-  realtime.broadcast("schedules_updated", { action: "catalog", catalog: tabella });
+  realtime.broadcast("schedules_updated", {
+    action: "catalog",
+    catalog: tabella,
+  });
 }
 
 // Differenza tra coppie attuali e desiderate: prima controlla, poi scrive
@@ -79,7 +82,10 @@ const catalogService = {
     const voce = await catalogRepository.trovaPerId(tabella, idValido(id));
     if (!voce) {
       const { etichetta } = catalogRepository.TABELLE[tabella];
-      throw new HttpError(404, `${ARTICOLO[etichetta].nessun} ${etichetta} con questo ID`);
+      throw new HttpError(
+        404,
+        `${ARTICOLO[etichetta].nessun} ${etichetta} con questo ID`,
+      );
     }
     return voce;
   },
@@ -143,7 +149,10 @@ const catalogService = {
   async impostaMaterieDocente(teacherId, subjectIds, silenzioso = false) {
     await this.richiedi("teachers", teacherId);
     const nuovi = elencoId(subjectIds) || [];
-    if ((await catalogRepository.contaEsistenti("subjects", nuovi)) !== nuovi.length) {
+    if (
+      (await catalogRepository.contaEsistenti("subjects", nuovi)) !==
+      nuovi.length
+    ) {
       throw new HttpError(400, "Una o più materie non esistono");
     }
     const attuali = await catalogRepository.legamiDocente(teacherId);
@@ -158,7 +167,10 @@ const catalogService = {
   async impostaDocentiMateria(subjectId, teacherIds, silenzioso = false) {
     await this.richiedi("subjects", subjectId);
     const nuovi = elencoId(teacherIds) || [];
-    if ((await catalogRepository.contaEsistenti("teachers", nuovi)) !== nuovi.length) {
+    if (
+      (await catalogRepository.contaEsistenti("teachers", nuovi)) !==
+      nuovi.length
+    ) {
       throw new HttpError(400, "Uno o più docenti non esistono");
     }
     const attuali = await catalogRepository.legamiMateria(subjectId);

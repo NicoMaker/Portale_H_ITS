@@ -20,7 +20,8 @@ function init(httpServer) {
     }
     socket.on("disconnect", () => {
       const sid = socket.data.sid;
-      if (sid && sessionSocketMap[sid] === socket.id) delete sessionSocketMap[sid];
+      if (sid && sessionSocketMap[sid] === socket.id)
+        delete sessionSocketMap[sid];
     });
   });
 

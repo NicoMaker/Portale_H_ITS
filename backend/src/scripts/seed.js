@@ -550,11 +550,13 @@ async function populateDatabase() {
         [t, s],
       );
       if (!docentiPerMateria.has(s)) docentiPerMateria.set(s, []);
-      if (!docentiPerMateria.get(s).includes(t)) docentiPerMateria.get(s).push(t);
+      if (!docentiPerMateria.get(s).includes(t))
+        docentiPerMateria.get(s).push(t);
     };
     for (const s of subjectIds) {
       const quanti = 1 + Math.floor(Math.random() * 3);
-      for (const t of shuffle([...teacherIds]).slice(0, quanti)) await collega(t, s);
+      for (const t of shuffle([...teacherIds]).slice(0, quanti))
+        await collega(t, s);
     }
     for (const t of teacherIds) {
       const ha = [...docentiPerMateria.values()].some((l) => l.includes(t));

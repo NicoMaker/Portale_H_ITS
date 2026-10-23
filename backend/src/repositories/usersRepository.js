@@ -11,7 +11,10 @@ const usersRepository = {
     return dbGet("SELECT * FROM users WHERE username = ?", [username]);
   },
   trovaPerUsernameEsclusoId(username, id) {
-    return dbGet("SELECT * FROM users WHERE username=? AND id!=?", [username, id]);
+    return dbGet("SELECT * FROM users WHERE username=? AND id!=?", [
+      username,
+      id,
+    ]);
   },
   corsiDellUtente(userId) {
     return dbAll(
@@ -20,9 +23,10 @@ const usersRepository = {
     );
   },
   async crea(username, hashedPassword, role) {
-    const r = await dbRun("INSERT INTO users (username, password, role) VALUES (?, ?, ?)", [
-      username, hashedPassword, role,
-    ]);
+    const r = await dbRun(
+      "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
+      [username, hashedPassword, role],
+    );
     return r.lastID;
   },
   aggiornaRuolo(id, role) {
@@ -30,7 +34,11 @@ const usersRepository = {
   },
   aggiornaCredenziali(id, username, hashedPassword) {
     if (hashedPassword) {
-      return dbRun("UPDATE users SET username=?, password=? WHERE id=?", [username, hashedPassword, id]);
+      return dbRun("UPDATE users SET username=?, password=? WHERE id=?", [
+        username,
+        hashedPassword,
+        id,
+      ]);
     }
     return dbRun("UPDATE users SET username=? WHERE id=?", [username, id]);
   },
@@ -38,7 +46,9 @@ const usersRepository = {
     return dbRun("DELETE FROM users WHERE id=?", [id]);
   },
   async contaAdmin() {
-    const row = await dbGet('SELECT COUNT(*) as n FROM users WHERE role="admin"');
+    const row = await dbGet(
+      'SELECT COUNT(*) as n FROM users WHERE role="admin"',
+    );
     return row.n;
   },
   rimuoviCorsi(userId) {

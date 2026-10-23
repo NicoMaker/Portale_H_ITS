@@ -5,11 +5,14 @@ const sessions = {};
 const SESSION_TTL_MS = 8 * 60 * 60 * 1000;
 const isExpired = (sess) => Date.now() - sess.created > SESSION_TTL_MS;
 
-setInterval(() => {
-  for (const [sid, sess] of Object.entries(sessions)) {
-    if (isExpired(sess)) delete sessions[sid];
-  }
-}, 10 * 60 * 1000).unref();
+setInterval(
+  () => {
+    for (const [sid, sess] of Object.entries(sessions)) {
+      if (isExpired(sess)) delete sessions[sid];
+    }
+  },
+  10 * 60 * 1000,
+).unref();
 
 function createSession(user) {
   const sid = crypto.randomBytes(16).toString("hex");

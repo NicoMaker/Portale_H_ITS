@@ -18,7 +18,11 @@ function getPublicIP() {
         let data = "";
         res.on("data", (chunk) => (data += chunk));
         res.on("end", () => {
-          try { resolve(JSON.parse(data).ip); } catch { resolve(null); }
+          try {
+            resolve(JSON.parse(data).ip);
+          } catch {
+            resolve(null);
+          }
         });
       })
       .on("error", () => resolve(null));

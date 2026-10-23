@@ -66,15 +66,17 @@ function disegna(prefix, sid, tid) {
   const docente = state.teachers.find((t) => t.id === tid) || null;
 
   // Se c'è un docente, solo le sue materie; se c'è una materia, solo i suoi docenti
-  const materie = (docente
-    ? state.subjects.filter((s) => docente.subject_ids.includes(s.id))
-    : state.subjects
+  const materie = (
+    docente
+      ? state.subjects.filter((s) => docente.subject_ids.includes(s.id))
+      : state.subjects
   )
     .slice()
     .sort(perNome);
-  const docenti = (materia
-    ? state.teachers.filter((t) => materia.teacher_ids.includes(t.id))
-    : state.teachers
+  const docenti = (
+    materia
+      ? state.teachers.filter((t) => materia.teacher_ids.includes(t.id))
+      : state.teachers
   )
     .slice()
     .sort(perNome);
@@ -82,12 +84,16 @@ function disegna(prefix, sid, tid) {
   $(`${prefix}-subject`).innerHTML = opzioni(
     materie,
     sid,
-    materie.length ? "Seleziona una materia" : "Nessuna materia per questo docente",
+    materie.length
+      ? "Seleziona una materia"
+      : "Nessuna materia per questo docente",
   );
   $(`${prefix}-teacher`).innerHTML = opzioni(
     docenti,
     tid,
-    docenti.length ? "Seleziona un docente" : "Nessun docente per questa materia",
+    docenti.length
+      ? "Seleziona un docente"
+      : "Nessun docente per questa materia",
   );
 
   // Suggerimenti sotto i campi
@@ -96,14 +102,16 @@ function disegna(prefix, sid, tid) {
   if (docente) {
     hintMateria.textContent = `Materie insegnate da ${docente.name}: ${materie.length}`;
   } else {
-    hintMateria.textContent = "Scegli la materia: il docente si propone da solo.";
+    hintMateria.textContent =
+      "Scegli la materia: il docente si propone da solo.";
   }
   if (materia && !materia.teacher_ids.length) {
     hintDocente.innerHTML = `⚠️ Nessun docente insegna questa materia: assegnalo in <a href="/manage_subjects.html" target="_blank" class="text-blue-600 underline">Gestione Materie</a>.`;
   } else if (materia) {
     hintDocente.textContent = `${docenti.length} ${docenti.length === 1 ? "docente insegna" : "docenti insegnano"} ${materia.name}.`;
   } else {
-    hintDocente.textContent = "Mostra tutti i docenti finché non scegli la materia.";
+    hintDocente.textContent =
+      "Mostra tutti i docenti finché non scegli la materia.";
   }
 }
 
@@ -129,7 +137,11 @@ function ricalcola(prefix, origine) {
 export function riempiSelezioni(prefix, { subjectId, teacherId, roomId } = {}) {
   disegna(prefix, subjectId || null, teacherId || null);
   const aule = state.rooms.slice().sort(perNome);
-  $(`${prefix}-room`).innerHTML = opzioni(aule, roomId || null, "Seleziona un'aula");
+  $(`${prefix}-room`).innerHTML = opzioni(
+    aule,
+    roomId || null,
+    "Seleziona un'aula",
+  );
 }
 
 export function setupLinkedSelects() {

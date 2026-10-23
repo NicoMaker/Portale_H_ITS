@@ -25,9 +25,10 @@ const catalogRepository = {
     );
     if (t === "rooms") return righe;
 
-    const [chiave, altra] = t === "teachers"
-      ? ["teacher_id", "subject_id"]
-      : ["subject_id", "teacher_id"];
+    const [chiave, altra] =
+      t === "teachers"
+        ? ["teacher_id", "subject_id"]
+        : ["subject_id", "teacher_id"];
     const nomeAltra = t === "teachers" ? "subjects" : "teachers";
     const legami = await dbAll(
       `SELECT ts.teacher_id, ts.subject_id, o.name AS altro_nome
@@ -46,39 +47,60 @@ const catalogRepository = {
   },
 
   trovaPerId(tabella, id) {
-    return dbGet(`SELECT id, name FROM ${tabellaValida(tabella)} WHERE id = ?`, [id]);
+    return dbGet(
+      `SELECT id, name FROM ${tabellaValida(tabella)} WHERE id = ?`,
+      [id],
+    );
   },
   trovaPerNome(tabella, name) {
-    return dbGet(`SELECT id, name FROM ${tabellaValida(tabella)} WHERE name = ?`, [name]);
+    return dbGet(
+      `SELECT id, name FROM ${tabellaValida(tabella)} WHERE name = ?`,
+      [name],
+    );
   },
   async trovaOCrea(tabella, name) {
     const t = tabellaValida(tabella);
-    const esistente = await dbGet(`SELECT id, name FROM ${t} WHERE name = ?`, [name]);
+    const esistente = await dbGet(`SELECT id, name FROM ${t} WHERE name = ?`, [
+      name,
+    ]);
     if (esistente) return { ...esistente, creato: false };
     const r = await dbRun(`INSERT INTO ${t} (name) VALUES (?)`, [name]);
     return { id: r.lastID, name, creato: true };
   },
   async rinomina(tabella, id, name) {
-    const r = await dbRun(`UPDATE ${tabellaValida(tabella)} SET name = ? WHERE id = ?`, [name, id]);
+    const r = await dbRun(
+      `UPDATE ${tabellaValida(tabella)} SET name = ? WHERE id = ?`,
+      [name, id],
+    );
     return r.changes;
   },
   async elimina(tabella, id) {
-    const r = await dbRun(`DELETE FROM ${tabellaValida(tabella)} WHERE id = ?`, [id]);
+    const r = await dbRun(
+      `DELETE FROM ${tabellaValida(tabella)} WHERE id = ?`,
+      [id],
+    );
     return r.changes;
   },
   async contaOrari(tabella, id) {
     const t = tabellaValida(tabella);
-    const r = await dbGet(`SELECT COUNT(*) AS n FROM schedules WHERE ${TABELLE[t].campo} = ?`, [id]);
+    const r = await dbGet(
+      `SELECT COUNT(*) AS n FROM schedules WHERE ${TABELLE[t].campo} = ?`,
+      [id],
+    );
     return r.n;
   },
 
   legamiDocente(teacherId) {
-    return dbAll("SELECT subject_id FROM teacher_subjects WHERE teacher_id = ?", [teacherId])
-      .then((r) => r.map((x) => x.subject_id));
+    return dbAll(
+      "SELECT subject_id FROM teacher_subjects WHERE teacher_id = ?",
+      [teacherId],
+    ).then((r) => r.map((x) => x.subject_id));
   },
   legamiMateria(subjectId) {
-    return dbAll("SELECT teacher_id FROM teacher_subjects WHERE subject_id = ?", [subjectId])
-      .then((r) => r.map((x) => x.teacher_id));
+    return dbAll(
+      "SELECT teacher_id FROM teacher_subjects WHERE subject_id = ?",
+      [subjectId],
+    ).then((r) => r.map((x) => x.teacher_id));
   },
   async insegna(teacherId, subjectId) {
     const r = await dbGet(

@@ -16,9 +16,18 @@ const schedulesRepository = {
   cerca({ teacher, room, subject } = {}) {
     let query = `${SELECT_ORARI} WHERE 1=1`;
     const params = [];
-    if (teacher) { query += " AND t.name LIKE ?"; params.push(`%${teacher}%`); }
-    if (room) { query += " AND r.name LIKE ?"; params.push(`%${room}%`); }
-    if (subject) { query += " AND sub.name LIKE ?"; params.push(`%${subject}%`); }
+    if (teacher) {
+      query += " AND t.name LIKE ?";
+      params.push(`%${teacher}%`);
+    }
+    if (room) {
+      query += " AND r.name LIKE ?";
+      params.push(`%${room}%`);
+    }
+    if (subject) {
+      query += " AND sub.name LIKE ?";
+      params.push(`%${subject}%`);
+    }
     query += " ORDER BY s.date, s.start_time, s.id";
     return dbAll(query, params);
   },
@@ -37,7 +46,15 @@ const schedulesRepository = {
   },
 
   // Righe che si sovrappongono nello stesso giorno per aula/docente/corso
-  conflitti({ room_id, teacher_id, course_id, date, start_time, end_time, ignoreId }) {
+  conflitti({
+    room_id,
+    teacher_id,
+    course_id,
+    date,
+    start_time,
+    end_time,
+    ignoreId,
+  }) {
     let sql = `
       SELECT s.id, r.name AS room, t.name AS teacher, c.name AS course
       FROM schedules s
@@ -56,21 +73,61 @@ const schedulesRepository = {
     return dbAll(sql, params);
   },
 
-  async crea({ course_id, teacher_id, room_id, subject_id, day, date, start_time, end_time }) {
+  async crea({
+    course_id,
+    teacher_id,
+    room_id,
+    subject_id,
+    day,
+    date,
+    start_time,
+    end_time,
+  }) {
     const r = await dbRun(
       `INSERT INTO schedules
         (course_id, teacher_id, room_id, subject_id, day, date, start_time, end_time)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [course_id, teacher_id, room_id, subject_id, day, date, start_time, end_time],
+      [
+        course_id,
+        teacher_id,
+        room_id,
+        subject_id,
+        day,
+        date,
+        start_time,
+        end_time,
+      ],
     );
     return r.lastID;
   },
 
-  aggiorna(id, { course_id, teacher_id, room_id, subject_id, day, date, start_time, end_time }) {
+  aggiorna(
+    id,
+    {
+      course_id,
+      teacher_id,
+      room_id,
+      subject_id,
+      day,
+      date,
+      start_time,
+      end_time,
+    },
+  ) {
     return dbRun(
       `UPDATE schedules SET course_id=?, teacher_id=?, room_id=?, subject_id=?,
          day=?, date=?, start_time=?, end_time=? WHERE id=?`,
-      [course_id, teacher_id, room_id, subject_id, day, date, start_time, end_time, id],
+      [
+        course_id,
+        teacher_id,
+        room_id,
+        subject_id,
+        day,
+        date,
+        start_time,
+        end_time,
+        id,
+      ],
     );
   },
 

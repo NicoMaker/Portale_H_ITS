@@ -83,7 +83,10 @@ export function createCatalogPage(config) {
     set("stat-used", tutte.filter((v) => v.schedules_count > 0).length);
     set("stat-unused", tutte.filter((v) => v.schedules_count === 0).length);
     if (relation) {
-      set("stat-empty", tutte.filter((v) => !v[relation.idsField].length).length);
+      set(
+        "stat-empty",
+        tutte.filter((v) => !v[relation.idsField].length).length,
+      );
     }
     set("stat-shown", lista.length);
 
@@ -159,7 +162,10 @@ export function createCatalogPage(config) {
       : `➕ Aggiungi ${config.singolare}`;
     $("form-submit").textContent = voce ? "Salva modifiche" : "Aggiungi";
     $("form-name").value = voce ? voce.name : "";
-    if (relation) stato.relForm.setValue(voce ? voce[relation.idsField] : [], { silent: true });
+    if (relation)
+      stato.relForm.setValue(voce ? voce[relation.idsField] : [], {
+        silent: true,
+      });
     messaggio("form-msg", "", true);
     $("form-modal").style.display = "flex";
     $("form-name").focus();
@@ -172,7 +178,12 @@ export function createCatalogPage(config) {
   async function inviaForm(e) {
     e.preventDefault();
     const dati = { name: $("form-name").value.trim() };
-    if (!dati.name) return messaggio("form-msg", `Inserisci il nome ${config.delNome}.`, false);
+    if (!dati.name)
+      return messaggio(
+        "form-msg",
+        `Inserisci il nome ${config.delNome}.`,
+        false,
+      );
     if (relation) dati[relation.sendField] = stato.relForm.getValue();
 
     if (stato.editingId) {
@@ -183,7 +194,11 @@ export function createCatalogPage(config) {
       const esito = await api.crea(dati);
       if (!esito.ok) return messaggio("form-msg", esito.errore, false);
       if (!esito.voce.creato) {
-        return messaggio("form-msg", `Esiste già ${config.unNome} con questo nome.`, false);
+        return messaggio(
+          "form-msg",
+          `Esiste già ${config.unNome} con questo nome.`,
+          false,
+        );
       }
       toast(`✅ ${config.singolareMaiuscolo} aggiunt${o}`);
     }
@@ -269,7 +284,8 @@ export function createCatalogPage(config) {
     }
     carica().catch((err) => {
       console.error(err);
-      $("list").innerHTML = `<p class="p-8 text-center text-red-600">Errore nel caricamento dei dati.</p>`;
+      $("list").innerHTML =
+        `<p class="p-8 text-center text-red-600">Errore nel caricamento dei dati.</p>`;
     });
   }
 

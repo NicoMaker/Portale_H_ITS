@@ -37,9 +37,17 @@ async function risolviAnagrafica(tabella, id, nome) {
 
 // Prepara i dati per il DB e verifica che il docente insegni la materia scelta
 async function preparaDati(dati = {}) {
-  const teacher = await risolviAnagrafica("teachers", dati.teacher_id, dati.teacher);
+  const teacher = await risolviAnagrafica(
+    "teachers",
+    dati.teacher_id,
+    dati.teacher,
+  );
   const room = await risolviAnagrafica("rooms", dati.room_id, dati.room);
-  const subject = await risolviAnagrafica("subjects", dati.subject_id, dati.subject);
+  const subject = await risolviAnagrafica(
+    "subjects",
+    dati.subject_id,
+    dati.subject,
+  );
 
   if (!(await catalogRepository.insegna(teacher.id, subject.id))) {
     if (teacher.creato || subject.creato) {

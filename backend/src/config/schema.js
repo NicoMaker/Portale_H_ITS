@@ -69,9 +69,15 @@ async function migraSchedulesDaTesto() {
     await dbRun("BEGIN");
     const nome = (col) =>
       `COALESCE(NULLIF(TRIM(${col}), ''), '${NOME_NON_SPECIFICATO}')`;
-    await dbRun(`INSERT OR IGNORE INTO teachers (name) SELECT DISTINCT ${nome("teacher")} FROM schedules`);
-    await dbRun(`INSERT OR IGNORE INTO rooms (name) SELECT DISTINCT ${nome("room")} FROM schedules`);
-    await dbRun(`INSERT OR IGNORE INTO subjects (name) SELECT DISTINCT ${nome("subject")} FROM schedules`);
+    await dbRun(
+      `INSERT OR IGNORE INTO teachers (name) SELECT DISTINCT ${nome("teacher")} FROM schedules`,
+    );
+    await dbRun(
+      `INSERT OR IGNORE INTO rooms (name) SELECT DISTINCT ${nome("room")} FROM schedules`,
+    );
+    await dbRun(
+      `INSERT OR IGNORE INTO subjects (name) SELECT DISTINCT ${nome("subject")} FROM schedules`,
+    );
     await dbRun("ALTER TABLE schedules RENAME TO schedules_old");
     await dbRun(SQL_CREA_SCHEDULES("schedules"));
     await dbRun(`INSERT INTO schedules
@@ -122,16 +128,24 @@ async function initDb() {
 }
 
 async function creaAdminPredefinito() {
-  const row = await dbGet('SELECT COUNT(*) AS count FROM users WHERE role = "admin"');
+  const row = await dbGet(
+    'SELECT COUNT(*) AS count FROM users WHERE role = "admin"',
+  );
   if (row.count > 0) {
-    console.log("Esiste già un utente 'admin'. Nessun nuovo admin predefinito creato.");
+    console.log(
+      "Esiste già un utente 'admin'. Nessun nuovo admin predefinito creato.",
+    );
     return;
   }
   const hashedPassword = await bcrypt.hash("Admin123!", 10);
   await dbRun("INSERT INTO users (username, password, role) VALUES (?, ?, ?)", [
-    "Admin", hashedPassword, "admin",
+    "Admin",
+    hashedPassword,
+    "admin",
   ]);
-  console.log(`Utente Admin predefinito creato con successo (password hashata).`);
+  console.log(
+    `Utente Admin predefinito creato con successo (password hashata).`,
+  );
 }
 
 module.exports = { initDb, NOME_NON_SPECIFICATO };

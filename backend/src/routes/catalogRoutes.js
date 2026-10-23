@@ -8,7 +8,11 @@ function router(tabella) {
   r.get("/", requireAdmin, catchErrors(catalogController[tabella].lista));
   r.post("/", requireAdmin, catchErrors(catalogController[tabella].crea));
   r.put("/:id", requireAdmin, catchErrors(catalogController[tabella].aggiorna));
-  r.delete("/:id", requireAdmin, catchErrors(catalogController[tabella].elimina));
+  r.delete(
+    "/:id",
+    requireAdmin,
+    catchErrors(catalogController[tabella].elimina),
+  );
   return r;
 }
 
