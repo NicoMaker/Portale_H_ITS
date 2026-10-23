@@ -2,6 +2,8 @@ erDiagram
     users ||--o{ user_courses : "1:N"
     courses ||--o{ user_courses : "1:N"
     courses ||--o{ schedules : "1:N"
+    teachers ||--o{ teacher_subjects : "1:N"
+    subjects ||--o{ teacher_subjects : "1:N"
     teachers ||--o{ schedules : "1:N"
     rooms ||--o{ schedules : "1:N"
     subjects ||--o{ schedules : "1:N"
@@ -37,6 +39,11 @@ erDiagram
     subjects {
         INTEGER id PK
         TEXT name UK
+    }
+
+    teacher_subjects {
+        INTEGER teacher_id PK, FK
+        INTEGER subject_id PK, FK
     }
 
     schedules {

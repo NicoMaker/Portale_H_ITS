@@ -1,9 +1,6 @@
-// Comportamenti dei form: ora di fine automatica, giorno automatico,
-// e aggiunta di nuovi docenti/aule/materie alle rispettive tabelle.
-import { toast } from "../../shared/dom.js";
-import { teachersApi, roomsApi, subjectsApi } from "../../shared/api.js";
+// Comportamenti dei form: ora di fine automatica, giorno automatico e
+// selettori collegati materia ↔ docente (si compilano e si filtrano a vicenda).
 import { state, addOneHourToTime, getDayOfWeek } from "./state.js";
-import { fetchCatalogs } from "./data.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -40,55 +37,108 @@ export function setupAutoDayOfWeek() {
   });
 }
 
-// Campo del form → anagrafica corrispondente nello stato / sul server
-const ANAGRAFICA = {
-  teacher: { lista: "teachers", api: teachersApi, etichetta: "Docente" },
-  room: { lista: "rooms", api: roomsApi, etichetta: "Aula" },
-  subject: { lista: "subjects", api: subjectsApi, etichetta: "Materia" },
-};
-
-const chiaveNome = (v) => v.trim().replace(/\s+/g, " ").toLowerCase();
-
-// Mostra il pulsante "+" se il valore digitato non esiste ancora nell'anagrafica
-export function toggleAddButtonVisibility(modalType, field) {
-  const input = $(`${modalType}-${field}`);
-  const button = $(`${modalType}-${field}-btn`);
-  const value = chiaveNome(input.value);
-  const esiste = state[ANAGRAFICA[field].lista].some(
-    (v) => chiaveNome(v.name) === value,
+// ── Selettori collegati materia ↔ docente ──
+// state.subjects[i].teacher_ids e state.teachers[i].subject_ids arrivano dalla
+// relazione "chi insegna cosa" (Gestione Materie / Gestione Docenti).
+const esc = (t) =>
+  String(t).replace(
+    /[&<>"']/g,
+    (c) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
+        c
+      ],
   );
-  button.style.display = value && !esiste ? "block" : "none";
+const perNome = (a, b) => a.name.localeCompare(b.name, "it");
+
+function opzioni(voci, selezionato, segnaposto) {
+  const righe = voci
+    .map(
+      (v) =>
+        `<option value="${v.id}"${v.id === selezionato ? " selected" : ""}>${esc(v.name)}</option>`,
+    )
+    .join("");
+  return `<option value="" disabled${selezionato ? "" : " selected"}>${esc(segnaposto)}</option>${righe}`;
 }
 
-// Crea il nuovo docente/aula/materia nella sua tabella e lo rende selezionabile
-async function handleAdd(field, modalType) {
-  const input = $(`${modalType}-${field}`);
-  const value = input.value.trim().replace(/\s+/g, " ");
-  if (!value) return;
-  const { api, etichetta } = ANAGRAFICA[field];
-  const esito = await api.crea(value);
-  if (!esito.ok) {
-    toast(
-      `⚠️ ${esito.errore || `Impossibile aggiungere: ${etichetta.toLowerCase()}`}`,
-    );
-    return;
+// Ridisegna i tre selettori in base a materia/docente scelti
+function disegna(prefix, sid, tid) {
+  const materia = state.subjects.find((s) => s.id === sid) || null;
+  const docente = state.teachers.find((t) => t.id === tid) || null;
+
+  // Se c'è un docente, solo le sue materie; se c'è una materia, solo i suoi docenti
+  const materie = (docente
+    ? state.subjects.filter((s) => docente.subject_ids.includes(s.id))
+    : state.subjects
+  )
+    .slice()
+    .sort(perNome);
+  const docenti = (materia
+    ? state.teachers.filter((t) => materia.teacher_ids.includes(t.id))
+    : state.teachers
+  )
+    .slice()
+    .sort(perNome);
+
+  $(`${prefix}-subject`).innerHTML = opzioni(
+    materie,
+    sid,
+    materie.length ? "Seleziona una materia" : "Nessuna materia per questo docente",
+  );
+  $(`${prefix}-teacher`).innerHTML = opzioni(
+    docenti,
+    tid,
+    docenti.length ? "Seleziona un docente" : "Nessun docente per questa materia",
+  );
+
+  // Suggerimenti sotto i campi
+  const hintMateria = $(`${prefix}-subject-hint`);
+  const hintDocente = $(`${prefix}-teacher-hint`);
+  if (docente) {
+    hintMateria.textContent = `Materie insegnate da ${docente.name}: ${materie.length}`;
+  } else {
+    hintMateria.textContent = "Scegli la materia: il docente si propone da solo.";
   }
-  await fetchCatalogs();
-  input.value = esito.voce.name;
-  toggleAddButtonVisibility(modalType, field);
-  toast(`✅ ${etichetta} aggiunto: ${esito.voce.name}`);
+  if (materia && !materia.teacher_ids.length) {
+    hintDocente.innerHTML = `⚠️ Nessun docente insegna questa materia: assegnalo in <a href="/manage_subjects.html" target="_blank" class="text-blue-600 underline">Gestione Materie</a>.`;
+  } else if (materia) {
+    hintDocente.textContent = `${docenti.length} ${docenti.length === 1 ? "docente insegna" : "docenti insegnano"} ${materia.name}.`;
+  } else {
+    hintDocente.textContent = "Mostra tutti i docenti finché non scegli la materia.";
+  }
 }
 
-// Collega i listener dei campi con aggiunta dinamica
-export function setupDynamicFields() {
-  const campi = ["teacher", "room", "subject"];
-  ["add", "edit"].forEach((modalType) => {
-    campi.forEach((field) => {
-      $(`${modalType}-${field}-btn`).onclick = () =>
-        handleAdd(field, modalType);
-      $(`${modalType}-${field}`).addEventListener("input", () =>
-        toggleAddButtonVisibility(modalType, field),
-      );
-    });
+// Dopo un cambio: azzera ciò che non è più coerente e compila l'unica scelta possibile
+function ricalcola(prefix, origine) {
+  let sid = Number($(`${prefix}-subject`).value) || null;
+  let tid = Number($(`${prefix}-teacher`).value) || null;
+  const materia = state.subjects.find((s) => s.id === sid);
+  const docente = state.teachers.find((t) => t.id === tid);
+
+  if (origine === "subject" && materia) {
+    if (tid && !materia.teacher_ids.includes(tid)) tid = null;
+    if (!tid && materia.teacher_ids.length === 1) tid = materia.teacher_ids[0];
+  }
+  if (origine === "teacher" && docente) {
+    if (sid && !docente.subject_ids.includes(sid)) sid = null;
+    if (!sid && docente.subject_ids.length === 1) sid = docente.subject_ids[0];
+  }
+  disegna(prefix, sid, tid);
+}
+
+// Riempie i selettori del form (add/edit) con i valori indicati
+export function riempiSelezioni(prefix, { subjectId, teacherId, roomId } = {}) {
+  disegna(prefix, subjectId || null, teacherId || null);
+  const aule = state.rooms.slice().sort(perNome);
+  $(`${prefix}-room`).innerHTML = opzioni(aule, roomId || null, "Seleziona un'aula");
+}
+
+export function setupLinkedSelects() {
+  ["add", "edit"].forEach((prefix) => {
+    $(`${prefix}-subject`).addEventListener("change", () =>
+      ricalcola(prefix, "subject"),
+    );
+    $(`${prefix}-teacher`).addEventListener("change", () =>
+      ricalcola(prefix, "teacher"),
+    );
   });
 }

@@ -1,4 +1,4 @@
-# Portale H ITS — v3.1
+# Portale H ITS — v3.2
 
 Portale di gestione corsi, utenti e orari per un ITS, con aggiornamenti in tempo reale via Socket.IO. Stesse funzionalità della v1, ma tutto il codice — backend e frontend — è stato diviso in componenti con una sola responsabilità ciascuno.
 
@@ -15,6 +15,16 @@ Seed non interattivo: `node src/scripts/seed.js --defaults` oppure con parametri
 `--admins=2 --enrolled=40 --unenrolled=10 --courses-with=4 --courses-without=2 --per-course=15 [--year=2026]`.
 
 Al primo avvio viene creato l'admin predefinito: **Admin / Admin123!**. Il database SQLite è generato in `backend/db/database.db`.
+
+## Novità della v3.2
+
+- **Pagine separate per ogni anagrafica**: oltre a Utenti, Corsi e Orari ci sono ora **Gestione Docenti** (`manage_teachers.html`), **Gestione Materie** (`manage_subjects.html`) e **Gestione Aule** (`manage_rooms.html`), ciascuna con ricerca, filtri, aggiunta, modifica ed eliminazione. La barra di navigazione e la dashboard admin le raggiungono tutte.
+- **Chi insegna cosa**: nuova tabella `teacher_subjects` (relazione N:N docente ↔ materia). In *Gestione Materie* si scelgono i docenti che la insegnano; in *Gestione Docenti* si vedono (e si possono modificare) le materie di ciascun docente. Entrambe le pagine mostrano la relazione e permettono di filtrarla.
+- **Form orari intelligenti**: materia e docente sono selettori collegati. Scegliendo la materia compaiono solo i docenti che la insegnano (e se ce n'è uno solo si compila da solo); scegliendo il docente compaiono solo le sue materie (se ne ha una sola si compila da sola). Il backend rifiuta le combinazioni non coerenti.
+- **Regole di integrità**: non si elimina un docente/aula/materia usato in almeno un orario, e non si toglie l'associazione docente ↔ materia se esistono orari che la usano.
+- **Migrazione automatica**: sui database esistenti `teacher_subjects` viene popolata dalle coppie docente/materia già presenti negli orari.
+- **Seed**: assegna a ogni materia 1–3 docenti e crea gli orari solo con docenti che la insegnano.
+- Nuove API (solo admin): `PUT/DELETE /api/teachers/:id`, `/api/rooms/:id`, `/api/subjects/:id`. `POST/PUT` di docenti accettano `subject_ids`, quelle di materie `teacher_ids`. Gli orari accettano `teacher_id`, `room_id`, `subject_id` (i nomi restano supportati).
 
 ## Novità della v3.1
 
@@ -71,7 +81,7 @@ backend/
     │   ├── usersRepository.js
     │   ├── coursesRepository.js
     │   ├── schedulesRepository.js
-    │   ├── catalogRepository.js → teachers / rooms / subjects
+    │   ├── catalogRepository.js → teachers / rooms / subjects / teacher_subjects
     │   └── statsRepository.js
     ├── middleware/
     │   ├── auth.js              → requireAdmin / requireUser / requireAuth
@@ -109,6 +119,8 @@ frontend/js/
     ├── admin_dashboard/         → stats · editProfile · uiEffects · index
     ├── manage_users/            → state · data · render · modals · index
     ├── manage_courses/          → state · filters · render · modals · index
+    ├── catalog/                 → catalogPage.js: pagina generica delle anagrafiche
+    ├── manage_teachers/ · manage_subjects/ · manage_rooms/ → index (solo configurazione)
     ├── manage_schedules/        → state · data · filters · render · formHelpers · modals · index
     └── user_dashboard/          → state · filters · render · editProfile · index
 ```
@@ -126,5 +138,5 @@ Il client apre una connessione Socket.IO e si registra con il proprio identifica
 - `GET/POST /api/users`, `PUT/DELETE /api/users/:id`, `POST /api/users/:id/{promote,demote,assign_course,edit}`
 - `GET/POST /api/courses`, `PUT/DELETE /api/courses/:id`
 - `GET/POST /api/schedules`, `PUT/DELETE /api/schedules/:id`, `GET /api/schedules/meta`
-- `GET/POST /api/teachers`, `GET/POST /api/rooms`, `GET/POST /api/subjects`
+- `GET/POST /api/teachers`, `/api/rooms`, `/api/subjects` · `PUT/DELETE /api/{teachers|rooms|subjects}/:id`
 - `GET /admin/stats`, `GET /admin/analytics`

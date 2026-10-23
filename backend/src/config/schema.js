@@ -3,6 +3,7 @@
 // Tabelle:
 //   users, courses, user_courses      → utenti, corsi, iscrizioni
 //   teachers, rooms, subjects         → anagrafiche (una tabella per ciascuna)
+//   teacher_subjects                  → quali docenti insegnano quali materie (N:N)
 //   schedules                         → orari: riferiscono corso, docente, aula e materia
 //                                       tramite chiave esterna; la data vive solo qui
 const bcrypt = require("bcryptjs");
@@ -37,6 +38,15 @@ async function creaTabelle() {
       name TEXT NOT NULL UNIQUE COLLATE NOCASE
     )`);
   }
+
+  // Relazione docente ↔ materia: chi insegna cosa
+  await dbRun(`CREATE TABLE IF NOT EXISTS teacher_subjects (
+    teacher_id INTEGER NOT NULL,
+    subject_id INTEGER NOT NULL,
+    PRIMARY KEY (teacher_id, subject_id),
+    FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE CASCADE,
+    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE
+  )`);
 }
 
 const SQL_CREA_SCHEDULES = (nome) => `CREATE TABLE IF NOT EXISTS ${nome} (
@@ -97,6 +107,15 @@ async function migraSchedulesDaTesto() {
   }
 }
 
+// Database già esistenti: le coppie docente/materia già presenti negli orari
+// diventano "il docente insegna la materia", così nulla risulta incoerente.
+async function popolaDocentiMaterieDaOrari() {
+  await dbRun(
+    `INSERT OR IGNORE INTO teacher_subjects (teacher_id, subject_id)
+     SELECT DISTINCT teacher_id, subject_id FROM schedules`,
+  );
+}
+
 async function creaIndici() {
   const indici = [
     "CREATE INDEX IF NOT EXISTS idx_schedules_course ON schedules(course_id)",
@@ -105,6 +124,7 @@ async function creaIndici() {
     "CREATE INDEX IF NOT EXISTS idx_schedules_subject ON schedules(subject_id)",
     "CREATE INDEX IF NOT EXISTS idx_schedules_date ON schedules(date)",
     "CREATE INDEX IF NOT EXISTS idx_user_courses_course ON user_courses(course_id)",
+    "CREATE INDEX IF NOT EXISTS idx_teacher_subjects_subject ON teacher_subjects(subject_id)",
   ];
   for (const sql of indici) await dbRun(sql);
 }
@@ -117,6 +137,7 @@ async function initDb() {
   await migraSchedulesDaTesto();
   await dbRun(SQL_CREA_SCHEDULES("schedules"));
   await creaIndici();
+  await popolaDocentiMaterieDaOrari();
 
   await creaAdminPredefinito();
 }

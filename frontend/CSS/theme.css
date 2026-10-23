@@ -125,3 +125,19 @@ table {
     background-color: rgba(129, 140, 248, 0.07);
   }
 }
+
+/* ── Barra di navigazione admin con 7 voci: compatta e scorrevole se serve ── */
+.admin-nav .nav-links {
+  flex: 1 1 auto;
+  min-width: 0;
+  justify-content: center;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.admin-nav .nav-links::-webkit-scrollbar {
+  display: none;
+}
+.admin-nav .nav-link {
+  white-space: nowrap;
+  padding: 0.45rem 0.7rem;
+}

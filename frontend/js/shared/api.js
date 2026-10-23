@@ -67,16 +67,31 @@ export const schedulesApi = {
   elimina: (id) => fetch(`/api/schedules/${id}`, { method: "DELETE" }),
 };
 
-// Anagrafiche: docenti, aule, materie (ognuna con la propria tabella sul server)
+// Anagrafiche: docenti, aule, materie (ognuna con la propria tabella sul server).
+// Docenti e materie portano anche la relazione "chi insegna cosa":
+//   teachers → subject_ids / subject_names     subjects → teacher_ids / teacher_names
 const catalogoApi = (percorso) => ({
   lista: () => getJson(`/api/${percorso}`),
+  // `dati` = { name, subject_ids? | teacher_ids? } (oppure solo il nome come stringa)
   // Ritorna { ok, voce?, errore? }
-  crea: async (name) => {
-    const r = await postJson(`/api/${percorso}`, { name });
+  crea: async (dati) => {
+    const corpo = typeof dati === "string" ? { name: dati } : dati;
+    const r = await postJson(`/api/${percorso}`, corpo);
     return r.ok
       ? { ok: true, voce: await r.json() }
       : { ok: false, errore: await r.text() };
   },
+  // Ritornano il testo della risposta: "OK" oppure il messaggio d'errore
+  modifica: async (id, dati) => {
+    const r = await fetch(`/api/${percorso}/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(dati),
+    });
+    return r.text();
+  },
+  elimina: async (id) =>
+    (await fetch(`/api/${percorso}/${id}`, { method: "DELETE" })).text(),
 });
 
 export const teachersApi = catalogoApi("teachers");

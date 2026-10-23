@@ -464,6 +464,7 @@ async function populateDatabase() {
     await dbRun("PRAGMA foreign_keys = ON;");
     for (const t of [
       "schedules",
+      "teacher_subjects",
       "user_courses",
       "courses",
       "users",
@@ -540,6 +541,26 @@ async function populateDatabase() {
     const roomIds = await inserisciAnagrafica("rooms", AULE);
     const subjectIds = await inserisciAnagrafica("subjects", MATERIE);
 
+    // Ogni materia è insegnata da 1-3 docenti; ogni docente ha almeno una materia
+    console.log("🔗 Associazione docenti ↔ materie...");
+    const docentiPerMateria = new Map();
+    const collega = async (t, s) => {
+      await dbRun(
+        "INSERT OR IGNORE INTO teacher_subjects (teacher_id, subject_id) VALUES (?, ?)",
+        [t, s],
+      );
+      if (!docentiPerMateria.has(s)) docentiPerMateria.set(s, []);
+      if (!docentiPerMateria.get(s).includes(t)) docentiPerMateria.get(s).push(t);
+    };
+    for (const s of subjectIds) {
+      const quanti = 1 + Math.floor(Math.random() * 3);
+      for (const t of shuffle([...teacherIds]).slice(0, quanti)) await collega(t, s);
+    }
+    for (const t of teacherIds) {
+      const ha = [...docentiPerMateria.values()].some((l) => l.includes(t));
+      if (!ha) await collega(t, getRandomItem(subjectIds));
+    }
+
     console.log("🕒 Creazione orari per TUTTI i corsi...");
     const allCourses = await dbAll("SELECT id FROM courses");
     const materieMescolate = shuffle([...subjectIds]);
@@ -548,14 +569,15 @@ async function populateDatabase() {
       for (let j = 0; j < schedulesPerCourse; j++) {
         const { date, day } = randomDataLavorativa(year);
         const { start_time, end_time } = randomOrario();
+        const subjectId = materieMescolate[totale % materieMescolate.length];
         await dbRun(
           `INSERT INTO schedules (course_id, teacher_id, room_id, subject_id, start_time, end_time, day, date)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             course.id,
-            getRandomItem(teacherIds),
+            getRandomItem(docentiPerMateria.get(subjectId)),
             getRandomItem(roomIds),
-            materieMescolate[totale % materieMescolate.length],
+            subjectId,
             start_time,
             end_time,
             day,

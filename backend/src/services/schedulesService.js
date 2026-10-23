@@ -1,6 +1,7 @@
 // Service orari: CRUD con anagrafiche, giorno derivato dalla data, eventi realtime
 const schedulesRepository = require("../repositories/schedulesRepository");
 const catalogService = require("./catalogService");
+const catalogRepository = require("../repositories/catalogRepository");
 const realtime = require("../realtime/socket");
 const { HttpError } = require("../middleware/errorHandler");
 
@@ -24,13 +25,33 @@ function giornoDaData(date) {
   return GIORNI[d.getDay()];
 }
 
-// Traduce i nomi ricevuti dal frontend negli id delle anagrafiche (creandole se mancano)
+// Ogni anagrafica arriva come id (preferito) oppure come nome (compatibilità:
+// in quel caso la voce viene creata se manca).
+async function risolviAnagrafica(tabella, id, nome) {
+  if (id !== undefined && id !== null && id !== "") {
+    const voce = await catalogService.richiedi(tabella, id);
+    return { ...voce, creato: false };
+  }
+  return catalogService.risolvi(tabella, nome);
+}
+
+// Prepara i dati per il DB e verifica che il docente insegni la materia scelta
 async function preparaDati(dati = {}) {
-  const [teacher, room, subject] = await Promise.all([
-    catalogService.risolvi("teachers", dati.teacher),
-    catalogService.risolvi("rooms", dati.room),
-    catalogService.risolvi("subjects", dati.subject),
-  ]);
+  const teacher = await risolviAnagrafica("teachers", dati.teacher_id, dati.teacher);
+  const room = await risolviAnagrafica("rooms", dati.room_id, dati.room);
+  const subject = await risolviAnagrafica("subjects", dati.subject_id, dati.subject);
+
+  if (!(await catalogRepository.insegna(teacher.id, subject.id))) {
+    if (teacher.creato || subject.creato) {
+      // Voci appena create dall'API a nomi: l'associazione nasce con l'orario
+      await catalogRepository.collega(teacher.id, subject.id);
+    } else {
+      throw new HttpError(
+        400,
+        `${teacher.name} non insegna ${subject.name}. Associa la materia al docente in Gestione Materie o Gestione Docenti.`,
+      );
+    }
+  }
   return {
     course_id: dati.course_id,
     teacher_id: teacher.id,

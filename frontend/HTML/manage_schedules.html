@@ -32,14 +32,13 @@
           <span class="nav-brand-label">Admin Panel</span>
         </a>
         <div class="nav-links">
-          <a href="/admin_dashboard.html" class="nav-link"
-            >🏠 Dashboard Admin</a
-          >
-          <a href="/manage_users.html" class="nav-link">👥 Gestione Utenti</a>
-          <a href="/manage_courses.html" class="nav-link">📚 Gestione Corsi</a>
-          <a href="/manage_schedules.html" class="nav-link active"
-            >📅 Gestione Orari</a
-          >
+          <a href="/admin_dashboard.html" class="nav-link">🏠 Dashboard</a>
+          <a href="/manage_users.html" class="nav-link">👥 Utenti</a>
+          <a href="/manage_courses.html" class="nav-link">📚 Corsi</a>
+          <a href="/manage_schedules.html" class="nav-link active">📅 Orari</a>
+          <a href="/manage_teachers.html" class="nav-link">👨‍🏫 Docenti</a>
+          <a href="/manage_subjects.html" class="nav-link">📖 Materie</a>
+          <a href="/manage_rooms.html" class="nav-link">🏫 Aule</a>
         </div>
         <div class="nav-actions">
           <a href="/logout" class="btn-logout">
@@ -465,82 +464,21 @@
               </div>
 
               <div>
-                <label
-                  for="edit-teacher"
-                  class="block text-sm font-medium text-gray-700 mb-2"
-                  >Docente</label
-                >
-                <div class="flex gap-2">
-                  <input
-                    type="text"
-                    id="edit-teacher"
-                    list="teacher-list"
-                    placeholder="Docente"
-                    required
-                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  <button
-                    type="button"
-                    id="edit-teacher-btn"
-                    style="display: block"
-                    class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                  >
-                    + Aggiungi
-                  </button>
-                </div>
+                <label for="edit-subject" class="block text-sm font-medium text-gray-700 mb-2">Materia</label>
+                <select id="edit-subject" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"></select>
+                <p id="edit-subject-hint" class="text-xs text-gray-500 mt-1"></p>
+              </div>
+              <div>
+                <label for="edit-teacher" class="block text-sm font-medium text-gray-700 mb-2">Docente</label>
+                <select id="edit-teacher" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"></select>
+                <p id="edit-teacher-hint" class="text-xs text-gray-500 mt-1"></p>
+              </div>
+              <div>
+                <label for="edit-room" class="block text-sm font-medium text-gray-700 mb-2">Aula</label>
+                <select id="edit-room" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"></select>
               </div>
 
-              <div>
-                <label
-                  for="edit-room"
-                  class="block text-sm font-medium text-gray-700 mb-2"
-                  >Aula</label
-                >
-                <div class="flex gap-2">
-                  <input
-                    type="text"
-                    id="edit-room"
-                    list="room-list"
-                    placeholder="Aula"
-                    required
-                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  <button
-                    type="button"
-                    id="edit-room-btn"
-                    style="display: block"
-                    class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                  >
-                    + Aggiungi
-                  </button>
-                </div>
-              </div>
 
-              <div>
-                <label
-                  for="edit-subject"
-                  class="block text-sm font-medium text-gray-700 mb-2"
-                  >Materia</label
-                >
-                <div class="flex gap-2">
-                  <input
-                    type="text"
-                    id="edit-subject"
-                    list="subject-list"
-                    placeholder="Materia"
-                    required
-                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  <button
-                    type="button"
-                    id="edit-subject-btn"
-                    style="display: block"
-                    class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                  >
-                    + Aggiungi
-                  </button>
-                </div>
-              </div>
 
               <div>
                 <label
@@ -660,82 +598,21 @@
               </div>
 
               <div>
-                <label
-                  for="add-teacher"
-                  class="block text-sm font-medium text-gray-700 mb-2"
-                  >Docente</label
-                >
-                <div class="flex gap-2">
-                  <input
-                    type="text"
-                    id="add-teacher"
-                    list="teacher-list"
-                    placeholder="Docente"
-                    required
-                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  <button
-                    type="button"
-                    id="add-teacher-btn"
-                    style="display: block"
-                    class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                  >
-                    + Aggiungi
-                  </button>
-                </div>
+                <label for="add-subject" class="block text-sm font-medium text-gray-700 mb-2">Materia</label>
+                <select id="add-subject" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"></select>
+                <p id="add-subject-hint" class="text-xs text-gray-500 mt-1"></p>
+              </div>
+              <div>
+                <label for="add-teacher" class="block text-sm font-medium text-gray-700 mb-2">Docente</label>
+                <select id="add-teacher" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"></select>
+                <p id="add-teacher-hint" class="text-xs text-gray-500 mt-1"></p>
+              </div>
+              <div>
+                <label for="add-room" class="block text-sm font-medium text-gray-700 mb-2">Aula</label>
+                <select id="add-room" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"></select>
               </div>
 
-              <div>
-                <label
-                  for="add-room"
-                  class="block text-sm font-medium text-gray-700 mb-2"
-                  >Aula</label
-                >
-                <div class="flex gap-2">
-                  <input
-                    type="text"
-                    id="add-room"
-                    list="room-list"
-                    placeholder="Aula"
-                    required
-                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  <button
-                    type="button"
-                    id="add-room-btn"
-                    style="display: block"
-                    class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                  >
-                    + Aggiungi
-                  </button>
-                </div>
-              </div>
 
-              <div>
-                <label
-                  for="add-subject"
-                  class="block text-sm font-medium text-gray-700 mb-2"
-                  >Materia</label
-                >
-                <div class="flex gap-2">
-                  <input
-                    type="text"
-                    id="add-subject"
-                    list="subject-list"
-                    placeholder="Materia"
-                    required
-                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  <button
-                    type="button"
-                    id="add-subject-btn"
-                    style="display: block"
-                    class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                  >
-                    + Aggiungi
-                  </button>
-                </div>
-              </div>
 
               <div>
                 <label
@@ -880,10 +757,6 @@
       </div>
     </div>
 
-    <datalist id="teacher-list"></datalist>
-    <datalist id="room-list"></datalist>
-    <datalist id="subject-list"></datalist>
-    <datalist id="day-list"></datalist>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="js/realtime/socket-client.js"></script>

@@ -4,7 +4,7 @@ import { formatDate } from "../../shared/dom.js";
 import { state } from "./state.js";
 import { fetchCoursesAndSchedules } from "./data.js";
 import { renderSchedules } from "./render.js";
-import { toggleAddButtonVisibility } from "./formHelpers.js";
+import { riempiSelezioni } from "./formHelpers.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -17,14 +17,10 @@ function mostraMsg(el, testo, ok) {
 
 // Valida i campi comuni ad add/edit; ritorna un messaggio d'errore o null
 function validaOrario(
-  { start_time, end_time, course_id, date, ignoreId },
-  prefix,
+  { start_time, end_time, course_id, date, subject_id, teacher_id, room_id, ignoreId },
 ) {
-  const bottoniAperti = ["teacher", "room", "subject"].some(
-    (f) => $(`${prefix}-${f}-btn`).style.display !== "none",
-  );
-  if (bottoniAperti)
-    return "Per favore, aggiungi i nuovi valori prima di salvare l'orario.";
+  if (!subject_id || !teacher_id || !room_id)
+    return "Seleziona materia, docente e aula.";
   if (start_time >= end_time)
     return "L'ora di inizio deve essere precedente a quella di fine.";
   const overlap = state.schedules.some(
@@ -55,14 +51,10 @@ function apriAdd() {
           `<option value="${c.id}"${corsoPreselezionato && String(c.id) === corsoPreselezionato ? " selected" : ""}>${c.name}</option>`,
       )
       .join("");
-  ["teacher", "room", "subject", "day", "date", "start", "end"].forEach(
-    (f) => ($(`add-${f}`).value = ""),
-  );
+  ["day", "date", "start", "end"].forEach((f) => ($(`add-${f}`).value = ""));
+  riempiSelezioni("add", {});
   $("add-schedule-msg").textContent = "";
   $("add-schedule-modal").style.display = "flex";
-  ["teacher", "room", "subject"].forEach((f) =>
-    toggleAddButtonVisibility("add", f),
-  );
 }
 
 async function submitAdd(e) {
@@ -70,7 +62,7 @@ async function submitAdd(e) {
   const msgEl = $("add-schedule-msg");
   const dati = raccogliDati("add");
 
-  const errore = validaOrario({ ...dati, ignoreId: undefined }, "add");
+  const errore = validaOrario({ ...dati, ignoreId: undefined });
   if (errore) return mostraMsg(msgEl, errore, false);
 
   msgEl.textContent = "";
@@ -99,19 +91,17 @@ export function openEditSchedule(id) {
     )
     .join("");
 
-  $("edit-teacher").value = s.teacher;
-  $("edit-room").value = s.room;
-  $("edit-subject").value = s.subject || "";
+  riempiSelezioni("edit", {
+    subjectId: s.subject_id,
+    teacherId: s.teacher_id,
+    roomId: s.room_id,
+  });
   $("edit-day").textContent = s.day || "";
   $("edit-date").value = s.date;
   $("edit-start").value = s.start_time;
   $("edit-end").value = s.end_time;
   $("edit-schedule-msg").textContent = "";
   $("edit-schedule-modal").style.display = "flex";
-
-  ["teacher", "room", "subject"].forEach((f) =>
-    toggleAddButtonVisibility("edit", f),
-  );
 }
 
 async function submitEdit(e) {
@@ -119,10 +109,10 @@ async function submitEdit(e) {
   const msgEl = $("edit-schedule-msg");
   const dati = raccogliDati("edit");
 
-  const errore = validaOrario(
-    { ...dati, ignoreId: state.editingScheduleId },
-    "edit",
-  );
+  const errore = validaOrario({
+    ...dati,
+    ignoreId: state.editingScheduleId,
+  });
   if (errore) return mostraMsg(msgEl, errore, false);
 
   msgEl.textContent = "";
@@ -141,9 +131,9 @@ async function submitEdit(e) {
 function raccogliDati(prefix) {
   return {
     course_id: $(`${prefix}-course-select`).value,
-    teacher: $(`${prefix}-teacher`).value,
-    room: $(`${prefix}-room`).value,
-    subject: $(`${prefix}-subject`).value,
+    teacher_id: Number($(`${prefix}-teacher`).value) || null,
+    room_id: Number($(`${prefix}-room`).value) || null,
+    subject_id: Number($(`${prefix}-subject`).value) || null,
     day: prefix === "add" ? $("add-day").value : $("edit-day").textContent,
     date: $(`${prefix}-date`).value,
     start_time: $(`${prefix}-start`).value,
