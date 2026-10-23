@@ -24,13 +24,11 @@ function creaApp({ port } = {}) {
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
 
-  // Static files
   app.use(express.static(path.join(__dirname, "..", "..", "frontend")));
   app.use(express.static(path.join(__dirname, "..", "..", "frontend", "HTML")));
 
   app.use("/", routes);
 
-  // Health check
   app.get("/api/health", async (req, res) => {
     const publicIP = await getPublicIP();
     res.json({
@@ -43,7 +41,6 @@ function creaApp({ port } = {}) {
     });
   });
 
-  // Root redirect
   app.get("/", (req, res) => {
     res.redirect("/login.html");
   });

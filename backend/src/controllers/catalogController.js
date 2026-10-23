@@ -1,4 +1,3 @@
-// Controller anagrafiche: docenti, aule, materie (stessa logica, tabella diversa)
 const catalogService = require("../services/catalogService");
 
 function perTabella(tabella) {

@@ -1,4 +1,3 @@
-// Route anagrafiche: /api/teachers, /api/rooms, /api/subjects (solo admin)
 const express = require("express");
 const catalogController = require("../controllers/catalogController");
 const { requireAdmin } = require("../middleware/auth");

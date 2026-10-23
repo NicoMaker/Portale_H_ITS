@@ -8,13 +8,7 @@ const router = express.Router();
 router.post("/login", catchErrors(authController.login));
 router.get("/logout", authController.logout);
 router.get("/api/session", authController.statoSessione);
-
-// Profilo dell'utente corrente (usati dai modali "Modifica profilo")
 router.get("/user/current", requireAuth, authController.utenteCorrente);
-router.post(
-  "/user/profile",
-  requireAuth,
-  catchErrors(authController.aggiornaProfilo),
-);
+router.post("/user/profile", requireAuth, catchErrors(authController.aggiornaProfilo));
 
 module.exports = router;

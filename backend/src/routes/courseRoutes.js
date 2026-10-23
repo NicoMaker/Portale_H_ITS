@@ -5,7 +5,6 @@ const { catchErrors } = require("../middleware/errorHandler");
 
 const router = express.Router();
 
-// GET accessibile a tutti gli autenticati; scrittura solo admin
 router.get("/", requireAuth, catchErrors(coursesController.lista));
 router.post("/", requireAdmin, catchErrors(coursesController.crea));
 router.put("/:id", requireAdmin, catchErrors(coursesController.aggiorna));

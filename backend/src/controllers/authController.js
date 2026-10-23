@@ -1,21 +1,13 @@
-// Controller auth: login/logout/sessione/profilo corrente
 const authService = require("../services/authService");
-const {
-  destroySession,
-  SESSION_TTL_MS,
-} = require("../services/sessionService");
+const { destroySession, SESSION_TTL_MS } = require("../services/sessionService");
 
 const authController = {
   async login(req, res) {
     const { username, password } = req.body;
     const esito = await authService.login(username, password);
-
     if (!esito) {
-      return res.send(
-        '<div class="hint" style="color:red;text-align:center">Credenziali non valide</div>',
-      );
+      return res.send('<div class="hint" style="color:red;text-align:center">Credenziali non valide</div>');
     }
-
     res.cookie("sid", esito.sid, {
       httpOnly: true,
       sameSite: "lax",
@@ -23,9 +15,7 @@ const authController = {
       maxAge: SESSION_TTL_MS,
       path: "/",
     });
-    res.redirect(
-      esito.role === "admin" ? "/admin_dashboard.html" : "/user_dashboard.html",
-    );
+    res.redirect(esito.role === "admin" ? "/admin_dashboard.html" : "/user_dashboard.html");
   },
 
   logout(req, res) {
@@ -37,18 +27,13 @@ const authController = {
     res.json(authService.statoSessione(req.cookies?.sid));
   },
 
-  // GET /user/current — dati dell'utente loggato
   utenteCorrente(req, res) {
     const { id, username, role } = req.session.user;
     res.json({ id, username, role });
   },
 
-  // POST /user/profile — aggiorna il profilo dell'utente loggato
   async aggiornaProfilo(req, res) {
-    const esito = await authService.aggiornaProfiloCorrente(
-      req.session.user.id,
-      req.body,
-    );
+    const esito = await authService.aggiornaProfiloCorrente(req.session.user.id, req.body);
     res.json(esito);
   },
 };

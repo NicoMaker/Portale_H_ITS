@@ -21,9 +21,7 @@ function requireUser(req, res, next) {
 
 function requireAuth(req, res, next) {
   const session = getSession(req);
-  if (!session) {
-    return res.status(403).send("Forbidden");
-  }
+  if (!session) return res.status(403).send("Forbidden");
   req.session = session;
   next();
 }

@@ -1,11 +1,4 @@
-// Schema del database + migrazioni + creazione dell'admin predefinito al primo avvio
-//
-// Tabelle:
-//   users, courses, user_courses      → utenti, corsi, iscrizioni
-//   teachers, rooms, subjects         → anagrafiche (una tabella per ciascuna)
-//   teacher_subjects                  → quali docenti insegnano quali materie (N:N)
-//   schedules                         → orari: riferiscono corso, docente, aula e materia
-//                                       tramite chiave esterna; la data vive solo qui
+// Schema del database + migrazioni + admin predefinito
 const bcrypt = require("bcryptjs");
 const { dbGet, dbAll, dbRun } = require("./database");
 
@@ -31,7 +24,6 @@ async function creaTabelle() {
     FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
   )`);
 
-  // Anagrafiche: nome unico, confronto senza distinzione maiuscole/minuscole
   for (const tabella of ["teachers", "rooms", "subjects"]) {
     await dbRun(`CREATE TABLE IF NOT EXISTS ${tabella} (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -39,7 +31,6 @@ async function creaTabelle() {
     )`);
   }
 
-  // Relazione docente ↔ materia: chi insegna cosa
   await dbRun(`CREATE TABLE IF NOT EXISTS teacher_subjects (
     teacher_id INTEGER NOT NULL,
     subject_id INTEGER NOT NULL,
@@ -49,6 +40,8 @@ async function creaTabelle() {
   )`);
 }
 
+// UNIQUE (course_id, date, start_time): nessun doppio orario per lo stesso corso
+// nello stesso slot, anche con inserimenti concorrenti.
 const SQL_CREA_SCHEDULES = (nome) => `CREATE TABLE IF NOT EXISTS ${nome} (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     course_id INTEGER NOT NULL,
@@ -62,31 +55,23 @@ const SQL_CREA_SCHEDULES = (nome) => `CREATE TABLE IF NOT EXISTS ${nome} (
     FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
     FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE RESTRICT,
     FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE RESTRICT,
-    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE RESTRICT
+    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE RESTRICT,
+    UNIQUE (course_id, date, start_time)
   )`;
 
-// Vecchio schema: schedules aveva teacher/room/subject come testo.
-// Le anagrafiche vengono ricavate dai valori esistenti e la tabella ricostruita.
 async function migraSchedulesDaTesto() {
   const colonne = await dbAll("PRAGMA table_info(schedules)");
   if (!colonne.some((c) => c.name === "teacher")) return;
 
   console.log("Migrazione: schedules → anagrafiche docenti/aule/materie...");
-  // Le chiavi esterne non si possono cambiare dentro una transazione
   await dbRun("PRAGMA foreign_keys = OFF;");
   try {
     await dbRun("BEGIN");
     const nome = (col) =>
       `COALESCE(NULLIF(TRIM(${col}), ''), '${NOME_NON_SPECIFICATO}')`;
-    await dbRun(
-      `INSERT OR IGNORE INTO teachers (name) SELECT DISTINCT ${nome("teacher")} FROM schedules`,
-    );
-    await dbRun(
-      `INSERT OR IGNORE INTO rooms (name) SELECT DISTINCT ${nome("room")} FROM schedules`,
-    );
-    await dbRun(
-      `INSERT OR IGNORE INTO subjects (name) SELECT DISTINCT ${nome("subject")} FROM schedules`,
-    );
+    await dbRun(`INSERT OR IGNORE INTO teachers (name) SELECT DISTINCT ${nome("teacher")} FROM schedules`);
+    await dbRun(`INSERT OR IGNORE INTO rooms (name) SELECT DISTINCT ${nome("room")} FROM schedules`);
+    await dbRun(`INSERT OR IGNORE INTO subjects (name) SELECT DISTINCT ${nome("subject")} FROM schedules`);
     await dbRun("ALTER TABLE schedules RENAME TO schedules_old");
     await dbRun(SQL_CREA_SCHEDULES("schedules"));
     await dbRun(`INSERT INTO schedules
@@ -107,13 +92,9 @@ async function migraSchedulesDaTesto() {
   }
 }
 
-// Database già esistenti: le coppie docente/materia già presenti negli orari
-// diventano "il docente insegna la materia", così nulla risulta incoerente.
 async function popolaDocentiMaterieDaOrari() {
-  await dbRun(
-    `INSERT OR IGNORE INTO teacher_subjects (teacher_id, subject_id)
-     SELECT DISTINCT teacher_id, subject_id FROM schedules`,
-  );
+  await dbRun(`INSERT OR IGNORE INTO teacher_subjects (teacher_id, subject_id)
+     SELECT DISTINCT teacher_id, subject_id FROM schedules`);
 }
 
 async function creaIndici() {
@@ -132,37 +113,25 @@ async function creaIndici() {
 async function initDb() {
   await dbRun("PRAGMA foreign_keys = ON;");
   console.log("Chiavi esterne abilitate con successo.");
-
   await creaTabelle();
   await migraSchedulesDaTesto();
   await dbRun(SQL_CREA_SCHEDULES("schedules"));
   await creaIndici();
   await popolaDocentiMaterieDaOrari();
-
   await creaAdminPredefinito();
 }
 
 async function creaAdminPredefinito() {
-  const row = await dbGet(
-    'SELECT COUNT(*) AS count FROM users WHERE role = "admin"',
-  );
+  const row = await dbGet('SELECT COUNT(*) AS count FROM users WHERE role = "admin"');
   if (row.count > 0) {
-    console.log(
-      "Esiste già un utente 'admin'. Nessun nuovo admin predefinito creato.",
-    );
+    console.log("Esiste già un utente 'admin'. Nessun nuovo admin predefinito creato.");
     return;
   }
-  const defaultAdminUser = "Admin";
-  const defaultAdminPassword = "Admin123!";
-  const hashedPassword = await bcrypt.hash(defaultAdminPassword, 10);
+  const hashedPassword = await bcrypt.hash("Admin123!", 10);
   await dbRun("INSERT INTO users (username, password, role) VALUES (?, ?, ?)", [
-    defaultAdminUser,
-    hashedPassword,
-    "admin",
+    "Admin", hashedPassword, "admin",
   ]);
-  console.log(
-    `Utente ${defaultAdminUser} predefinito creato con successo (password hashata).`,
-  );
+  console.log(`Utente Admin predefinito creato con successo (password hashata).`);
 }
 
 module.exports = { initDb, NOME_NON_SPECIFICATO };

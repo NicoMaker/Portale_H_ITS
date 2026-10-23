@@ -1,4 +1,3 @@
-// Utility di rete per health check e banner di avvio
 const os = require("os");
 const https = require("https");
 
@@ -6,9 +5,7 @@ function getLocalIP() {
   const interfaces = os.networkInterfaces();
   for (const name of Object.keys(interfaces)) {
     for (const iface of interfaces[name]) {
-      if (iface.family === "IPv4" && !iface.internal) {
-        return iface.address;
-      }
+      if (iface.family === "IPv4" && !iface.internal) return iface.address;
     }
   }
   return "localhost";
@@ -21,11 +18,7 @@ function getPublicIP() {
         let data = "";
         res.on("data", (chunk) => (data += chunk));
         res.on("end", () => {
-          try {
-            resolve(JSON.parse(data).ip);
-          } catch (e) {
-            resolve(null);
-          }
+          try { resolve(JSON.parse(data).ip); } catch { resolve(null); }
         });
       })
       .on("error", () => resolve(null));

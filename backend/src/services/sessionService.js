@@ -1,20 +1,15 @@
-// Gestione delle sessioni in-memory: { sid: { user, created } }
+// Gestione delle sessioni in-memory
 const crypto = require("crypto");
 
 const sessions = {};
-
-// Durata massima di una sessione (8 ore) e pulizia periodica delle scadute
 const SESSION_TTL_MS = 8 * 60 * 60 * 1000;
 const isExpired = (sess) => Date.now() - sess.created > SESSION_TTL_MS;
 
-setInterval(
-  () => {
-    for (const [sid, sess] of Object.entries(sessions)) {
-      if (isExpired(sess)) delete sessions[sid];
-    }
-  },
-  10 * 60 * 1000,
-).unref();
+setInterval(() => {
+  for (const [sid, sess] of Object.entries(sessions)) {
+    if (isExpired(sess)) delete sessions[sid];
+  }
+}, 10 * 60 * 1000).unref();
 
 function createSession(user) {
   const sid = crypto.randomBytes(16).toString("hex");
@@ -23,8 +18,7 @@ function createSession(user) {
 }
 
 function getSession(req) {
-  const sid = req.cookies?.sid;
-  return getSessionBySid(sid);
+  return getSessionBySid(req.cookies?.sid);
 }
 
 function getSessionBySid(sid) {
@@ -43,7 +37,6 @@ function destroySession(req, res) {
   res.clearCookie("sid");
 }
 
-// Invalida tutte le sessioni di un utente (per id) e ritorna gli sid invalidati
 function invalidateUserSessions(userId) {
   const invalidated = [];
   for (const [sid, sess] of Object.entries(sessions)) {
@@ -55,12 +48,9 @@ function invalidateUserSessions(userId) {
   return invalidated;
 }
 
-// Aggiorna lo username nelle sessioni attive dell'utente (senza fare logout)
 function updateSessionUsername(userId, newUsername) {
   for (const sess of Object.values(sessions)) {
-    if (sess.user.id == userId) {
-      sess.user.username = newUsername;
-    }
+    if (sess.user.id == userId) sess.user.username = newUsername;
   }
 }
 

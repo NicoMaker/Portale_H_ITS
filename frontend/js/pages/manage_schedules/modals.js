@@ -1,4 +1,6 @@
-// Modali della pagina Gestione Orari: aggiungi, modifica, elimina
+// Modali della pagina Gestione Orari: aggiungi, modifica, elimina.
+// La validazione "vera" (sovrapposizioni aula/docente/corso, coerenza docente↔materia)
+// è lato server; qui solo controlli minimi per UX.
 import { schedulesApi } from "../../shared/api.js";
 import { formatDate } from "../../shared/dom.js";
 import { state } from "./state.js";
@@ -15,42 +17,25 @@ function mostraMsg(el, testo, ok) {
     : "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800";
 }
 
-// Valida i campi comuni ad add/edit; ritorna un messaggio d'errore o null
-function validaOrario(
-  { start_time, end_time, course_id, date, subject_id, teacher_id, room_id, ignoreId },
-) {
-  if (!subject_id || !teacher_id || !room_id)
-    return "Seleziona materia, docente e aula.";
-  if (start_time >= end_time)
-    return "L'ora di inizio deve essere precedente a quella di fine.";
-  const overlap = state.schedules.some(
-    (s) =>
-      String(s.course_id) === String(course_id) &&
-      s.date === date &&
-      s.start_time === start_time &&
-      (ignoreId === undefined || s.id != ignoreId),
-  );
-  if (overlap)
-    return "Esiste già un orario per questo corso, data e ora di inizio.";
+function validaOrario({ start_time, end_time, course_id, date, subject_id, teacher_id, room_id }) {
+  if (!course_id) return "Seleziona un corso.";
+  if (!subject_id || !teacher_id || !room_id) return "Seleziona materia, docente e aula.";
+  if (!date) return "Seleziona una data.";
+  if (!start_time || !end_time) return "Indica ora di inizio e fine.";
+  if (start_time >= end_time) return "L'ora di inizio deve essere precedente a quella di fine.";
   return null;
 }
 
 // ── AGGIUNGI ──
 function apriAdd() {
-  // Se nei filtri è selezionato un solo corso, viene preselezionato nel form
   const filtrati = [...(state.filters?.values("course") || [])];
   const corsoPreselezionato = filtrati.length === 1 ? String(filtrati[0]) : "";
-  const sorted = [...state.courses].sort((a, b) =>
-    a.name.localeCompare(b.name),
-  );
+  const sorted = [...state.courses].sort((a, b) => a.name.localeCompare(b.name));
   $("add-course-select").innerHTML =
     `<option value="" disabled selected>Seleziona un corso</option>` +
-    sorted
-      .map(
-        (c) =>
-          `<option value="${c.id}"${corsoPreselezionato && String(c.id) === corsoPreselezionato ? " selected" : ""}>${c.name}</option>`,
-      )
-      .join("");
+    sorted.map((c) =>
+      `<option value="${c.id}"${corsoPreselezionato && String(c.id) === corsoPreselezionato ? " selected" : ""}>${c.name}</option>`
+    ).join("");
   ["day", "date", "start", "end"].forEach((f) => ($(`add-${f}`).value = ""));
   riempiSelezioni("add", {});
   $("add-schedule-msg").textContent = "";
@@ -61,8 +46,7 @@ async function submitAdd(e) {
   e.preventDefault();
   const msgEl = $("add-schedule-msg");
   const dati = raccogliDati("add");
-
-  const errore = validaOrario({ ...dati, ignoreId: undefined });
+  const errore = validaOrario(dati);
   if (errore) return mostraMsg(msgEl, errore, false);
 
   msgEl.textContent = "";
@@ -80,22 +64,11 @@ async function submitAdd(e) {
 export function openEditSchedule(id) {
   state.editingScheduleId = id;
   const s = state.schedules.find((x) => x.id == id);
-  const sorted = [...state.courses].sort((a, b) =>
-    a.name.localeCompare(b.name),
-  );
-
-  $("edit-course-select").innerHTML = sorted
-    .map(
-      (c) =>
-        `<option value="${c.id}"${c.id == s.course_id ? " selected" : ""}>${c.name}</option>`,
-    )
-    .join("");
-
-  riempiSelezioni("edit", {
-    subjectId: s.subject_id,
-    teacherId: s.teacher_id,
-    roomId: s.room_id,
-  });
+  const sorted = [...state.courses].sort((a, b) => a.name.localeCompare(b.name));
+  $("edit-course-select").innerHTML = sorted.map((c) =>
+    `<option value="${c.id}"${c.id == s.course_id ? " selected" : ""}>${c.name}</option>`
+  ).join("");
+  riempiSelezioni("edit", { subjectId: s.subject_id, teacherId: s.teacher_id, roomId: s.room_id });
   $("edit-day").textContent = s.day || "";
   $("edit-date").value = s.date;
   $("edit-start").value = s.start_time;
@@ -108,17 +81,13 @@ async function submitEdit(e) {
   e.preventDefault();
   const msgEl = $("edit-schedule-msg");
   const dati = raccogliDati("edit");
-
-  const errore = validaOrario({
-    ...dati,
-    ignoreId: state.editingScheduleId,
-  });
+  const errore = validaOrario(dati);
   if (errore) return mostraMsg(msgEl, errore, false);
 
   msgEl.textContent = "";
   const msg = await schedulesApi.modifica(state.editingScheduleId, dati);
-  await fetchCoursesAndSchedules();
   if (msg === "OK") {
+    await fetchCoursesAndSchedules();
     mostraMsg(msgEl, "Orario aggiornato!", true);
     renderSchedules();
     setTimeout(() => ($("edit-schedule-modal").style.display = "none"), 1000);
@@ -127,7 +96,6 @@ async function submitEdit(e) {
   }
 }
 
-// Legge i valori del form (il giorno di edit sta in un <span>)
 function raccogliDati(prefix) {
   return {
     course_id: $(`${prefix}-course-select`).value,
@@ -166,7 +134,7 @@ async function deleteSchedule() {
   state.deletingScheduleId = null;
 }
 
-// ── Setup listener dei modali ──
+// ── Setup listener ──
 export function initModali() {
   $("add-schedule-btn").onclick = apriAdd;
   $("add-schedule-form").onsubmit = submitAdd;
@@ -182,15 +150,12 @@ export function initModali() {
   $("cancel-edit-schedule").onclick = () => chiudi("edit-schedule-modal");
   $("close-add-schedule-modal").onclick = () => chiudi("add-schedule-modal");
   $("cancel-add-schedule").onclick = () => chiudi("add-schedule-modal");
-  $("close-delete-schedule-modal").onclick = () =>
-    chiudi("delete-schedule-modal", true);
-  $("cancel-delete-schedule").onclick = () =>
-    chiudi("delete-schedule-modal", true);
+  $("close-delete-schedule-modal").onclick = () => chiudi("delete-schedule-modal", true);
+  $("cancel-delete-schedule").onclick = () => chiudi("delete-schedule-modal", true);
 
   window.addEventListener("click", (e) => {
     if (e.target === $("edit-schedule-modal")) chiudi("edit-schedule-modal");
     if (e.target === $("add-schedule-modal")) chiudi("add-schedule-modal");
-    if (e.target === $("delete-schedule-modal"))
-      chiudi("delete-schedule-modal", true);
+    if (e.target === $("delete-schedule-modal")) chiudi("delete-schedule-modal", true);
   });
 }

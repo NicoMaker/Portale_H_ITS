@@ -1,4 +1,3 @@
-// Aggregatore delle route dell'applicazione
 const express = require("express");
 const authRoutes = require("./authRoutes");
 const userRoutes = require("./userRoutes");
