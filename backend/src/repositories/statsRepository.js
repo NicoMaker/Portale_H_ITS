@@ -1,3 +1,4 @@
+// Repository statistiche: query aggregate per dashboard e analytics admin
 const { dbGet, dbAll } = require("../config/database");
 
 const statsRepository = {

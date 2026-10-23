@@ -1,61 +1,52 @@
 erDiagram
-    users ||--o{ user_courses : "iscrizione (1:N)"
-    courses ||--o{ user_courses : "iscrizione (1:N)"
-
-    courses ||--o{ schedules : "orario (1:N)"
-    teachers ||--o{ schedules : "orario (1:N)"
-    rooms ||--o{ schedules : "orario (1:N)"
-    subjects ||--o{ schedules : "orario (1:N)"
-
-    teachers ||--o{ teacher_subjects : "insegna (1:N)"
-    subjects ||--o{ teacher_subjects : "insegnata da (1:N)"
+    users ||--o{ user_courses : "1:N"
+    courses ||--o{ user_courses : "1:N"
+    courses ||--o{ schedules : "1:N"
+    teachers ||--o{ schedules : "1:N"
+    rooms ||--o{ schedules : "1:N"
+    subjects ||--o{ schedules : "1:N"
 
     users {
-        INTEGER id "PK"
-        TEXT username "UK UNIQUE NOT NULL"
-        TEXT password "NOT NULL (hash bcrypt)"
-        TEXT role "NOT NULL (admin | user)"
+        INTEGER id PK
+        TEXT username UK
+        TEXT password
+        TEXT role
     }
 
     courses {
-        INTEGER id "PK"
-        TEXT name "UK UNIQUE NOT NULL"
-        TEXT description "nullable"
+        INTEGER id PK
+        TEXT name UK
+        TEXT description
     }
 
     user_courses {
-        INTEGER user_id "PK, FK → users.id ON DELETE CASCADE"
-        INTEGER course_id "PK, FK → courses.id ON DELETE CASCADE"
+        INTEGER user_id PK, FK
+        INTEGER course_id PK, FK
     }
 
     teachers {
-        INTEGER id "PK"
-        TEXT name "UK UNIQUE COLLATE NOCASE NOT NULL"
+        INTEGER id PK
+        TEXT name UK
     }
 
     rooms {
-        INTEGER id "PK"
-        TEXT name "UK UNIQUE COLLATE NOCASE NOT NULL"
+        INTEGER id PK
+        TEXT name UK
     }
 
     subjects {
-        INTEGER id "PK"
-        TEXT name "UK UNIQUE COLLATE NOCASE NOT NULL"
-    }
-
-    teacher_subjects {
-        INTEGER teacher_id "PK, FK → teachers.id ON DELETE CASCADE"
-        INTEGER subject_id "PK, FK → subjects.id ON DELETE CASCADE"
+        INTEGER id PK
+        TEXT name UK
     }
 
     schedules {
-        INTEGER id "PK"
-        INTEGER course_id "FK → courses.id ON DELETE CASCADE"
-        INTEGER teacher_id "FK → teachers.id ON DELETE RESTRICT"
-        INTEGER room_id "FK → rooms.id ON DELETE RESTRICT"
-        INTEGER subject_id "FK → subjects.id ON DELETE RESTRICT"
-        TEXT start_time "NOT NULL (HH:MM)"
-        TEXT end_time "NOT NULL (HH:MM)"
-        TEXT day "NOT NULL (derivato da date)"
-        TEXT date "NOT NULL (YYYY-MM-DD)"
+        INTEGER id PK
+        INTEGER course_id FK
+        INTEGER teacher_id FK
+        INTEGER room_id FK
+        INTEGER subject_id FK
+        TEXT start_time
+        TEXT end_time
+        TEXT day
+        TEXT date
     }

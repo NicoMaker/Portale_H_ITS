@@ -5,12 +5,15 @@ const { catchErrors } = require("../middleware/errorHandler");
 
 const router = express.Router();
 
+// Pagine protette
 router.get(
   "/admin_dashboard.html",
   requireAdmin,
   dashboardController.paginaAdmin,
 );
 router.get("/user_dashboard.html", requireUser, dashboardController.paginaUser);
+
+// Dati per la dashboard utente
 router.get(
   "/user/courses",
   requireUser,
@@ -21,6 +24,8 @@ router.get(
   requireUser,
   catchErrors(dashboardController.orariUtente),
 );
+
+// Statistiche admin
 router.get(
   "/admin/stats",
   requireAdmin,

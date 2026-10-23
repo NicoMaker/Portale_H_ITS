@@ -18,10 +18,6 @@ export function initEditProfile() {
   const editMsg = $("edit-profile-msg");
   const togglePassword = $("toggle-password");
 
-  // Se la pagina non contiene la modale del profilo, il resto della dashboard
-  // deve comunque inizializzarsi (effetti UI, statistiche…)
-  if (!modal || !togglePassword) return;
-
   // Mostra/nascondi password
   togglePassword.addEventListener("click", () => {
     const type =

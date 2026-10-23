@@ -1,4 +1,6 @@
 // Gestione centralizzata degli errori.
+// Le risposte d'errore restano testo semplice per compatibilità con il frontend.
+
 class HttpError extends Error {
   constructor(status, messaggio) {
     super(messaggio);
@@ -6,6 +8,7 @@ class HttpError extends Error {
   }
 }
 
+// Wrapper per handler async: gli errori finiscono nel middleware
 function catchErrors(handler) {
   return async (req, res, next) => {
     try {

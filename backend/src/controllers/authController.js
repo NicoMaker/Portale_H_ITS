@@ -1,3 +1,4 @@
+// Controller auth: login/logout/sessione/profilo corrente
 const authService = require("../services/authService");
 const {
   destroySession,
@@ -8,11 +9,13 @@ const authController = {
   async login(req, res) {
     const { username, password } = req.body;
     const esito = await authService.login(username, password);
+
     if (!esito) {
       return res.send(
         '<div class="hint" style="color:red;text-align:center">Credenziali non valide</div>',
       );
     }
+
     res.cookie("sid", esito.sid, {
       httpOnly: true,
       sameSite: "lax",
@@ -34,11 +37,13 @@ const authController = {
     res.json(authService.statoSessione(req.cookies?.sid));
   },
 
+  // GET /user/current — dati dell'utente loggato
   utenteCorrente(req, res) {
     const { id, username, role } = req.session.user;
     res.json({ id, username, role });
   },
 
+  // POST /user/profile — aggiorna il profilo dell'utente loggato
   async aggiornaProfilo(req, res) {
     const esito = await authService.aggiornaProfiloCorrente(
       req.session.user.id,

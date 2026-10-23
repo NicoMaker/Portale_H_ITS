@@ -23,6 +23,7 @@ router.post(
   requireAdmin,
   catchErrors(usersController.assegnaCorso),
 );
+// Due varianti equivalenti mantenute per compatibilità con i client esistenti
 router.post(
   "/:id/edit",
   requireAdmin,

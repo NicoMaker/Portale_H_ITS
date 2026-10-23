@@ -6,7 +6,7 @@ import { clearFilters, initFilterControls } from "./filters.js";
 import {
   setupAutoEndTime,
   setupAutoDayOfWeek,
-  setupLinkedSelects,
+  setupDynamicFields,
 } from "./formHelpers.js";
 import {
   initModali,
@@ -36,7 +36,7 @@ function initRealtime() {
 document.addEventListener("DOMContentLoaded", () => {
   setupAutoEndTime();
   setupAutoDayOfWeek();
-  setupLinkedSelects();
+  setupDynamicFields();
   initModali();
   initFiltri();
   initRealtime();
