@@ -2,6 +2,7 @@
 const coursesRepository = require("../repositories/coursesRepository");
 const realtime = require("../realtime/socket");
 const { HttpError } = require("../middleware/errorHandler");
+const { eliminaMultipli } = require("../utils/bulk");
 
 const coursesService = {
   lista() {
@@ -42,6 +43,19 @@ const coursesService = {
       courseId: Number(id),
     });
     realtime.broadcast("schedule_updated", { courseId: Number(id) });
+  },
+
+  async eliminaMultiple(ids) {
+    const lista = await coursesRepository.trovaTutti();
+    const nomi = Object.fromEntries(lista.map((c) => [c.id, c.name]));
+    return eliminaMultipli(
+      ids,
+      async (id) => {
+        if (!nomi[id]) throw new HttpError(404, "Corso non trovato");
+        return this.elimina(id);
+      },
+      nomi,
+    );
   },
 };
 

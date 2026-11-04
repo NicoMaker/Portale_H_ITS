@@ -1,6 +1,7 @@
 // Entry point pagina Gestione Utenti: collega dati, render, modali, filtri e realtime
 import { toast } from "../../shared/dom.js";
 import { renderUsersList } from "./render.js";
+import { registerBulk } from "../../shared/bulk.js";
 import { fetchCourses, fetchUsers, updateNewCourseSelect } from "./data.js";
 import {
   initModali,
@@ -69,6 +70,15 @@ function initRealtime() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  registerBulk("users", {
+    endpoint: "/api/users",
+    singolare: "utente",
+    plurale: "utenti",
+    avviso:
+      "Il tuo account e l'ultimo admin rimasto non verranno eliminati.",
+    anchor: () => $("users-table-body").closest(".overflow-x-auto"),
+    onDone: () => fetchCourses().then(fetchUsers),
+  });
   $("new-role").addEventListener("change", updateNewCourseSelect);
   initModali();
   initFiltri();

@@ -2,6 +2,7 @@
 import { state } from "./state.js";
 import { fetchCoursesAndSchedules } from "./data.js";
 import { renderSchedules } from "./render.js";
+import { registerBulk } from "../../shared/bulk.js";
 import { clearFilters, initFilterControls } from "./filters.js";
 import {
   setupAutoEndTime,
@@ -34,6 +35,13 @@ function initRealtime() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  registerBulk("schedules", {
+    endpoint: "/api/schedules",
+    singolare: "orario",
+    plurale: "orari",
+    anchor: () => $("schedules-list").parentElement,
+    onDone: fetchCoursesAndSchedules,
+  });
   setupAutoEndTime();
   setupAutoDayOfWeek();
   setupDynamicFields();

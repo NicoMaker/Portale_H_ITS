@@ -9,6 +9,11 @@ router.get("/", requireAdmin, catchErrors(schedulesController.lista));
 router.get("/meta", requireAdmin, catchErrors(schedulesController.metadati));
 router.post("/", requireAdmin, catchErrors(schedulesController.crea));
 router.put("/:id", requireAdmin, catchErrors(schedulesController.aggiorna));
+router.post(
+  "/elimina-multiple",
+  requireAdmin,
+  catchErrors(schedulesController.eliminaMultiple),
+);
 router.delete("/:id", requireAdmin, catchErrors(schedulesController.elimina));
 
 module.exports = router;

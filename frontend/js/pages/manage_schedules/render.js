@@ -2,6 +2,7 @@
 import { formatDate } from "../../shared/dom.js";
 import { state } from "./state.js";
 import { getFilteredSchedules } from "./filters.js";
+import { bulkHeaderCell, bulkCell, bulkAfterRender } from "../../shared/bulk.js";
 
 export function renderSchedules() {
   const filtered = getFilteredSchedules()
@@ -23,6 +24,7 @@ export function renderSchedules() {
         <p style="font-size:.875rem;color:#9ca3af;margin:0;">Modifica i filtri per visualizzare altri risultati.</p>
       </div>`;
     updateScheduleStats();
+    bulkAfterRender("schedules");
     return;
   }
 
@@ -34,7 +36,7 @@ export function renderSchedules() {
       <table style="width:100%;border-collapse:collapse;">
         <thead>
           <tr style="background:linear-gradient(135deg,#f8f7ff,#f0f9ff);border-bottom:2px solid #e0e7ff;">
-            ${th("📚 Corso")}${th("🕐 Orario")}${th("📅 Giorno")}${th("📆 Data")}${th("👨‍🏫 Docente")}${th("🏫 Aula")}${th("📖 Materia")}${th("⚙️ Azioni", "center")}
+            ${bulkHeaderCell("schedules")}${th("📚 Corso")}${th("🕐 Orario")}${th("📅 Giorno")}${th("📆 Data")}${th("👨‍🏫 Docente")}${th("🏫 Aula")}${th("📖 Materia")}${th("⚙️ Azioni", "center")}
           </tr>
         </thead>
         <tbody>`;
@@ -43,6 +45,7 @@ export function renderSchedules() {
     const course = state.courses.find((c) => c.id == s.course_id);
     html += `
       <tr style="border-bottom:1px solid #f3f4f6;transition:background .15s;" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background=''">
+        ${bulkCell("schedules", s.id)}
         <td style="padding:.75rem 1rem;">
           <span style="display:inline-block;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;padding:3px 10px;border-radius:9999px;font-size:.75rem;font-weight:600;">${course ? course.name : "-"}</span>
         </td>
@@ -73,6 +76,7 @@ export function renderSchedules() {
   html += "</tbody></table></div>";
   container.innerHTML = html;
   updateScheduleStats();
+  bulkAfterRender("schedules");
 }
 
 export function updateScheduleStats() {

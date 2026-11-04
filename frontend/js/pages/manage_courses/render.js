@@ -1,6 +1,7 @@
 // Rendering della tabella corsi, statistiche, tag filtri e icone di ordinamento
 import { highlight } from "../../shared/dom.js";
 import { state } from "./state.js";
+import { bulkCell, bulkAfterRender } from "../../shared/bulk.js";
 import { getFilters, applyFilters } from "./filters.js";
 
 export function renderCoursesList() {
@@ -28,7 +29,7 @@ export function renderCoursesList() {
   if (!filtered.length) {
     tableBody.innerHTML = `
       <tr>
-        <td colspan="4" style="padding:3rem;text-align:center;">
+        <td colspan="5" style="padding:3rem;text-align:center;">
           <div style="font-size:2.5rem;margin-bottom:.75rem;">🔍</div>
           <p style="font-weight:700;font-size:.9rem;color:#374151;margin:0 0 .25rem;">Nessun corso trovato</p>
           <p style="font-size:.8rem;color:#9ca3af;margin:0;">Modifica i filtri o la ricerca per vedere altri risultati.</p>
@@ -40,6 +41,7 @@ export function renderCoursesList() {
   tableBody.innerHTML = filtered
     .map((course) => rigaCorso(course, search))
     .join("");
+  bulkAfterRender("courses");
 }
 
 function rigaCorso(course, search) {
@@ -71,6 +73,7 @@ function rigaCorso(course, search) {
 
   return `
     <tr style="border-bottom:1px solid #f3f4f6;transition:background .15s;" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background=''">
+      ${bulkCell("courses", course.id)}
       <td style="padding:.875rem 1.25rem;">
         <div style="display:flex;align-items:center;gap:.75rem;">
           <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">📚</div>

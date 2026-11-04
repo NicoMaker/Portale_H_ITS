@@ -26,7 +26,7 @@ export function fetchCourses() {
       const tb = document.getElementById("courses-table-body");
       if (tb)
         tb.innerHTML = `
-        <tr><td colspan="4" style="padding:3rem;text-align:center;color:#ef4444;font-weight:500;">
+        <tr><td colspan="5" style="padding:3rem;text-align:center;color:#ef4444;font-weight:500;">
           ⚠️ Errore nel caricamento: ${err.message}
         </td></tr>`;
     });

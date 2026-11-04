@@ -9,6 +9,11 @@ const router = express.Router();
 router.get("/", requireAuth, catchErrors(coursesController.lista));
 router.post("/", requireAdmin, catchErrors(coursesController.crea));
 router.put("/:id", requireAdmin, catchErrors(coursesController.aggiorna));
+router.post(
+  "/elimina-multiple",
+  requireAdmin,
+  catchErrors(coursesController.eliminaMultiple),
+);
 router.delete("/:id", requireAdmin, catchErrors(coursesController.elimina));
 
 module.exports = router;

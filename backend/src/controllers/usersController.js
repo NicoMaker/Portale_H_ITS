@@ -27,6 +27,12 @@ const usersController = {
     res.send("OK");
   },
 
+  async eliminaMultiple(req, res) {
+    res.json(
+      await usersService.eliminaMultiple(req.body.ids, req.session.user.id),
+    );
+  },
+
   async assegnaCorso(req, res) {
     await usersService.assegnaCorso(req.params.id, req.body.course_id);
     res.send("OK");

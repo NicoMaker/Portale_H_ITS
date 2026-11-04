@@ -16,6 +16,10 @@ const coursesController = {
     res.send("OK");
   },
 
+  async eliminaMultiple(req, res) {
+    res.json(await coursesService.eliminaMultiple(req.body.ids));
+  },
+
   async elimina(req, res) {
     await coursesService.elimina(req.params.id);
     res.send("OK");

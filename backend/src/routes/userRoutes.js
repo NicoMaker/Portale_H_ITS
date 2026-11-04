@@ -17,6 +17,11 @@ router.post(
   requireAdmin,
   catchErrors(usersController.retrocedi),
 );
+router.post(
+  "/elimina-multiple",
+  requireAdmin,
+  catchErrors(usersController.eliminaMultiple),
+);
 router.delete("/:id", requireAdmin, catchErrors(usersController.elimina));
 router.post(
   "/:id/assign_course",

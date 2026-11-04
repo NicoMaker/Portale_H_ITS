@@ -3,6 +3,7 @@ import { state, fetchCourses } from "./state.js";
 import { renderCoursesList } from "./render.js";
 import { createLetterFilter } from "../../components/LetterFilter.js";
 import { initModali, openEditCourse, deleteCourse } from "./modals.js";
+import { registerBulk } from "../../shared/bulk.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -63,6 +64,15 @@ function initRealtime() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  registerBulk("courses", {
+    endpoint: "/api/courses",
+    singolare: "corso",
+    plurale: "corsi",
+    avviso:
+      "⚠️ Eliminando un corso vengono rimossi anche i suoi orari e le iscrizioni degli utenti.",
+    anchor: () => $("courses-table-body").closest(".overflow-x-auto"),
+    onDone: fetchCourses,
+  });
   initModali();
   initFiltri();
   initRealtime();

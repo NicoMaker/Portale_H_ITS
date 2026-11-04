@@ -3,6 +3,7 @@ const schedulesRepository = require("../repositories/schedulesRepository");
 const catalogService = require("./catalogService");
 const realtime = require("../realtime/socket");
 const { HttpError } = require("../middleware/errorHandler");
+const { eliminaMultipli } = require("../utils/bulk");
 
 const GIORNI = [
   "Domenica",
@@ -96,6 +97,24 @@ const schedulesService = {
     if (courseId) {
       realtime.broadcast("schedule_updated", { courseId: Number(courseId) });
     }
+  },
+
+  async eliminaMultiple(ids) {
+    const lista = await schedulesRepository.cerca({});
+    const nomi = Object.fromEntries(
+      lista.map((s) => [
+        s.id,
+        `${s.course_name || "-"} · ${s.date} ${s.start_time}-${s.end_time}`,
+      ]),
+    );
+    return eliminaMultipli(
+      ids,
+      async (id) => {
+        if (!nomi[id]) throw new HttpError(404, "Orario non trovato");
+        return this.elimina(id);
+      },
+      nomi,
+    );
   },
 
   // Valori disponibili per i selettori: leggono direttamente le anagrafiche

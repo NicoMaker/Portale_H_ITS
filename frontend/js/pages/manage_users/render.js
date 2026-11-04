@@ -1,5 +1,6 @@
 // Rendering della tabella utenti e delle card statistiche
 import { state } from "./state.js";
+import { bulkCell, bulkAfterRender } from "../../shared/bulk.js";
 
 // Design tokens (in JS così l'HTML generato è coerente con il CSS)
 const T = {
@@ -39,7 +40,7 @@ export function renderUsersList() {
   if (!filteredUsers.length) {
     html = `
       <tr>
-        <td colspan="4" style="padding:3rem;text-align:center;">
+        <td colspan="5" style="padding:3rem;text-align:center;">
           <div style="font-size:3rem;margin-bottom:.75rem;">👥</div>
           <p style="font-weight:700;font-size:1rem;color:#374151;margin:0 0 .25rem;">Nessun utente trovato</p>
           <p style="font-size:.875rem;color:#9ca3af;margin:0;">Modifica i filtri per vedere altri risultati.</p>
@@ -73,6 +74,7 @@ export function renderUsersList() {
       const disableDel = isAdmin && adminCount <= 1;
       html += `
         <tr style="border-bottom:1px solid #f3f4f6;transition:background .15s;" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background=''">
+          ${bulkCell("users", u.id)}
           <td style="padding:.875rem 1.25rem;">
             <div style="display:flex;align-items:center;gap:.6rem;">
               <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.85rem;flex-shrink:0;">
@@ -97,6 +99,7 @@ export function renderUsersList() {
   }
 
   if (tableBody) tableBody.innerHTML = html;
+  bulkAfterRender("users");
   updateUserStats();
 }
 

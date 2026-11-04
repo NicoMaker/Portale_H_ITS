@@ -4,6 +4,7 @@ const usersRepository = require("../repositories/usersRepository");
 const sessionService = require("./sessionService");
 const realtime = require("../realtime/socket");
 const { HttpError } = require("../middleware/errorHandler");
+const { eliminaMultipli } = require("../utils/bulk");
 
 // Invalida le sessioni dell'utente e forza il logout via socket
 function invalidaEForzaLogout(userId) {
@@ -96,6 +97,23 @@ const usersService = {
       action: "deleted",
       userId: Number(id),
     });
+  },
+
+  // Eliminazione multipla: salta l'utente che la richiede, gli utenti non
+  // trovati e l'ultimo admin rimasto (controllato a ogni passo)
+  async eliminaMultiple(ids, richiedenteId) {
+    const lista = await usersRepository.trovaTutti();
+    const nomi = Object.fromEntries(lista.map((u) => [u.id, u.username]));
+    return eliminaMultipli(
+      ids,
+      async (id) => {
+        if (!nomi[id]) throw new HttpError(404, "Utente non trovato");
+        if (Number(id) === Number(richiedenteId))
+          throw new HttpError(400, "Non puoi eliminare il tuo account in blocco");
+        return this.elimina(id);
+      },
+      nomi,
+    );
   },
 
   async assegnaCorso(id, course_id) {

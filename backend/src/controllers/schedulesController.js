@@ -17,6 +17,10 @@ const schedulesController = {
     res.send("OK");
   },
 
+  async eliminaMultiple(req, res) {
+    res.json(await schedulesService.eliminaMultiple(req.body.ids));
+  },
+
   async elimina(req, res) {
     await schedulesService.elimina(req.params.id);
     res.send("OK");
