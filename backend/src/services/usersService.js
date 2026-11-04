@@ -109,7 +109,10 @@ const usersService = {
       async (id) => {
         if (!nomi[id]) throw new HttpError(404, "Utente non trovato");
         if (Number(id) === Number(richiedenteId))
-          throw new HttpError(400, "Non puoi eliminare il tuo account in blocco");
+          throw new HttpError(
+            400,
+            "Non puoi eliminare il tuo account in blocco",
+          );
         return this.elimina(id);
       },
       nomi,

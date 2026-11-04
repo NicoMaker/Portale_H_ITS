@@ -2,7 +2,11 @@
 import { formatDate } from "../../shared/dom.js";
 import { state } from "./state.js";
 import { getFilteredSchedules } from "./filters.js";
-import { bulkHeaderCell, bulkCell, bulkAfterRender } from "../../shared/bulk.js";
+import {
+  bulkHeaderCell,
+  bulkCell,
+  bulkAfterRender,
+} from "../../shared/bulk.js";
 
 export function renderSchedules() {
   const filtered = getFilteredSchedules()

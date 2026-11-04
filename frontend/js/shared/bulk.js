@@ -12,7 +12,10 @@ const registry = {};
 const esc = (t) =>
   String(t).replace(
     /[&<>"']/g,
-    (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c],
+    (c) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
+        c
+      ],
   );
 
 const CB_STYLE = "width:16px;height:16px;cursor:pointer;accent-color:#ef4444;";
@@ -57,7 +60,8 @@ export function bulkUpdateToolbar(entity) {
   const boxes = document.querySelectorAll(`.bulk-cb[data-entity="${entity}"]`);
   const n = selected(entity).length;
   if (bar) bar.style.display = n > 0 ? "flex" : "none";
-  if (count) count.textContent = n + (n === 1 ? " selezionato" : " selezionati");
+  if (count)
+    count.textContent = n + (n === 1 ? " selezionato" : " selezionati");
   if (all) {
     all.checked = n > 0 && n === boxes.length;
     all.indeterminate = n > 0 && n < boxes.length;
@@ -143,7 +147,9 @@ export async function bulkDelete(entity) {
     if (k > 0) {
       html += `<div style="margin-top:.6rem;">⚠️ <strong>${k}</strong> non eliminabil${k === 1 ? "e" : "i"}:</div><ul style="margin:.4rem 0 0 1.1rem;list-style:disc;">`;
       html += data.saltati
-        .map((s) => `<li><strong>${esc(s.nome)}</strong> — ${esc(s.motivo)}</li>`)
+        .map(
+          (s) => `<li><strong>${esc(s.nome)}</strong> — ${esc(s.motivo)}</li>`,
+        )
         .join("");
       html += "</ul>";
     }

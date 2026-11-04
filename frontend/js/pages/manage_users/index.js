@@ -74,8 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
     endpoint: "/api/users",
     singolare: "utente",
     plurale: "utenti",
-    avviso:
-      "Il tuo account e l'ultimo admin rimasto non verranno eliminati.",
+    avviso: "Il tuo account e l'ultimo admin rimasto non verranno eliminati.",
     anchor: () => $("users-table-body").closest(".overflow-x-auto"),
     onDone: () => fetchCourses().then(fetchUsers),
   });
